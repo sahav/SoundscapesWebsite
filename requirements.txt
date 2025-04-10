@@ -3,3 +3,4 @@ datetime
 tabulate
 ipywidgets
 jupyter
+ipython
