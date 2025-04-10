@@ -1,5 +1,4 @@
 pandas
 datetime
 tabulate
-os
 ipywidgets
