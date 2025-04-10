@@ -4,8 +4,8 @@ project:
 website: 
   page-navigation: true
   title: "NOAA quarto simple" 
-  site-url: "https://nmfs-opensci.github.io/NOAA-quarto-simple" 
-  repo-url: "https://github.com/nmfs-opensci/NOAA-quarto-simple"
+  site-url: "https://ci-cmg.github.io/SoundscapesWebsite/content/" 
+  repo-url: "https://github.com/CI-CMG/SoundscapesWebsite"
   repo-actions: [edit, source, issue]
   favicon: images/favicon.ico
   
