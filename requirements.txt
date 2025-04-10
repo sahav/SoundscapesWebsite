@@ -4,3 +4,4 @@ tabulate
 ipywidgets
 jupyter
 ipython
+openpyxl
