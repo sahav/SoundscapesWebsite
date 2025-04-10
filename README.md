@@ -1,6 +1,6 @@
 [![](https://img.shields.io/badge/Open%20In-RStudio%20Cloud-green)](https://rstudio.cloud/content/4771757) *Try without installing anything. Make sure to click the Make a Copy button or you will lose all your changes.*
  
-# NOAA quarto simple website with R in qmd or Rmd files
+# Soundscapes Website
 
 This is a template for [a simple Quarto website](https://nmfs-opensci.github.io/NOAA-quarto-simple/) (`type: website`). It looks like a html book (`type: book`) but unlike the book type it only has html format and you will not have the download options. `type: website` is a common format for documentation. 
 
