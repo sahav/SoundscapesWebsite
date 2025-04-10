@@ -7,9 +7,16 @@ name: Render and Publish
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    env:
+      RENV_PATHS_ROOT: ~/.local/share/renv
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2 
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+
+      - name: "Install Python deps"
+        run: |
+          pip install -r requirements.txt
         
       - name: Set up R (needed for Rmd)
         uses: r-lib/actions/setup-r@v2
