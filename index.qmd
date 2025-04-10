@@ -3,7 +3,7 @@
 import pandas as pd
 from datetime import date
 from tabulate import tabulate
-from IPython.core.display import display, HTML, Image
+from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
 
