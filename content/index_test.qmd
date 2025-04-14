@@ -81,7 +81,7 @@ editor_options:
 
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What is ocean sound?"]))
+display(HTML(standardTextDict["What is ocean sound??"]))
 ```
 :::
 
@@ -170,7 +170,7 @@ display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
 
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+display(HTML(standardTextDict["How often is ocean sound above wind conditions?"]))
 display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
 infoHtml = f'''
             <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
