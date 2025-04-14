@@ -61,8 +61,8 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
-title: "Soundscape Inventory Report"
-author: "Stellwagen Bank National Marine Sanctuary"
+title: "Soundscape Monitoring Report for Stellwagen Bank National Marine Sanctuary"
+author: "ONMS Sound"
 date: "today"
 output: 
   html_document: 
@@ -87,15 +87,9 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## When, where, & why are we listening?
-
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
-```
-### Ocean sound monitoring within SBNMS 
-```{python}
-#| echo: false
-display(HTML(standardTextDict["SB"]))
 ```
 ### Summary of SBNMS ocean sound monitoring sites
 ```{python}
