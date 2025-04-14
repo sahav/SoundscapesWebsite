@@ -21,11 +21,11 @@ website:
     align: center
     tools: 
       - icon: globe
-        href: https://nmfs-opensci.github.io
-        text: "NMFS Open Science"
+        href: https://sanctuaries.noaa.gov/
+        text: "Office of National Marine Sanctuaries"
       - icon: github
-        href: https://github.com/nmfs-opensci
-        text: "NMFS OpenSci"
+        href: https://github.com/CI-CMG/SoundscapesWebsite
+        text: "ONMS Sound"
 
     style: "docked"
     search: true
@@ -35,7 +35,7 @@ website:
         text: Home
       - href: content/index_test.qmd
         text: Testing Page
-      - href: content/acknowledgements.qmd
+      - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         text: Acknowledgements
 
 format:
