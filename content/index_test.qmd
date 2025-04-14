@@ -91,10 +91,13 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
+```
+### Ocean sound monitoring within SBNMS 
+```{python}
+#| echo: false
 display(HTML(standardTextDict["SB"]))
 ```
-
-### Summary of ocean sound monitoring sites:
+### Summary of SBNMS ocean sound monitoring sites
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
