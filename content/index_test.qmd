@@ -77,9 +77,11 @@ editor_options:
 ---
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## What is ocean sound??
 
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["What is ocean sound?"]))
 ```
 :::
 
@@ -164,6 +166,7 @@ display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## How often is ocean sound above wind conditions?
 
 ```{python}
 #| echo: false
