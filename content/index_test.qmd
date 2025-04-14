@@ -94,6 +94,7 @@ display(HTML(standardTextDict["When, where, & why are we listening?"]))
 ### Summary of SBNMS ocean sound monitoring sites
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["SB"]))
 display(HTML(htmlTable))
 ```
 :::
@@ -129,20 +130,10 @@ display(HTML(infoHtml))
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## What are the latest conditions in ocean sound?
-
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
 display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How often is ship noise above threshold?
-In many nearshore marine environments, vessels are transiting the region for a variety of reasons and <a href="https://link.springer.com/article/10.1007/s10661-024-12497-2">adding noise to the soundscape</a>. Using 100 Hz as an indicator of vessel noise, we measured how often vessel noise is above sound levels at the known wind conditions. This method helps to control for the influence of wind on a soundscape. Specifically, when wind is high, vessel noise exceedance will be lower, compared to lower wind speed conditions.
-```{python}
-#| echo: false
-display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
 ```
 :::
 
@@ -152,14 +143,14 @@ display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind conditions?"]))
-display(HTML(makeButtons("table_***_AISabove.jpg", "TimeSeries")))
+display(HTML(makeButtons("table_***_AboveWind.jpg", "TimeSeries")))
 infoHtml = f'''
             <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
             Time series of results
             </button>
             <dialog id ="infoModal3">
                 <p> </p>
-                {makeButtons("plot_***_AISTimeSeries.jpg", "MonthTable")}
+                {makeButtons("plot_***_Exceed100.jpg", "MonthTable")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
                 Close
                 </button>
@@ -188,6 +179,23 @@ infoHtml = f'''
                 </button>
                 '''
 display(HTML(infoHtml))
+```
+:::
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## How much do vessel speed reduction programs reduce ocean noise?
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["How much do vessel speed reduction programs reduce ocean noise?"]))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## When do biological sounds contribute to the soundscape?
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["When do biological sounds contribute to the soundscape?"]))
 ```
 :::
 
