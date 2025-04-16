@@ -47,9 +47,11 @@ df = pd.read_excel(metaFile, sheet_name="Standard Report Text", engine_kwargs={'
 standardTextDict = pd.Series(df.iloc[:, 3].values, index=df.iloc[:, 1]).to_dict()
 
 for key in standardTextDict:
-    while "**" in standardTextDict[key]:
-        standardTextDict[key] = standardTextDict[key].replace("**", "<b>", 1)
-        standardTextDict[key] = standardTextDict[key].replace("**", "</b>", 1)
+    value = standardTextDict[key]
+    if isinstance(value, str):  # Only process if it's a string
+        while "**" in value:
+            value = value.replace("**", "<b>", 1)
+            value = value.replace("**", "</b>", 1)
 
 df = pd.read_excel(metaFile, sheet_name="SB")
 summaryTable = [list(df.columns.values)]
