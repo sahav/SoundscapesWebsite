@@ -93,8 +93,8 @@ display(HTML('<img src="MBNMS.jpg" alt="MarineLife" width="600">'))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML(makeButtons("gantt_ONMS.jpg", "Gantt")))
 display(HTML(makeButtons("map_ONMS_2024-11-05.jpg", "Map")))
+display(HTML(makeButtons("gantt_ONMS.jpg","Gantt")))
 
 ```
 :::
