@@ -84,7 +84,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
-display(HTML(makeButtons("gantt_ONMS.jpg", "Gantt")))
+display(HTML('<img src="MBNMS.jpg" alt="MarineLife" width="600">'))
 ```
 :::
 
@@ -93,8 +93,9 @@ display(HTML(makeButtons("gantt_ONMS.jpg", "Gantt")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
+display(HTML(makeButtons("gantt_ONMS.jpg", "Gantt")))
 display(HTML(makeButtons("map_ONMS_2024-11-05.jpg", "Map")))
-display(HTML(makeButtons("MBNMS.jpg", "MarineLife")))
+
 ```
 :::
 
