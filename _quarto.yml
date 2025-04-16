@@ -34,9 +34,9 @@ website:
       - href: index.qmd
         text: Home
       - href: content/index_test.qmd
-        text: Testing Page
+        text: Stellwagon Bank
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
-        text: Acknowledgements
+        text: ONMS Sound
 
 format:
   html:
