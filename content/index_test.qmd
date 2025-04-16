@@ -137,11 +137,11 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How often is ocean sound above wind conditions?
+## How often is ocean sound above wind noise?
 
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How often is ocean sound above wind conditions?"]))
+display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
 display(HTML(makeButtons("table_***_AboveWind.jpg", "TimeSeries")))
 infoHtml = f'''
             <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
@@ -180,18 +180,12 @@ infoHtml = f'''
 display(HTML(infoHtml))
 ```
 :::
+
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## How much do vessel speed reduction programs reduce ocean noise?
 
-```{python}
-#| echo: false
-display(HTML(standardTextDict["How much do vessel speed reduction programs reduce ocean noise?"]))
-```
-:::
-
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## When do biological sounds contribute to the soundscape?
-
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When do biological sounds contribute to the soundscape?"]))
@@ -200,7 +194,6 @@ display(HTML(standardTextDict["When do biological sounds contribute to the sound
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## What are we learning?
-
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are we learning?"]))
