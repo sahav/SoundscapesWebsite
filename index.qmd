@@ -42,6 +42,7 @@ def makeImage(imageName, identifier):
     path = inputDir + imageName
     path += "?raw=true"
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    return initialImage
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
