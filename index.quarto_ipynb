@@ -1,0 +1,205 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| include: false\n",
+        "import pandas as pd\n",
+        "from datetime import date\n",
+        "from tabulate import tabulate\n",
+        "from IPython.display import display, HTML, Image\n",
+        "import os\n",
+        "import ipywidgets as widgets\n",
+        "\n",
+        "\n",
+        "sites = [\"sb01\", \"sb03\"]\n",
+        "\n",
+        "def makeButtons(generalFormat, identifier):\n",
+        "    buttons = \"\"\n",
+        "    scripts = \"\"\n",
+        "    inputDir = \"https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/\"\n",
+        "    path = inputDir + generalFormat\n",
+        "    path = path.replace(\"***\", sites[0])\n",
+        "    path += \"?raw=true\"\n",
+        "    initialImage = f'<img src=\"{path}\" width=\"700\" id=\"{identifier}\">'\n",
+        "    if len(sites) == 1:\n",
+        "        return initialImage\n",
+        "    \n",
+        "    for site in sites:\n",
+        "        path = inputDir + generalFormat\n",
+        "        path = path.replace(\"***\", site)\n",
+        "        path += \"?raw=true\"\n",
+        "        \n",
+        "        buttons += f'<button onclick=\"{site}{identifier}()\" style=\"padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;\">{site}</button>'\n",
+        "        scripts += f\"\"\"\n",
+        "                    <script>\n",
+        "                    function {site}{identifier}() {{\n",
+        "                        var imgElement = document.getElementById('{identifier}');\n",
+        "                        imgElement.src = \"{path}\";\n",
+        "                    }}\n",
+        "                    </script>\n",
+        "        \"\"\"\n",
+        "    return buttons + initialImage + scripts\n",
+        "  \n",
+        "def makeImage(imageName, identifier):\n",
+        "    inputDir = \"https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/\"\n",
+        "    path = inputDir + imageName\n",
+        "    path += \"?raw=true\"\n",
+        "    initialImage = f'<img src=\"{path}\" width=\"700\" id=\"{identifier}\">'\n",
+        "\n",
+        "inputDir = os.path.normpath(os.path.join(os.getcwd(), \"resources\"))\n",
+        "metaFile = os.path.join(inputDir, \"ONMSSound_IndicatorCategories.xlsx\")\n",
+        "metadata = pd.read_excel(metaFile, sheet_name=\"Summary\", header=1)\n",
+        "lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]\n",
+        "dicts = [l.to_dict() for l in lookup]\n",
+        "\n",
+        "df = pd.read_excel(metaFile, sheet_name=\"Standard Report Text\", engine_kwargs={'keep_links': True})\n",
+        "standardTextDict = pd.Series(df.iloc[:, 3].values, index=df.iloc[:, 1]).to_dict()\n",
+        "\n",
+        "for key in standardTextDict:\n",
+        "    value = standardTextDict[key]\n",
+        "    if isinstance(value, str):  # Only process if it's a string\n",
+        "        while \"**\" in value:\n",
+        "            value = value.replace(\"**\", \"<b>\", 1)\n",
+        "            value = value.replace(\"**\", \"</b>\", 1)\n",
+        "        standardTextDict[key] = value\n",
+        "\n",
+        "df = pd.read_excel(metaFile, sheet_name=\"SB\")\n",
+        "summaryTable = [list(df.columns.values)]\n",
+        "for i in range(len(summaryTable[0])):\n",
+        "    summaryTable[0][i] = summaryTable[0][i].replace(\" \", \".\")\n",
+        "summaryTable.extend(df.values.tolist())\n",
+        "\n",
+        "htmlTable = tabulate(summaryTable, tablefmt=\"html\")"
+      ],
+      "id": "4a198f21",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Ocean Sound Monitoring\"\n",
+        "author: \"Office of National Marine Sanctuaries\"\n",
+        "date: \"today\"\n",
+        "output: \n",
+        "  html_document: \n",
+        "    fig_caption: true\n",
+        "params:\n",
+        "  author: \"Stellwagen Bank National Marine Sanctuary\"\n",
+        "  abrv: \"SBNMS\"\n",
+        "  sitetype: \"nearshore\"\n",
+        "editor_options: \n",
+        "  markdown: \n",
+        "    wrap: 72\n",
+        "---\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## What is ocean sound?"
+      ],
+      "id": "18b0d154"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"What is ocean sound?\"]))\n",
+        "display(HTML(makeImage(\"MBNMS.jpg\", \"MarineLife\")))"
+      ],
+      "id": "01583443",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Ocean Sound Monitoring"
+      ],
+      "id": "aafa0e2d"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"When, where, & why are we listening?\"]))\n",
+        "display(HTML(makeImage(\"map_ONMS_2024-11-05.jpg\", \"Map\")))\n",
+        "display(HTML(makeImage(\"gantt_ONMS.jpg\",\"Gantt\")))"
+      ],
+      "id": "31513af6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## What is a soundscape?"
+      ],
+      "id": "786695e2"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"What is a soundscape?\"]))\n",
+        "display(HTML(makeImage(\"plot_sb01_SeasonalSPL.jpg\", \"Seasons\")))"
+      ],
+      "id": "efb8458a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## What are we learning?"
+      ],
+      "id": "8fd15dcc"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"What are we learning?\"]))"
+      ],
+      "id": "9ebac4a3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::"
+      ],
+      "id": "03d17f2f"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "/Users/quca3108/Applications/miniconda3/share/jupyter/kernels/python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

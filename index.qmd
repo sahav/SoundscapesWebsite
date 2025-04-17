@@ -36,6 +36,12 @@ def makeButtons(generalFormat, identifier):
                     </script>
         """
     return buttons + initialImage + scripts
+  
+def makeImage(imageName, identifier):
+    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    path = inputDir + imageName
+    path += "?raw=true"
+    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
@@ -84,7 +90,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
-display(HTML('<img src="MBNMS.jpg" alt="MarineLife" width="600">'))
+display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 ```
 :::
 
@@ -93,8 +99,8 @@ display(HTML('<img src="MBNMS.jpg" alt="MarineLife" width="600">'))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML(makeButtons("map_ONMS_2024-11-05.jpg", "Map")))
-display(HTML(makeButtons("gantt_ONMS.jpg","Gantt")))
+display(HTML(makeImage("map_ONMS_2024-11-05.jpg", "Map")))
+display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 
 ```
 :::
@@ -104,7 +110,7 @@ display(HTML(makeButtons("gantt_ONMS.jpg","Gantt")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
-display(HTML(makeButtons("plot_sb01_SeasonalSPL.jpg", "Seasons")))
+display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ```
 :::
 
