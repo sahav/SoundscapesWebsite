@@ -101,7 +101,7 @@ display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(makeImage("map_ONMS_2024-11-05.jpg", "Map")))
-display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
+display(HTML(makeImage("gantt_ONMS_2024-11-05.jpg","Gantt")))
 
 ```
 :::
