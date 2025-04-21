@@ -35,6 +35,8 @@ website:
         text: Home
       - href: content/index_test.qmd
         text: Stellwagon Bank
+      - href: content/mb.qmd
+        text: Monterey Bay
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         text: Project Home Page
 
