@@ -7,6 +7,7 @@ from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
 
+sites = ["sb01", "sb03"]
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
