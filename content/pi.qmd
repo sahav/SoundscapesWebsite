@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["mb01", "mb02"]
+sites = ["pm01"]
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
@@ -53,7 +53,7 @@ for key in standardTextDict:
             value = value.replace("**", "<b>", 1)
             value = value.replace("**", "</b>", 1)
 
-df = pd.read_excel(metaFile, sheet_name="SB")
+df = pd.read_excel(metaFile, sheet_name="PM")
 summaryTable = [list(df.columns.values)]
 for i in range(len(summaryTable[0])):
     summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
@@ -63,56 +63,24 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
-title: "Soundscape Inventory Report"
-author: "Stellwagen Bank National Marine Sanctuary"
+title: "Pacific Islands Marine Sanctuary Soundscape Report"
+author: "draft"
 date: "today"
 output: 
   html_document: 
     fig_caption: true
-params:
-  author: "Stellwagen Bank National Marine Sanctuary"
-  abrv: "SBNMS"
-  sitetype: "nearshore"
 editor_options: 
   markdown: 
     wrap: 72
 ---
-
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What is ocean sound?
-
+## Where are we listening?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What is ocean sound?"]))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## When, where, & why are we listening?
-
-```{python}
-#| echo: false
-display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML("""The <a href="https://stellwagen.noaa.gov">Stellwagen Bank National Marine Sanctuary</a> is a wild ocean 
-                place near an urban world, sits east of Boston, Massachusetts between Cape Ann and Cape Cod. 
-                Historically important as a fishing ground, New England’s only national marine sanctuary now reigns as 
-                a premier whale watching destination and continues to support commercial and recreational fishing.<br><br>
-               <b>Ocean sound monitoring</b> within <b>SBNMS</b> has a long history of underwater acoustic monitoring with 
-               a focus on monitoring of 
-               <a href="https://www.frontiersin.org/journals/remote-sensing/articles/10.3389/frsen.2022.970401/full">
-               marine mammal</a>, including the endangered North Atlantic Right Whale presence. As well as 
-               <a href="https://link.springer.com/article/10.1007/s10661-024-12497-2">noise reduction</a> during 
-               <a href="https://www.fisheries.noaa.gov/national/endangered-species-conservation/reducing-vessel-strikes-north-atlantic-right-whales#current-vessel-speed-restrictions">
-               vessel speed reduction programs</a>.<br><br>
-               <b>Current ocean sound monitoring and analysis</b> is maintained at four sites within <b>SBNMS</b>. Two sites 
-               (SB01, SB02, SB03) are located more inshore, capturing more local vessel activity and sounds from nearshore 
-               species. The one offshore sites (NRS09) capture patterns in migrating whales and transiting commercial vessel 
-               traffic and is part of the 
-               <a href="https://www.pmel.noaa.gov/acoustics/noaanps-ocean-noise-reference-station-network">
-               US Ocean Noise Reference Station Network.</a></p>"""))
+#display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 ```
 
-### Summary of ocean sound monitoring sites:
+### Ocean sound monitoring sites
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
@@ -120,7 +88,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What is a soundscape?
+## Soundscape Overview for Pacific Islands National Marine Sanctuary
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
@@ -159,64 +127,23 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How often is ship noise above threshold?
-In many nearshore marine environments, vessels are transiting the region for a variety of reasons and <a href="https://link.springer.com/article/10.1007/s10661-024-12497-2">adding noise to the soundscape</a>. Using 100 Hz as an indicator of vessel noise, we measured how often vessel noise is above sound levels at the known wind conditions. This method helps to control for the influence of wind on a soundscape. Specifically, when wind is high, vessel noise exceedance will be lower, compared to lower wind speed conditions.
-```{python}
-#| echo: false
-display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How much noise do nearby ships contribute to the soundscape?
+## How often is ocean sound above wind noise?
 
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
+display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
+display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
 infoHtml = f'''
-            <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
-            Table of results
-            </button>
-            <dialog id="infoModal3">
-                <p>Summary of sound level increase when ships nearby. Calculated as monthly average from daily differences in 125 Hz sound levels when AIS ships nearby verse no ships nearby.</p>
-                {makeButtons("table_***_AISabove.jpg", "MonthTable")}
-                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
-                Close
-                </button>
+<button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
+  Table of results
+  </button>
+  <dialog id="infoModal3">
+  <p>ADD DESCRIPTION</p>
+  {makeButtons("table_***_AboveWind.jpg", "MonthTable")}
+  <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
+    Close
+    </button>
                 '''
 display(HTML(infoHtml))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How much noise do nearby ships contribute to the soundscape?
-
-```{python}
-#| echo: false
-display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_AIShist.jpg", "Hist")))
-infoHtml = f'''
-            <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).showModal()">
-            Table of results
-            </button>
-            
-            <dialog id="infoModal4">
-                <p>Summary of nearby AIS ship traffic.</p>
-                {makeButtons("table_***_AIShist.jpg", "TableHist")}
-                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).close()">
-                Close
-                </button>
-                '''
-display(HTML(infoHtml))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What are we learning?
-
-```{python}
-#| echo: false
-display(HTML(standardTextDict["What are we learning?"]))
 ```
 :::
