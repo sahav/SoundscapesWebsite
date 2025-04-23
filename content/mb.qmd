@@ -163,6 +163,6 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When do biological sounds contribute to the soundscape?"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "Fish Chorus")))
+display(HTML(makeButtons("plot_***_FinalRosePlot.jpg", "Fish Chorus")))
 ```
 :::
