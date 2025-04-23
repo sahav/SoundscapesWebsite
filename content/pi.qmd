@@ -64,7 +64,6 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 
 ---
 title: "Papahānaumokuākea National Monument Soundscape Report"
-author: "draft"
 date: "today"
 output: 
   html_document: 

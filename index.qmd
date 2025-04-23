@@ -71,7 +71,6 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 
 ---
 title: "Ocean Sound Monitoring in U.S. National Marine Sanctuaries"
-author: "draft"
 date: "today"
 output: 
   html_document: 
