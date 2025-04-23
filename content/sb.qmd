@@ -84,7 +84,7 @@ editor_options:
 ## Where are we listening?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Stellwagen Bank National Marine Sanctuary"]))
+display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 ```
 
 ### Ocean sound monitoring sites
