@@ -82,11 +82,6 @@ editor_options:
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Where are we listening?
-The <a href=https://montereybay.noaa.gov//">Monterey Bay National Marine Sanctuary (MBNMS)</a> offers some of the best wildlife viewing in the world! This "Serengeti of the Sea" stretches along the central coast from San Francisco to Cambria and includes pristine beaches, jewel-like tide pools, lush kelp forests, steep canyons and an offshore seamount teeming with life—from tiny shrimp to giant blue whales.
-<br><br>
-Ocean sound monitoring coordinated by ONMS began in 2019, however, a long history of underwater acoustic monitoring has occurred in this sanctuary <a href=https://pubs.aip.org/asa/arlo/article/3/2/65/123823/Ocean-ambient-sound-Comparing-the-1960s-with-the">[1]</a>. Further, the Monterey Bay Aquarium Research Institute (MBARI) supports a continuous real-time monitoring effort within the sanctuary that began in 2015, known as the <a href=https://www.mbari.org/project/soundscape-listening-room/">Soundscape Listening Room</a>. 
-
-Collectively, these underwater sound monitoring efforts have provided key insights on <a href=https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-024-00500-x">cryptic species</a>, <a href=https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2435.14013">whale migration patterns and drivers</a>, <a href=https://pubs.aip.org/asa/jasa/article/153/3/1710/2881267)">methods for detecting fish sounds</a>, and <a href=https://pubs.aip.org/asa/arlo/article/3/2/65/123823/Ocean-ambient-sound-Comparing-the-1960s-with-the">steady rise in ocean noise levels</a>, to highlight a few.
 
 ```{python}
 #| echo: false
@@ -168,6 +163,6 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When do biological sounds contribute to the soundscape?"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.png", "Fish Chorus")))
+display(HTML(makeImage("plot_***_FinalRosePlot.pjpg", "Fish Chorus")))
 ```
 :::
