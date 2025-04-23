@@ -39,7 +39,7 @@ website:
         text: Monterey Bay
       - href: content/oc.qmd
         text: Olympic Coast 
-       - href: content/pi.qmd
+      - href: content/pi.qmd
         text: Papahānaumokuākea
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         text: Project Home Page
