@@ -77,10 +77,6 @@ editor_options:
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Where are we listening?
-The <a href=https://stellwagen.noaa.gov/">Stellwagen Bank National Marine Sanctuary (SBNMS)</a> is a wild ocean place near an urban world, sits east of Boston, Massachusetts between Cape Ann and Cape Cod.  Historically important as a fishing ground, New England’s only national marine sanctuary now reigns as  a premier whale watching destination and continues to support commercial and recreational fishing.
-<br><br>
-Ocean sound monitoring within SBNMS has a long history of underwater acoustic monitoring with a focus on monitoring of marine mammal, including the endangered North Atlantic Right Whale presence. As well as noise reduction during vessel speed reduction programs. Current ocean sound monitoring and analysis is maintained at four sites within SBNMS. Three sites (SB01, SB02, SB03) are located more inshore, capturing more local vessel activity and sounds from nearshore species. The one offshore sites (NRS09) capture patterns in migrating whales and transiting commercial vessel traffic and is part of the <a href=https://www.pmel.noaa.gov/acoustics/noaanps-ocean-noise-reference-station-network">US Ocean Noise Reference Station Network.</a>
-
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["SBNMS"]))
@@ -97,7 +93,7 @@ display(HTML(htmlTable))
 ## Soundscape Overview for Stellwagen Bank National Marine Sanctuary
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What is a soundscape?"]))
+#display(HTML(standardTextDict["What is a soundscape?"]))
 display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
@@ -144,7 +140,7 @@ infoHtml = f'''
   Table of results
   </button>
   <dialog id="infoModal3">
-  <p>ADD DESCRIPTION</p>
+  <p>Percent Time Above Wind Noise</p>
   {makeButtons("table_***_AboveWind.jpg", "MonthTable")}
   <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
     Close

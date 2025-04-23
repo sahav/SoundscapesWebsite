@@ -96,6 +96,10 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
+```
+### Example soundscape
+```{python}
+#| echo: false
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ```
 :::

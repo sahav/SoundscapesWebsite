@@ -138,7 +138,7 @@ infoHtml = f'''
   Table of results
   </button>
   <dialog id="infoModal3">
-  <p>ADD DESCRIPTION</p>
+  <p>Percent Time Above Wind Noise</p>
   {makeButtons("table_***_AboveWind.jpg", "MonthTable")}
   <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
     Close
