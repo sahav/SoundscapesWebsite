@@ -80,27 +80,9 @@ editor_options:
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Where are we listening?
-
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML("""The <a href="https://stellwagen.noaa.gov">Stellwagen Bank National Marine Sanctuary</a> is a wild ocean 
-                place near an urban world, sits east of Boston, Massachusetts between Cape Ann and Cape Cod. 
-                Historically important as a fishing ground, New England’s only national marine sanctuary now reigns as 
-                a premier whale watching destination and continues to support commercial and recreational fishing.<br><br>
-               <b>Ocean sound monitoring</b> within <b>SBNMS</b> has a long history of underwater acoustic monitoring with 
-               a focus on monitoring of 
-               <a href="https://www.frontiersin.org/journals/remote-sensing/articles/10.3389/frsen.2022.970401/full">
-               marine mammal</a>, including the endangered North Atlantic Right Whale presence. As well as 
-               <a href="https://link.springer.com/article/10.1007/s10661-024-12497-2">noise reduction</a> during 
-               <a href="https://www.fisheries.noaa.gov/national/endangered-species-conservation/reducing-vessel-strikes-north-atlantic-right-whales#current-vessel-speed-restrictions">
-               vessel speed reduction programs</a>.<br><br>
-               <b>Current ocean sound monitoring and analysis</b> is maintained at four sites within <b>SBNMS</b>. Two sites 
-               (SB01, SB02, SB03) are located more inshore, capturing more local vessel activity and sounds from nearshore 
-               species. The one offshore sites (NRS09) capture patterns in migrating whales and transiting commercial vessel 
-               traffic and is part of the 
-               <a href="https://www.pmel.noaa.gov/acoustics/noaanps-ocean-noise-reference-station-network">
-               US Ocean Noise Reference Station Network.</a></p>"""))
+display(HTML(standardTextDict["Stellwagen Bank National Marine Sanctuary"]))
 ```
 
 ### Ocean sound monitoring sites
