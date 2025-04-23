@@ -91,7 +91,7 @@ display(HTML(htmlTable))
 ## Soundscape Overview for Olympic Coast National Marine Sanctuary
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What is a soundscape?"]))
+#display(HTML(standardTextDict["What is a soundscape?"]))
 display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
