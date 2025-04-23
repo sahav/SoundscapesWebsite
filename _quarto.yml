@@ -33,12 +33,17 @@ website:
     contents:
       - href: index.qmd
         text: Home
+text: East Coast Region
       - href: content/sb.qmd
         text: Stellwagen Bank
+text: West Coast Region
       - href: content/mb.qmd
         text: Monterey Bay
-      - href: content/pi.qmd
-        text: Pacific Islands
+      - href: content/oc.qmd
+        text: Olympic Coast 
+text: Pacific Islands Region
+       - href: content/pi.qmd
+        text: Papahānaumokuākea
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         text: Project Home Page
 
