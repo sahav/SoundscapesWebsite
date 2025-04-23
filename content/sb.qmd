@@ -45,7 +45,7 @@ lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]
 dicts = [l.to_dict() for l in lookup]
 
 df = pd.read_excel(metaFile, sheet_name="Standard Report Text", engine_kwargs={'keep_links': True})
-standardTextDict = pd.Series(df.iloc[:, 3].values, index=df.iloc[:, 1]).to_dict()
+standardTextDict = pd.Series(df.iloc[:, 3].values, index = df.iloc[:, 1]).to_dict()
 
 for key in standardTextDict:
     value = standardTextDict[key]
