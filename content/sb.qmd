@@ -156,16 +156,6 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
 display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How much noise do nearby ships contribute to the soundscape?
-
-```{python}
-#| echo: false
-display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
   Table of results
@@ -178,6 +168,16 @@ infoHtml = f'''
     </button>
                 '''
 display(HTML(infoHtml))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## How much noise do nearby ships contribute to the soundscape?
+Can I add text here??
+```{python}
+#| echo: false
+display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+# display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
 ```
 :::
 
