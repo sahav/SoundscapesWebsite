@@ -86,6 +86,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["MBNMS"]))
+
 display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 ```
 
@@ -131,6 +132,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+
 display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
@@ -141,6 +143,7 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
+
 display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
