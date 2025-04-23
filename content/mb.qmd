@@ -10,6 +10,13 @@ import ipywidgets as widgets
 
 sites = ["mb01", "mb02"]
 
+def makeImage(imageName, identifier):
+    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    path = inputDir + imageName
+    path += "?raw=true"
+    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    return initialImage
+
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
