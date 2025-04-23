@@ -66,15 +66,10 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 
 ---
 title: "Stellwagen Bank National Marine Sanctuary Soundscape Report"
-author: "draft"
 date: "today"
 output: 
   html_document: 
     fig_caption: true
-params:
-  author: "Stellwagen Bank National Marine Sanctuary"
-  abrv: "SBNMS"
-  sitetype: "nearshore"
 editor_options: 
   markdown: 
     wrap: 72
