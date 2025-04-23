@@ -63,7 +63,7 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
-title: "Pacific Islands Marine Sanctuary Soundscape Report"
+title: "Papahānaumokuākea National Monument Soundscape Report"
 author: "draft"
 date: "today"
 output: 
@@ -73,11 +73,12 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Where are we listening?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+display(HTML(standardTextDict["PINMS"]))
 ```
 
 ### Ocean sound monitoring sites
@@ -88,7 +89,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview for Pacific Islands National Marine Sanctuary
+## Soundscape Overview for Papahānaumokuākea National Monument
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
