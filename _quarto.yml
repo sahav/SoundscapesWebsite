@@ -39,6 +39,8 @@ website:
         text: Monterey Bay
       - href: content/oc.qmd
         text: Olympic Coast 
+      - href: content/cb.qmd
+        text: Cordell Bank
       - href: content/pi.qmd
         text: Papahānaumokuākea
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
