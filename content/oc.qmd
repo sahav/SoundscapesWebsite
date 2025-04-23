@@ -83,7 +83,7 @@ editor_options:
 ### Ocean sound monitoring sites
 ```{python}
 #| echo: false
-display(HTML(htmlTable))
+# display(HTML(htmlTable))
 ```
 :::
 
