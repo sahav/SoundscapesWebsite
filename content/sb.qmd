@@ -36,7 +36,8 @@ def makeButtons(generalFormat, identifier):
                     </script>
         """
     return buttons + initialImage + scripts
-
+  
+# input table for standard
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
 metadata = pd.read_excel(metaFile, sheet_name="Summary", header=1)
@@ -53,11 +54,12 @@ for key in standardTextDict:
             value = value.replace("**", "<b>", 1)
             value = value.replace("**", "</b>", 1)
 
-df = pd.read_excel(metaFile, sheet_name="SB")
-summaryTable = [list(df.columns.values)]
+# input table for site information
+df1 = pd.read_excel(metaFile, sheet_name="SB")
+summaryTable = [list(df1.columns.values)]
 for i in range(len(summaryTable[0])):
     summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
-summaryTable.extend(df.values.tolist())
+summaryTable.extend(df1.values.tolist())
 
 htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
