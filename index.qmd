@@ -8,8 +8,6 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["sb01", "sb03"]
-
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
@@ -71,23 +69,19 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
-title: "Ocean Sound Monitoring"
+title: "Ocean Sound Monitoring in U.S. National Marine Sanctuaries"
 author: "draft"
 date: "today"
 output: 
   html_document: 
     fig_caption: true
-params:
-  author: "Stellwagen Bank National Marine Sanctuary"
-  abrv: "SBNMS"
-  sitetype: "nearshore"
 editor_options: 
   markdown: 
     wrap: 72
 ---
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What is ocean sound?
+## Why are we monitoring ocean sound?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
@@ -96,12 +90,12 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean Sound Monitoring
+## Where are we listening?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(makeImage("map_ONMS_2024-11-05.jpg", "Map")))
-display(HTML(makeImage("gantt_ONMS_2024-11-05.jpg","Gantt")))
+display(HTML(makeImage("gantt_ONMS_2025-04-22.jpg","Gantt")))
 
 ```
 :::

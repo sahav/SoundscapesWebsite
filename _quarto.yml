@@ -37,6 +37,8 @@ website:
         text: Stellwagen Bank
       - href: content/mb.qmd
         text: Monterey Bay
+      - href: content/pi.qmd
+        text: Pacific Islands
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         text: Project Home Page
 

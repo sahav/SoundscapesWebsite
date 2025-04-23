@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["sb01", "sb03"]
+sites = ["mb01", "mb02"]
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
@@ -63,8 +63,8 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
-title: "Stellwagen Bank National Marine Sanctuary Soundscape Report"
-author: "draft"
+title: "Soundscape Inventory Report"
+author: "Stellwagen Bank National Marine Sanctuary"
 date: "today"
 output: 
   html_document: 
@@ -79,7 +79,16 @@ editor_options:
 ---
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Where are we listening?
+## What is ocean sound?
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["What is ocean sound?"]))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## When, where, & why are we listening?
 
 ```{python}
 #| echo: false
@@ -103,7 +112,7 @@ display(HTML("""The <a href="https://stellwagen.noaa.gov">Stellwagen Bank Nation
                US Ocean Noise Reference Station Network.</a></p>"""))
 ```
 
-### Ocean sound monitoring sites
+### Summary of ocean sound monitoring sites:
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
@@ -111,7 +120,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview for Stellwagen Bank National Marine Sanctuary
+## What is a soundscape?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
@@ -150,12 +159,11 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How often is ocean sound above wind noise?
-
+## How often is ship noise above threshold?
+In many nearshore marine environments, vessels are transiting the region for a variety of reasons and <a href="https://link.springer.com/article/10.1007/s10661-024-12497-2">adding noise to the soundscape</a>. Using 100 Hz as an indicator of vessel noise, we measured how often vessel noise is above sound levels at the known wind conditions. This method helps to control for the influence of wind on a soundscape. Specifically, when wind is high, vessel noise exceedance will be lower, compared to lower wind speed conditions.
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
-display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
+display(HTML(makeButtons("plot_***_125Hz.jpg", "Freq")))
 ```
 :::
 
@@ -167,17 +175,48 @@ display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
 infoHtml = f'''
-<button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
-  Table of results
-  </button>
-  <dialog id="infoModal3">
-  <p>ADD DESCRIPTION</p>
-  {makeButtons("table_***_AboveWind.jpg", "MonthTable")}
-  <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
-    Close
-    </button>
+            <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
+            Table of results
+            </button>
+            <dialog id="infoModal3">
+                <p>Summary of sound level increase when ships nearby. Calculated as monthly average from daily differences in 125 Hz sound levels when AIS ships nearby verse no ships nearby.</p>
+                {makeButtons("table_***_AISabove.jpg", "MonthTable")}
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
+                Close
+                </button>
                 '''
 display(HTML(infoHtml))
 ```
 :::
 
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## How much noise do nearby ships contribute to the soundscape?
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+display(HTML(makeButtons("plot_***_AIShist.jpg", "Hist")))
+infoHtml = f'''
+            <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).showModal()">
+            Table of results
+            </button>
+            
+            <dialog id="infoModal4">
+                <p>Summary of nearby AIS ship traffic.</p>
+                {makeButtons("table_***_AIShist.jpg", "TableHist")}
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).close()">
+                Close
+                </button>
+                '''
+display(HTML(infoHtml))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## What are we learning?
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["What are we learning?"]))
+```
+:::
