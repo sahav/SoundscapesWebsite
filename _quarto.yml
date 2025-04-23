@@ -33,8 +33,8 @@ website:
     contents:
       - href: index.qmd
         text: Home
-      - href: content/index_test.qmd
-        text: Stellwagon Bank
+      - href: content/sb.qmd
+        text: Stellwagen Bank
       - href: content/mb.qmd
         text: Monterey Bay
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/

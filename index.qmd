@@ -72,7 +72,7 @@ htmlTable = tabulate(summaryTable, tablefmt="html")
 
 ---
 title: "Ocean Sound Monitoring"
-author: "Office of National Marine Sanctuaries"
+author: "draft"
 date: "today"
 output: 
   html_document: 
@@ -91,7 +91,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
-display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
+#display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 ```
 :::
 
