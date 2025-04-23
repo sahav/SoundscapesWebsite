@@ -151,12 +151,10 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How much noise do nearby ships contribute to the soundscape?
-Can I add text here?? Instead of using the table
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-# display(HTML(makeButtons("plot_***_AISTimeSeries.jpg", "TimeSeries")))
+display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
 ```
 :::
 
