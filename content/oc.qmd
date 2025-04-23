@@ -53,7 +53,7 @@ for key in standardTextDict:
             value = value.replace("**", "<b>", 1)
             value = value.replace("**", "</b>", 1)
 
-df = pd.read_excel(metaFile, sheet_name="MB")
+df = pd.read_excel(metaFile, sheet_name="OC")
 summaryTable = [list(df.columns.values)]
 for i in range(len(summaryTable[0])):
     summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
@@ -77,7 +77,7 @@ editor_options:
 ## Where are we listening?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["PINMS"]))
+display(HTML(standardTextDict["PINMS"]))
 ```
 
 ### Ocean sound monitoring sites

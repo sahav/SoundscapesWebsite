@@ -83,7 +83,7 @@ Collectively, these underwater sound monitoring efforts have provided key insigh
 
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["MBNMS"]))
+display(HTML(standardTextDict["MBNMS"]))
 ```
 
 ### Ocean sound monitoring sites

@@ -83,7 +83,7 @@ Ocean sound monitoring within SBNMS has a long history of underwater acoustic mo
 
 ```{python}
 #| echo: false
-# display(HTML(standardTextDict["SBNMS"]))
+display(HTML(standardTextDict["SBNMS"]))
 ```
 
 ### Ocean sound monitoring sites

@@ -77,7 +77,7 @@ editor_options:
 ## Where are we listening?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["PINMS"]))
+display(HTML(standardTextDict["PINMS"]))
 ```
 
 ### Ocean sound monitoring sites
