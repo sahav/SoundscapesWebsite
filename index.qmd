@@ -88,12 +88,11 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(makeImage("map_ONMS_2024-11-05.jpg", "Map")))
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
-
 ```
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What is a soundscape?
+## Visualizing Ocean Sound
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is a soundscape?"]))
