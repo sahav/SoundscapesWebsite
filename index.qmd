@@ -77,7 +77,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
-
+#display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 ```
 :::
 
