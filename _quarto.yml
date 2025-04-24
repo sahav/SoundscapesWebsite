@@ -14,8 +14,8 @@ website:
     left: "&copy; CC-1.0"
   
   sidebar:
-    background: "#D9E3E4"
-    logo: images/NMSS Logo_Vertical_White Text.png
+    background: "#AABFC1"
+    logo: images/onms-logo-no-text-800.png
     favicon: images/favicon.ico
     pinned: true
     align: center
