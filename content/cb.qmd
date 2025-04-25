@@ -93,7 +93,7 @@ display(HTML(htmlTable))
 ## Soundscape Overview
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["What is a soundscape?"]))
+display(HTML(standardTextDict["Soundscape Overview"]))
 display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
