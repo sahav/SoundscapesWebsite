@@ -88,7 +88,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview for Papahānaumokuākea National Monument
+## Soundscape Overview
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["What is a soundscape?"]))

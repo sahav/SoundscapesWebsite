@@ -77,18 +77,18 @@ editor_options:
 ## Where are we listening?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["PINMS"]))
+display(HTML(standardTextDict["OCNMS"]))
 ```
 
 ### Ocean sound monitoring sites
 ```{python}
 #| echo: false
-# display(HTML(htmlTable))
+display(HTML(htmlTable))
 ```
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview for Olympic Coast National Marine Sanctuary
+## Soundscape Overview
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["What is a soundscape?"]))
