@@ -82,13 +82,13 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Where are we listening?
+## Overview of Ocean Sound Monitoring Effort
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(makeImage("map_ONMS.jpg", "Map")))
 ```
-### Overview of Ocean Sound Monitoring Effort
+### Summary of ublicly available ONMS Ocean Sound data
 ```{python}
 #| echo: false
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
