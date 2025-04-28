@@ -88,7 +88,7 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(makeImage("map_ONMS.jpg", "Map")))
 ```
-### Summary of publicly available ONMS Ocean Sound data
+### summary of publicly available ONMS Ocean Sound data
 ```{python}
 #| echo: false
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
@@ -105,7 +105,7 @@ display(HTML(makeImage("sanctsound_scene.jpg", "MarineLife")))
 
 display(HTML(standardTextDict["What is a soundscape?"]))
 ```
-### Example soundscape
+### example soundscape
 ```{python}
 #| echo: false
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
