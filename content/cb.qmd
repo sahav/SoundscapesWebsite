@@ -56,7 +56,7 @@ for key in standardTextDict:
 
 # input table for site information
 # input table for site information
-df1 = pd.read_excel(metaFile, sheet_name="SB")
+df1 = pd.read_excel(metaFile, sheet_name="CB")
 
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 

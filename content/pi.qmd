@@ -54,7 +54,7 @@ for key in standardTextDict:
             value = value.replace("**", "</b>", 1)
 
 # input table for site information
-df1 = pd.read_excel(metaFile, sheet_name="SB")
+df1 = pd.read_excel(metaFile, sheet_name="PM")
 
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 
