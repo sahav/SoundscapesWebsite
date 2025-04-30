@@ -56,9 +56,9 @@ for key in standardTextDict:
 
 # input table for site information
 df1 = pd.read_excel(metaFile, sheet_name="SB")
-summaryTable = [list(df1.columns.values)]
-for i in range(len(summaryTable[0])):
-    summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
+
+summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
+
 summaryTable.extend(df1.values.tolist())
 
 htmlTable = tabulate(summaryTable, tablefmt="unsafehtml")
