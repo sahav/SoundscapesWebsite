@@ -61,7 +61,8 @@ for i in range(len(summaryTable[0])):
     summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
 summaryTable.extend(df1.values.tolist())
 
-htmlTable = tabulate(summaryTable, tablefmt="html")
+htmlTable = tabulate(summaryTable, tablefmt="unsafehtml")
+
 ```
 
 ---
