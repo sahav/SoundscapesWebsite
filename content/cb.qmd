@@ -55,13 +55,21 @@ for key in standardTextDict:
             value = value.replace("**", "</b>", 1)
 
 # input table for site information
-df1 = pd.read_excel(metaFile, sheet_name="CB")
-summaryTable = [list(df1.columns.values)]
-for i in range(len(summaryTable[0])):
-    summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
+# input table for site information
+df1 = pd.read_excel(metaFile, sheet_name="SB")
+
+summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
+
 summaryTable.extend(df1.values.tolist())
 
-htmlTable = tabulate(summaryTable, tablefmt="html")
+htmlTable = '<div style="overflow-x: auto;">' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
+
+#df1 = pd.read_excel(metaFile, sheet_name="CB")
+#summaryTable = [list(df1.columns.values)]
+#for i in range(len(summaryTable[0])):
+    #summaryTable[0][i] = summaryTable[0][i].replace(" ", ".")
+#summaryTable.extend(df1.values.tolist())
+#htmlTable = tabulate(summaryTable, tablefmt="html")
 ```
 
 ---
