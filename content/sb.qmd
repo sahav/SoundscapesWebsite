@@ -61,7 +61,8 @@ summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spac
 
 summaryTable.extend(df1.values.tolist())
 
-htmlTable = tabulate(summaryTable, tablefmt="unsafehtml")
+htmlTable = '<div style="overflow-x: auto;">' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
+#htmlTable = tabulate(summaryTable, tablefmt="unsafehtml")
 
 ```
 
