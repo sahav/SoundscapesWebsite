@@ -64,7 +64,7 @@ htmlTable = '<div style="overflow-x: auto;">' + tabulate(summaryTable, tablefmt=
 ```
 
 ---
-title: "Papahānaumokuākea National Monument Soundscape Report"
+title: "Papahānaumokuākea National Marine Sanctuary Soundscape Report"
 date: "today"
 output: 
   html_document: 
