@@ -105,11 +105,17 @@ display(HTML(makeImage("sanctsound_scene.jpg", "MarineLife")))
 
 display(HTML(standardTextDict["What is a soundscape?"]))
 ```
-### example soundscape
+### example seasonal differences in a soundscape
 ```{python}
 #| echo: false
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ```
+### example of site differences
+```{python}
+#| echo: false
+display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
+```
+
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
