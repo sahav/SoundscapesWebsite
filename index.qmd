@@ -111,12 +111,13 @@ display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ### Soundscape comparison
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["Seasonal soundscape conditions"]))
 display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
 ```
 ### Indicators from ocean sound
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Indicators from ocean sound"]))
+display(HTML(standardTextDict["Soundscape comparison"]))
 display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "sites")))
 ```
 :::
