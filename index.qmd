@@ -98,22 +98,28 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Visualizing Ocean Sound
+## Understanding Ocean Sound
 ```{python}
 #| echo: false
-display(HTML(makeImage("sanctsound_scene.jpg", "MarineLife")))
+display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic)))
 
-display(HTML(standardTextDict["What is a soundscape?"]))
 ```
-### example seasonal differences in a soundscape
+### Seasonal soundscape conditions
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["What is a soundscape?"]))
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ```
-### example of site differences
+### Soundscape comparison
 ```{python}
 #| echo: false
 display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
+```
+### Indicators from ocean sound
+```{python}
+#| echo: false
+display(HTML(standardTextDict["Indicators from ocean sound"]))
+display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg, "sites")))
 ```
 
 :::
