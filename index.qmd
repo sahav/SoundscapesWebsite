@@ -107,7 +107,7 @@ display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic")))
 ### Seasonal soundscape conditions
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What is a soundscape?"]))
+display(HTML(standardTextDict["Seasonal soundscape conditions"]))
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ```
 ### Soundscape comparison
