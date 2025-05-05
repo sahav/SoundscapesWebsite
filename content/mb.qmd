@@ -162,8 +162,9 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## When do fish choruses contribute to the soundscape?
+## Ocean sound indicators
 
+### When do fish choruses contribute to the soundscape?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When do biological sounds contribute to the soundscape?"]))
