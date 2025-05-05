@@ -82,7 +82,7 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Overview of Ocean Sound Monitoring Effort
+## Overview of ocean sound monitoring effort
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
@@ -96,7 +96,7 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Understanding Ocean Sound
+## Understanding ocean sound
 ```{python}
 #| echo: false
 display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic")))
@@ -106,19 +106,19 @@ display(HTML(standardTextDict["Understanding Ocean Sound"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Seasonal soundscape conditions"]))
-display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
+display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "seasons")))
 ```
 ### Soundscape comparison
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Seasonal soundscape conditions"]))
+display(HTML(standardTextDict["Soundscape comparison"]))
 display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
 ```
 ### Indicators from ocean sound
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Soundscape comparison"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "sites")))
+display(HTML(standardTextDict["Indicators from ocean sound"]))
+display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "fish")))
 ```
 :::
 
