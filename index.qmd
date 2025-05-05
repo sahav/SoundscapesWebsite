@@ -95,14 +95,12 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 ```
 :::
 
-:::
-
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Understanding Ocean Sound
 ```{python}
 #| echo: false
 display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic")))
-
+display(HTML(standardTextDict["Understanding Ocean Sound"]))
 ```
 ### Seasonal soundscape conditions
 ```{python}
@@ -121,7 +119,6 @@ display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
 display(HTML(standardTextDict["Indicators from ocean sound"]))
 display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "sites")))
 ```
-
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
