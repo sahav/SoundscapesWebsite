@@ -101,7 +101,7 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 ## Understanding Ocean Sound
 ```{python}
 #| echo: false
-display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic)))
+display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic")))
 
 ```
 ### Seasonal soundscape conditions
