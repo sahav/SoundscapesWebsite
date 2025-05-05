@@ -113,7 +113,7 @@ display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
 ### example of site differences
 ```{python}
 #| echo: false
-display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "Seasons")))
+display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
 ```
 
 :::
