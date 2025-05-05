@@ -92,7 +92,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview
+## Seasonal soundscape conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))

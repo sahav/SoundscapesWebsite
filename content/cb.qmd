@@ -98,7 +98,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Soundscape Overview
+## Seasonal soundscape conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
@@ -159,11 +159,14 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How much noise do nearby ships contribute to the soundscape?
+## Ocean sound indicators
+
+### How much noise do nearby ships contribute to the soundscape?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
+
 ```
 :::
 
