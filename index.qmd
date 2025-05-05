@@ -119,7 +119,7 @@ display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicators from ocean sound"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg, "sites")))
+display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "sites")))
 ```
 
 :::
