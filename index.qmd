@@ -42,6 +42,9 @@ def makeImage(imageName, identifier):
     path += "?raw=true"
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
+  
+def embedMapViewer(imageName, identifier):
+    return f'<embed src="https://www.ncei.noaa.gov/maps/passive-acoustic-data/" style="width:700px; height: 400px;">'
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
@@ -86,7 +89,7 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML(makeImage("map_ONMS.jpg", "Map")))
+display(HTML(embedMapViewer()))
 ```
 ### Summary of ONMS Sound data available through NCEI Passive Acoustic Data Archive <a href="https://www.ncei.noaa.gov/maps/passive-acoustic-data/">Map Viewer</a> and <a href="https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?invt=AbwKlA">Google Cloud Platform</a>  
 ```{python}
