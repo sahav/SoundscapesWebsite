@@ -33,20 +33,20 @@ website:
     contents:
       - href: index.qmd
         text: Home
-      - text: '    '
+      - text: &nbsp;
       - text: <b>East Coast Region</b>
       - href: content/sb.qmd
-        text: Stellwagen Bank
+        text: &nbsp;Stellwagen Bank
       - href: content/mb.qmd
-        text: Monterey Bay
+        text: &nbsp;Monterey Bay
       - href: content/oc.qmd
-        text: Olympic Coast
+        text: &nbsp;Olympic Coast
       - href: content/cb.qmd
-        text: Cordell Bank
+        text: &nbsp;Cordell Bank
       - href: content/pi.qmd
-        text: Papahānaumokuākea
+        text: &nbsp;Papahānaumokuākea
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
-        text: Project Home Page
+        text: &nbsp;Project Home Page
 
 format:
   html:
