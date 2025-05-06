@@ -44,7 +44,7 @@ def makeImage(imageName, identifier):
     return initialImage
   
 def embedMapViewer():
-    return f'<embed src="https://www.ncei.noaa.gov/maps/passive-acoustic-data/" style="width:800px; height: 800px;">'
+    return f'<embed src="https://www.ncei.noaa.gov/maps/passive-acoustic-data/" style="width:900px; height: 800px;">'
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
