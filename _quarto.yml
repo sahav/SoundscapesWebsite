@@ -35,6 +35,7 @@ website:
       - href: index.qmd
         text: Home
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
+        target: _blank
         text: Project Home Page
       - text: <br>
       - text: <b>East Coast Region</b>
