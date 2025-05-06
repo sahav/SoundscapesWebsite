@@ -33,6 +33,7 @@ website:
     contents:
       - href: index.qmd
         text: Home
+      - text: **East Coast Region**
       - href: content/sb.qmd
         text: Stellwagen Bank
       - href: content/mb.qmd
