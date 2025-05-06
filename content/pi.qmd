@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["PM01"]
+sites = ["pm01"]
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
