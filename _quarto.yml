@@ -31,8 +31,11 @@ website:
     search: true
     collapse-level: 1
     contents:
+      - text: <b>General</b>
       - href: index.qmd
         text: Home
+      - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
+        text: Project Home Page
       - text: <br>
       - text: <b>East Coast Region</b>
       - href: content/sb.qmd
@@ -49,9 +52,6 @@ website:
       - text: <b>Pacific Islands Region</b>
       - href: content/pi.qmd
         text: Papahānaumokuākea
-      - text: <br>
-      - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
-        text: Project Home Page
 
 format:
   html:
