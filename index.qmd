@@ -43,7 +43,7 @@ def makeImage(imageName, identifier):
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
   
-def embedMapViewer(imageName, identifier):
+def embedMapViewer():
     return f'<embed src="https://www.ncei.noaa.gov/maps/passive-acoustic-data/" style="width:700px; height: 400px;">'
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
