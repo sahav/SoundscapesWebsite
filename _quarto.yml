@@ -37,12 +37,16 @@ website:
       - text: <b>East Coast Region</b>
       - href: content/sb.qmd
         text: Stellwagen Bank
+      - text: <br>
+      - text: <b>West Coast Region</b>
       - href: content/mb.qmd
         text: Monterey Bay
       - href: content/oc.qmd
         text: Olympic Coast
       - href: content/cb.qmd
         text: Cordell Bank
+      - text: <br>
+      - text: <b>Pacific Islands Region</b>
       - href: content/pi.qmd
         text: Papahānaumokuākea
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
