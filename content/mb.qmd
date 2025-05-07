@@ -14,7 +14,7 @@ def makeImage(imageName, identifier):
     inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
     path = inputDir + imageName
     path += "?raw=true"
-    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img onclick="window.open("anotherpage.html", "_blank");"src="{path}" width="700" id="{identifier}">'
     return initialImage
 
 def makeButtons(generalFormat, identifier):
@@ -24,7 +24,7 @@ def makeButtons(generalFormat, identifier):
     path = inputDir + generalFormat
     path = path.replace("***", sites[0])
     path += "?raw=true"
-    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img onclick="window.open("anotherpage.html", "_blank");" src="{path}" width="700" id="{identifier}">'
     if len(sites) == 1:
         return initialImage
     
