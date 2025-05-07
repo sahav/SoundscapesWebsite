@@ -15,7 +15,7 @@ def makeButtons(generalFormat, identifier):
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
     path = f'{inputDir}/{generalFormat}'
     path = path.replace("***", sites[0])
-    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="this.requestFullscreen()>'
     if len(sites) == 1:
         return initialImage
     
@@ -37,7 +37,7 @@ def makeButtons(generalFormat, identifier):
 def makeImage(imageName, identifier):
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
     path = f'{inputDir}/{imageName}'
-    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="this.requestFullscreen()>'
     return initialImage
   
 def embedMapViewer():
