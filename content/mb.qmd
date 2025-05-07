@@ -11,20 +11,20 @@ import ipywidgets as widgets
 sites = ["mb01", "mb02"]
 
 def makeImage(imageName, identifier):
-    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "resources/")))
     path = inputDir + imageName
     path += "?raw=true"
-    initialImage = f'<img target="_blank" href="{path}" src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
-    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "resources/")))
     path = inputDir + generalFormat
     path = path.replace("***", sites[0])
     path += "?raw=true"
-    initialImage = f'<img target="_blank" href="{path}" src="{path}" width="700" id="{identifier}">'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     if len(sites) == 1:
         return initialImage
     
