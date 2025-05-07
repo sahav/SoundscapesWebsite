@@ -14,6 +14,19 @@ def makeImage(imageName, identifier):
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
     path = f'{inputDir}/{imageName}'
     initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="this.requestFullscreen()">'
+    initialImage += f"""
+                    <script>
+                    function {identifier}Toggle() {{
+                        if (!document.fullscreenElement) {
+                            document.body.requestFullscreen();
+                            document.body.setAttribute("fullscreen",""); 
+                        } else {
+                            document.exitFullscreen();
+                            document.body.removeAttribute("fullscreen"); 
+                        }
+                    }}
+                    </script>
+    """
     return initialImage
 
 def makeButtons(generalFormat, identifier):
