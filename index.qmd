@@ -15,7 +15,6 @@ def makeButtons(generalFormat, identifier):
     inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
     path = inputDir + generalFormat
     path = path.replace("***", sites[0])
-    path += "?raw=true"
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     if len(sites) == 1:
         return initialImage
@@ -23,8 +22,7 @@ def makeButtons(generalFormat, identifier):
     for site in sites:
         path = inputDir + generalFormat
         path = path.replace("***", site)
-        path += "?raw=true"
-        
+
         buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;">{site}</button>'
         scripts += f"""
                     <script>
@@ -39,7 +37,6 @@ def makeButtons(generalFormat, identifier):
 def makeImage(imageName, identifier):
     inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
     path = inputDir + imageName
-    path += "?raw=true"
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
   
