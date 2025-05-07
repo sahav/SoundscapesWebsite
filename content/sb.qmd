@@ -23,8 +23,7 @@ def makeButtons(generalFormat, identifier):
     for site in sites:
         path = inputDir + generalFormat
         path = path.replace("***", site)
-        path += "?raw=true"
-        
+
         buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;">{site}</button>'
         scripts += f"""
                     <script>
@@ -158,7 +157,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_125Hz.jpg", "soundLevelVariance")))
+display(HTML(makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
 ```
 ### How much noise do nearby ships contribute to the soundscape?
 ```{python}
