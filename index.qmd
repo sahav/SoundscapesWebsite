@@ -12,15 +12,15 @@ sites = ["sb01", "sb03"]
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
-    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources/")))
-    path = inputDir + generalFormat
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources")))
+    path = f'{inputDir}/{generalFormat}'
     path = path.replace("***", sites[0])
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     if len(sites) == 1:
         return initialImage
     
     for site in sites:
-        path = inputDir + generalFormat
+        path = f'{inputDir}/{generalFormat}'
         path = path.replace("***", site)
 
         buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;">{site}</button>'
@@ -35,8 +35,8 @@ def makeButtons(generalFormat, identifier):
     return buttons + initialImage + scripts
   
 def makeImage(imageName, identifier):
-    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources/")))
-    path = inputDir + imageName
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources")))
+    path = f'{inputDir}/{imageName}'
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
   
