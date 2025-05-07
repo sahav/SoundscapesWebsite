@@ -11,7 +11,7 @@ import ipywidgets as widgets
 sites = ["mb01", "mb02"]
 
 def makeImage(imageName, identifier):
-    inputDir = "/resources"
+    inputDir = "https://github.com/CI-CMG/SoundscapesWebsite/tree/main/content/resources"
     path = f'{inputDir}/{imageName}'
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
@@ -19,7 +19,7 @@ def makeImage(imageName, identifier):
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
-    inputDir = "/resources"
+    inputDir = "https://github.com/CI-CMG/SoundscapesWebsite/tree/main/content/resources"
     path = f'{inputDir}/{generalFormat}'
     path = path.replace("***", sites[0])
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
