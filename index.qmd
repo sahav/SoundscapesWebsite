@@ -12,7 +12,7 @@ sites = ["sb01", "sb03"]
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = ""
-    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources/")))
     path = inputDir + generalFormat
     path = path.replace("***", sites[0])
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
@@ -35,7 +35,7 @@ def makeButtons(generalFormat, identifier):
     return buttons + initialImage + scripts
   
 def makeImage(imageName, identifier):
-    inputDir = "https://github.com/CI-CMG/SoundscapeScenes/blob/main/ONMS-Sound/report/"
+    inputDir = str(os.path.normpath(os.path.join(os.getcwd(), "content/resources/")))
     path = inputDir + imageName
     initialImage = f'<img src="{path}" width="700" id="{identifier}">'
     return initialImage
