@@ -21,7 +21,7 @@ def makeButtons(generalFormat, identifier):
         return initialImage
     
     for site in sites:
-        path = inputDir + generalFormat
+        path = f'{inputDir}/{generalFormat}'
         path = path.replace("***", site)
 
         buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;">{site}</button>'
