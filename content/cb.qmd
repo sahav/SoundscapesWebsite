@@ -16,7 +16,7 @@ def makeButtons(generalFormat, identifier):
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
     path = f'{inputDir}/{generalFormat}'
     path = path.replace("***", sites[0])
-    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="this.requestFullscreen()">'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="toggle{identifier}()">'
     if len(sites) == 1:
         return initialImage
     
