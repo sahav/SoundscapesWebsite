@@ -17,13 +17,13 @@ def makeImage(imageName, identifier):
     initialImage += f"""
                     <script>
                     function {identifier}Toggle() {{
-                        if (!document.fullscreenElement) {
-                            document.body.requestFullscreen();
-                            document.body.setAttribute("fullscreen",""); 
-                        } else {
-                            document.exitFullscreen();
-                            document.body.removeAttribute("fullscreen"); 
-                        }
+                        if (!this.fullscreenElement) {{
+                            this.requestFullscreen();
+                            this.setAttribute("fullscreen",""); 
+                        }} else {{
+                            this.exitFullscreen();
+                            this.removeAttribute("fullscreen"); 
+                        }}
                     }}
                     </script>
     """

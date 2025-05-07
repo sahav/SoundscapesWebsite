@@ -19,13 +19,13 @@ def makeButtons(generalFormat, identifier):
     initialImage += f"""
                     <script>
                     function {identifier}Toggle() {{
-                        if (!this.fullscreenElement) {
+                        if (!this.fullscreenElement) {{
                             this.requestFullscreen();
                             this.setAttribute("fullscreen",""); 
-                        } else {
+                        }} else {{
                             this.exitFullscreen();
                             this.removeAttribute("fullscreen"); 
-                        }
+                        }}
                     }}
                     </script>
     """
@@ -54,13 +54,13 @@ def makeImage(imageName, identifier):
     initialImage += f"""
                     <script>
                     function {identifier}Toggle() {{
-                        if (!this.fullscreenElement) {
+                        if (!this.fullscreenElement) {{
                             this.requestFullscreen();
                             this.setAttribute("fullscreen",""); 
-                        } else {
+                        }} else {{
                             this.exitFullscreen();
                             this.removeAttribute("fullscreen"); 
-                        }
+                        }}
                     }}
                     </script>
     """
