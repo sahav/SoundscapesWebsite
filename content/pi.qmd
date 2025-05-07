@@ -33,6 +33,18 @@ def makeButtons(generalFormat, identifier):
                     }}
                     </script>
         """
+    scripts += f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
     return buttons + initialImage + scripts
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))

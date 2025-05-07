@@ -32,6 +32,18 @@ def makeButtons(generalFormat, identifier):
                     }}
                     </script>
         """
+    scripts += f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
     return buttons + initialImage + scripts
   
 def makeImage(imageName, identifier):
@@ -111,7 +123,7 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 ## Understanding ocean sound
 ```{python}
 #| echo: false
-display(HTML(makeImage("sanctsound_scene.jpg", "soundscape infographic")))
+display(HTML(makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
 display(HTML(standardTextDict["Understanding Ocean Sound"]))
 ```
 ### Seasonal soundscape conditions
