@@ -29,7 +29,7 @@ def makeButtons(generalFormat, identifier):
     path = path.replace("***", sites[0])
     initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="toggle{identifier}()">'
     if len(sites) == 1:
-        return initialImage
+        return initialImage + scripts
     
     for site in sites:
         path = f'{inputDir}/{generalFormat}'
