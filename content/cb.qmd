@@ -175,7 +175,16 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
+display(HTML(f"""
+            <iframe
+                src="resources/plot_cb11_TS125ptly.html"
+                name="targetframe"
+                allowTransparency="true"
+                scrolling="no"
+                frameborder="0"
+            >
+            </iframe>
+""")))
 
 ```
 :::
