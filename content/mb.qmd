@@ -30,7 +30,18 @@ def makeImage(imageName, identifier):
 
 def makeButtons(generalFormat, identifier):
     buttons = ""
-    scripts = ""
+    scripts = f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
     path = f'{inputDir}/{generalFormat}'
     path = path.replace("***", sites[0])
@@ -51,18 +62,6 @@ def makeButtons(generalFormat, identifier):
                     }}
                     </script>
         """
-    scripts += f"""
-                    <script>
-                    function toggle{identifier}() {{
-                        var imgElement = document.getElementById('{identifier}');
-                        if (!document.fullscreenElement) {{
-                            imgElement.requestFullscreen();
-                        }} else {{
-                            document.exitFullscreen();
-                        }}
-                    }}
-                    </script>
-    """
     return buttons + initialImage + scripts
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
