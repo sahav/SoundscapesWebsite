@@ -166,7 +166,7 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
 
-display(HTML(makeButtons("plot_***_AboveWind.jpg", "Freq")))
+display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
   Table of results
