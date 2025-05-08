@@ -182,6 +182,7 @@ display(HTML(f"""
                 allowTransparency="true"
                 scrolling="no"
                 frameborder="0"
+                width="700px"
             >
             </iframe>
 """))
