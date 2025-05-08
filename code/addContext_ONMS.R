@@ -23,9 +23,9 @@ library(plotly)
 ##  sites ####
 ONMSsites = c("sb01", "sb03","mb01","mb02", "pm01","oc02", "cb11")
 ## directories ####
-outDirG =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\content\\resources" # "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\" 
-outDirC = "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\context\\" #context
-#outDirG = paste0( outDir,"report\\" ) #graphics
+outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
+outDirG =  paste0(outDir, "content\\resources") #save graphics
+outDirC =  paste0(outDir,"context\\") #context
 
 ## parameters ####
 DC = Sys.Date()
@@ -153,7 +153,7 @@ for (uu in 1:length(ONMSsites)) {
       legend.position = "top"  # Place the legend at the top
     )
   p1
-  #ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_Effort.jpg"), plot = p1, width = 10, height = 6, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## add SEASON conditions ####
   seas = unique(season$Season)
@@ -183,6 +183,7 @@ for (uu in 1:length(ONMSsites)) {
       legend.position = "none"  # Place the legend at the top
     )
   p2
+  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   ## add WIND category ####
   gps$wind_category = NA
@@ -296,17 +297,23 @@ for (uu in 1:length(ONMSsites)) {
     geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = -Inf, ymax = Inf), 
               fill = "gray", alpha = 0.2)+  # Adjust alpha for transparency
     # Add labels at the bottom of each line
-    geom_text(data = FOIs, aes(x = FQstart, y = 50, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 3) +
+    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     
     # Additional aesthetics
     theme_minimal()+
     theme(legend.position = "top",
-          plot.title = element_text(size = 16, face = "bold", hjust = 0)) +  # This line removes the legend
+          plot.title = element_text(size = 16, face = "bold", hjust = 0),
+          plot.caption = element_text(size = 12, face = "italic"), 
+          plot.legend = element_text(size =12), # Caption text size
+          axis.title.x = element_text(size = 12),           # X-axis label size
+          axis.title.y = element_text(size = 12),           # Y-axis label size
+          axis.text = element_text(size = 12)               # Tick mark labels
+          ) +  # This line removes the legend
     labs(
       title = paste0(toupper(site)), #, "- ", 
                      #tolower(FOIs$Oceanographic.setting[1]), " monitoring site" ),
       #subtitle = paste0("data summarized from ", st, " to ", ed, "\n vertical lines indicate frequencies for sounds of interest in this soundscape" ),
-      caption = paste0("vertical lines indicate frequencies for sounds of interest in this soundscape \n black lines are expected wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s]"), 
+      caption = paste0("vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n black lines are expected wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s]"), 
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     )
@@ -315,7 +322,7 @@ for (uu in 1:length(ONMSsites)) {
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ### save: plot seasonal spectra ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   ## YEARLY ANALYSIS ####
   if (sidx == "other"){ #only keep peak
@@ -379,16 +386,23 @@ for (uu in 1:length(ONMSsites)) {
     # Add vertical lines at FQstart
     geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
     # Add labels at the bottom of each line
-    geom_text(data = FOIs, aes(x = FQstart, y = 50, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 3) +
+    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     
     # Additional aesthetics
     theme_minimal() +
-    # This line removes the legend
+    theme(legend.position = "top",
+          plot.title = element_text(size = 16, face = "bold", hjust = 0),
+          plot.caption = element_text(size = 12, face = "italic"), 
+          plot.legend = element_text(size =12), # Caption text size
+          axis.title.x = element_text(size = 12),           # X-axis label size
+          axis.title.y = element_text(size = 12),           # Y-axis label size
+          axis.text = element_text(size = 12)               # Tick mark labels
+    ) +
     labs(
       title =  paste0(toupper(site)), #, "- ", 
                       #tolower(FOIs$Oceanographic.setting[1]), " monitoring site" ),
       #subtitle = paste0( "Data summarized from ", st, " to ", ed),
-      caption  = paste0("Vertical lines indicate frequencies for sounds of interest in this soundscape \n",
+      caption  = paste0("Vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n",
                         "black lines are modeled wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s] "),
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
@@ -431,7 +445,7 @@ for (uu in 1:length(ONMSsites)) {
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
   ### save: plot yearly spectra ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   ## CONVERT ALL DATA TO 1 Hz  ####
   gpsBB = gps
@@ -535,7 +549,7 @@ for (uu in 1:length(ONMSsites)) {
   p
   
   ### save: plot 125 Hz time series ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_125Hz.jpg"), plot = p, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_125Hz.jpg"), plot = p, width = 10, height = 12, dpi = 300)
   
   ## TIME SERIES - interactive ####
   yearly_data <- split(dailyFQ_complete, dailyFQ_complete$yr)
@@ -559,7 +573,7 @@ for (uu in 1:length(ONMSsites)) {
   fig
   
   htmlwidgets::saveWidget(as_widget(fig), 
-  paste0( outDir, "\\plot_", tolower(site), "_TS125ptly.html") ) 
+  paste0( outDirG, "\\plot_", tolower(site), "_TS125ptly.html") ) 
   
   ## TIME SERIES - exceedence 100 Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
@@ -648,7 +662,7 @@ for (uu in 1:length(ONMSsites)) {
   table_grob2 = tableGrob(as.data.frame( seasonalNE_wide), rows = NULL )
   combined_grob = arrangeGrob(title_grob, table_grob, title_grob2, table_grob2, ncol = 2)  
   
-  ggsave(paste0(outDirG, "table_", site, "_AboveWind.jpg"), combined_grob, width = 10, height = 8)
+  ggsave(paste0(outDirG, "\\table_", site, "_AboveWind.jpg"), combined_grob, width = 10, height = 8)
   
   
   dailyFQ = gpsFQ %>%
@@ -724,22 +738,27 @@ for (uu in 1:length(ONMSsites)) {
       legend.position = "none",
       strip.text = element_text(size = 10, hjust =0, vjust = 0),  # Facet labels inside (centered)
       strip.background = element_blank(),  # Remove background behind facet labels
-      panel.spacing = unit(.1, "lines") ) + # Adjust the spacing between facets) +
+      panel.spacing = unit(.1, "lines"), 
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      plot.caption = element_text(size = 10, face = "italic"), 
+      axis.title.x = element_text(size = 12),           # X-axis label size
+      axis.title.y = element_text(size = 12),           # Y-axis label size
+      axis.text = element_text(size = 12) ) + # Adjust the spacing between facets) +
     
     labs(
       title =paste0("Decibels Above Wind Noise" ),
       subtitle =  paste0(toupper(site) ), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
-      caption = paste0("difference between sound level and modeled sound levels based on wind speed at ", fqIn2name, "
-                      threshold for % above = ", ab2, "dB"),
+      caption = paste0("difference between measured sound level and modeled wind noise levels \n at known wind speed for ", 
+                        "(threshold for ", fqIn2name, " % above = ", ab2, "dB)"),
       x = "",
-      y = expression(paste("Decibels Above Wind Noise" ) ),
+      y = paste0("Decibels Above Wind Noise at ", fqIn2name),
       color = "Year"  # Label for the color legend
     ) 
   pE
   ### save: plot NE time series ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_Exceed100.jpg"), plot = pE, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "\\plot_", tolower(site), "_Exceed100.jpg"), plot = pE, width = 10, height = 12, dpi = 300)
   ## SAVE UPDATED DATA ####
-  save(gps, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
+  save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
   
   
   
