@@ -115,6 +115,7 @@ display(HTML(embedMapViewer()))
 ```{python}
 #| echo: false
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
+display(HTML(makeImage("map_ONMS.jpg","Gantt")))
 ```
 :::
 
