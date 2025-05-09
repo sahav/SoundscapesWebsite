@@ -111,7 +111,7 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(embedMapViewer()))
 ```
-### Summary of ONMS Sound data available through NCEI Passive Acoustic Data Archive <a href="https://www.ncei.noaa.gov/maps/passive-acoustic-data/">Map Viewer</a> and <a href="https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?invt=AbwKlA">Google Cloud Platform</a>  
+### Summary of ONMS Sound data available through NCEI Passive Acoustic Data Archive <a href="https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?invt=AbwKlA"  target="_blank">Google Cloud Platform</a>  
 ```{python}
 #| echo: false
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
