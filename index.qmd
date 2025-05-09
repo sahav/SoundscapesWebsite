@@ -122,8 +122,12 @@ display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
 ## Understanding ocean sound
 ```{python}
 #| echo: false
-display(HTML(makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
 display(HTML(standardTextDict["Understanding Ocean Sound"]))
+```
+```{python}
+#| echo: false
+display(HTML(makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
+display(HTML(standardTextDict["Soundscapes"]))
 ```
 ### Seasonal soundscape conditions
 ```{python}
