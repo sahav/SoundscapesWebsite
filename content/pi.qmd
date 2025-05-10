@@ -10,6 +10,24 @@ import ipywidgets as widgets
 
 sites = ["pm01"]
 
+def makeImage(imageName, identifier):
+    inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
+    path = f'{inputDir}/{imageName}'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="toggle{identifier}()">'
+    initialImage += f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
+    return initialImage
+  
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = f"""
