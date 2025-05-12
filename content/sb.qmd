@@ -64,9 +64,11 @@ for key in standardTextDict:
             value = value.replace("**", "</b>", 1)
 
 # input table for site information
-#df1 = pd.read_excel(metaFile, sheet_name="SB")
-
-df1 = pd.read_excel(metaFile, sheet_name="SB", dtype={"Start Date": str})
+df1 = pd.read_excel(metaFile, sheet_name="SB")
+for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
+    df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format
+    
+#df1 = pd.read_excel(metaFile, sheet_name="SB", dtype={"Start Date": str})
 
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 
