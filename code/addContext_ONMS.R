@@ -98,25 +98,25 @@ for (uu in 1:length(ONMSsites)) {
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
-    seasonLabel = "(Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }else if  ( sidx == "other") {
     season = data.frame(
       Season = c("Early", "Peak", "Late", "Non"),
       Months = c("10,11,12", "1,2,3", "4,5,6", "7,8,9") ,
       values = c(  "#56B4E9",  "#009E73","#CC79A7", "#E69F00") )
-    seasonLabel = "(Peak (Jan-Mar), Late (Apr-Jun), Non (Jul-Sep), Early (Oct-Dec)"
+    seasonLabel = "Peak (Jan-Mar), Late (Apr-Jun), Non (Jul-Sep), Early (Oct-Dec)"
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
       Months = c("7,8,9,10,11", "3,4,5,6", "12,1,2") ,
       values = c(  "#CC79A7",  "#009E73","#56B4E9") )
-    seasonLabel = "(Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
+    seasonLabel = "Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
   }else {
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
-    seasonLabel = "(Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }
  
   ## SPL data ####
@@ -177,7 +177,8 @@ for (uu in 1:length(ONMSsites)) {
     labs(
       title = "monitoring effort by season",
       caption  = paste0(toupper(site), " has ", udays, 
-                        " unique days: ", as.character(st), " to ", as.character(ed)),
+                        " unique days: ", as.character(st), " to ", as.character(ed), "\n",
+                        seasonLabel),
       x = "",      y = "Hours",      fill = "Year"
     ) +
     scale_fill_manual(values = season$values) +
@@ -218,10 +219,11 @@ for (uu in 1:length(ONMSsites)) {
   l = ggplot(gps, aes(x = "", fill = wind_category)) +
     geom_bar(stat = "count", position = position_stack(reverse = TRUE)) +  # Stacked bar chart
     coord_flip() +  # Flip the coordinates to make it horizontal
-    ggtitle("% time the soundscape is in different wind speed categories ") +  # Add the main title
+    facet_wrap(~yr)+
+    ggtitle("% time in different wind speed categories ") +  # Add the main title
     theme_minimal() +
     labs(x = NULL, y = NULL,
-         subtitle = paste0("(low < ",windL, ", med ", windL,"-",windH, ", high > ",windH, " m/s)")) +  # Remove x-axis label
+         subtitle = paste0("(low <",windL, ", med ", windL,"-",windH, ", high >",windH, "m/s)")) +  # Remove x-axis label
     theme(
       plot.title = element_text(hjust = 0),  # Align the title to the left
       axis.text.y = element_blank(),
@@ -235,6 +237,36 @@ for (uu in 1:length(ONMSsites)) {
     #scale_x_discrete(labels = category_counts$wind_category) +  # Place the category labels under the plot
     scale_fill_manual(values = c("low" = "lightgray",  "med" = "gray", "high" = "darkgray") )
   l
+  
+  gps_summary <- gps %>%
+    group_by(yr, wind_category) %>%
+    summarise(n = n(), .groups = 'drop') %>%
+    group_by(yr) %>%
+    mutate(prop = n / sum(n))
+  l <- ggplot(gps_summary, aes(x = "", y = prop, fill = wind_category)) +
+    geom_bar(stat = "identity", width = 1, position = position_stack(reverse = TRUE)) +
+    coord_polar(theta = "y") +
+    facet_wrap(~yr, nrow = length(unique( gps_summary$yr)) ) +
+    ggtitle("% time in wind speed categories") +
+    labs(x = NULL, y = NULL,
+         caption = paste0("(low <", windL, ", med ", windL, "-", windH, ", high >", windH, " m/s)")) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(t = 5, r = 5, b = 5, l = 0), 
+      plot.title = element_text(hjust = 0),
+      plot.caption = element_text(hjust = 0),
+      axis.text  = element_blank(),
+      axis.ticks = element_blank(),
+      panel.grid = element_blank(),
+      legend.position = "right",
+      legend.title = element_blank(),
+      legend.text = element_text(size = 10)
+    ) +
+    scale_fill_viridis_d(option = "C")
+    #scale_fill_manual(values = c("low" = "#1b9e77", "med" = "#d95f02", "high" = "#7570b3", "NA" = "black"))
+  
+  l
+  
   ### calculate quantiles ####
   tol_columns = grep("TOL", colnames(gps))
   #overall
@@ -516,6 +548,7 @@ for (uu in 1:length(ONMSsites)) {
   
   p0 = ggplot(dailyFQ_complete, aes(x = Julian, y = TOL100_50, group = yr, color = factor(yr))) 
   # Add shaded background layer first
+  
   if (nrow(TOIs) > 0) {
     p0 <-  p0 + geom_rect(
       data = TOIs %>% filter(yr %in% unique(dailyFQ_complete$yr)), 
@@ -528,14 +561,12 @@ for (uu in 1:length(ONMSsites)) {
   p <- p0 + geom_line() +
     
     scale_color_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year)))))  +
-    # Main data layers (drawn above the shaded area)
     geom_line(size = 1, na.rm = TRUE) +
-    
     geom_ribbon(aes(ymin = TOL100_25, ymax = TOL100_75), fill = "gray", alpha = 0.5) +
     facet_wrap(~facet_title, nrow = length(unique(dailyFQ$yr)) ) +
     theme_minimal() +
     scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +  
-   geom_hline(aes(yintercept = ab), linetype = "dashed", color = "gray", size = 0.7) +
+   geom_hline(aes(yintercept = ab), linetype = "dashed", color = "gray", linewidth = 0.7) +
     
     theme(
       legend.position = "none",
@@ -545,7 +576,7 @@ for (uu in 1:length(ONMSsites)) {
     labs(
       title = paste0("Soundscape Conditions at 125 Hz" ) ,
       subtitle =  paste0(toupper(site)), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ),
-      caption = paste0("% above threshold = ", ab, " dB"),
+      caption = paste0("% time above threshold = ", ab, " dB"),
       x = "",
       y = expression(paste("Sound Levels (125 Hz dB re 1", mu, " Pa/Hz)" ) ),
       color = "Year"  # Label for the color legend
@@ -560,7 +591,8 @@ for (uu in 1:length(ONMSsites)) {
   plots <- lapply(yearly_data, function(df) {
     plot_ly(df, x = ~Julian, y = ~TOL100_50, type = 'scatter', mode = 'lines') %>%
       layout(showlegend = FALSE,
-    yaxis = list(title = expression(paste("Sound Levels (125 Hz dB re 1", mu, " Pa/Hz)" )) ) )
+    yaxis = list(title = expression(paste("Sound Levels (125 Hz dB re 1", mu, " Pa/Hz)" )) ),
+    title = paste0("Soundscape Conditions at 125 Hz at ", toupper(site) ) )
   })
   fig <- subplot(plots, nrows = length(plots), shareX = TRUE, shareY = TRUE, titleY = TRUE)
   annotations <- list()
@@ -579,7 +611,7 @@ for (uu in 1:length(ONMSsites)) {
   htmlwidgets::saveWidget(as_widget(fig), 
   paste0( outDirG, "\\plot_", tolower(site), "_TS125ptly.html") ) 
   
-  ## TIME SERIES - exceedence 100 Hz  ####
+  ## TIME SERIES - exceed at XX Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
   gpsFQ = gps %>% select(all_of(cols_to_select))
   #ADD wind speed estimate for each hour of data in frequency of interest
@@ -597,8 +629,6 @@ for (uu in 1:length(ONMSsites)) {
   gpsFQ$Windthres = "unk"
   gpsFQ$Windthres[gpsFQ$Exceed <= ab2] = "below"
   gpsFQ$Windthres[gpsFQ$Exceed > ab2] = "above"
-  
-  # above 
 
   seasonalNE = gpsFQ %>%
     mutate(Date = as.Date(UTC)) %>%
@@ -753,14 +783,20 @@ for (uu in 1:length(ONMSsites)) {
       title =paste0("Decibels Above Wind Noise" ),
       subtitle =  paste0(toupper(site) ), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
       caption = paste0("difference between measured sound level and expected wind noise levels \n given local wind speed ", 
-                        "(threshold for ", fqIn2name, " % above = ", ab2, "dB)"),
+                        "(threshold for ", fqIn2name, " % time above = ", ab2, "dB)"),
       x = "",
       y = paste0("Decibels Above Wind Noise at ", fqIn2name),
       color = "Year"  # Label for the color legend
     ) 
   pE
   ### save: plot NE time series ####
-  ggsave(filename = paste0(outDirG, "\\plot_", tolower(site), "_Exceed100.jpg"), plot = pE, width = 10, height = 12, dpi = 300)
+  separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
+  # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
+  pNE = grid.arrange(pE, l, nrow = 1,widths = c(2, 1))
+  
+  pNE= grid.arrange(pE, separator, l, heights =c(4, 0.1, 1))
+  
+  ggsave(filename = paste0(outDirG, "\\plot_", tolower(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
   ## SAVE UPDATED DATA ####
   save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
   

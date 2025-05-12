@@ -162,7 +162,8 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean sound indicators
+## cean sound indicators
+
 
 ### How do sound levels vary at 125 Hz?
 ```{python}
