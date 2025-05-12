@@ -64,7 +64,8 @@ for key in standardTextDict:
 
 # input table for site information
 df1 = pd.read_excel(metaFile, sheet_name="OC")
-
+for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
+    df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 
 summaryTable.extend(df1.values.tolist())
