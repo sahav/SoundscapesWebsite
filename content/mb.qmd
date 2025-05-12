@@ -107,8 +107,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["MBNMS"]))
-
-display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
+#display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
 ```
 
 ### Ocean sound monitoring sites
@@ -148,7 +147,7 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## What are the latest conditions in ocean sound?
+## Annual soundscape conditions
 
 ```{python}
 #| echo: false
@@ -158,9 +157,20 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## How often is ocean sound above wind noise?
 
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Daily soundscape conditions
+```{python}
+#| echo: false
+#display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+#display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Ocean sound indicators
+
+### How often is ocean sound above wind noise?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
@@ -179,10 +189,6 @@ infoHtml = f'''
                 '''
 display(HTML(infoHtml))
 ```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean sound indicators
 
 ### When do fish choruses contribute to the soundscape?
 ```{python}
