@@ -52,6 +52,7 @@ TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
 FOI = as.data.frame ( xlsx::read.xlsx(metaFile, sheetName = "Frequency of Interest") )
 FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
 FOI$Sanctuary = tolower(FOI$Sanctuary)
+FOI = FOI[FOI$Show.on.plot. == "Y",]
 ## tol conversion ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
@@ -519,7 +520,7 @@ for (uu in 1:length(ONMSsites)) {
   monthly_sequence <- seq.Date(as.Date("2021-01-01"), as.Date("2021-12-01"), by = "month")
   month_names_seq   <- format(monthly_sequence, "%b")  # Extracts full month names
   days_of_year_for_months <- yday(monthly_sequence)
-  hist(dailyFQ$TOL100_50)
+  #hist(dailyFQ$TOL100_50)
   
   ### calculate percentage above threshold ####
   percentage_above <- dailyFQ %>%
@@ -790,12 +791,8 @@ for (uu in 1:length(ONMSsites)) {
     ) 
   pE
   ### save: plot NE time series ####
-  separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pNE = grid.arrange(pE, l, nrow = 1,widths = c(2, 1))
-  
-  pNE= grid.arrange(pE, separator, l, heights =c(4, 0.1, 1))
-  
   ggsave(filename = paste0(outDirG, "\\plot_", tolower(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
   ## SAVE UPDATED DATA ####
   save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
