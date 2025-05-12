@@ -3,7 +3,7 @@
 #INPUTS: output of HrTOLs_ONMS.R, loads the most recent file; ONMS metadata; wind Model
 # works for each monitoring site
 
-# CHECK: Exceedence 100 HZ values by season
+# ADD: wind pie charts
 
 # LIBRARIES ####
 rm(list=ls()) 
@@ -96,27 +96,31 @@ for (uu in 1:length(ONMSsites)) {
   if ( length(sidx) == 0 ) {
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
-      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
+      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+    seasonLabel = "(Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }else if  ( sidx == "other") {
     season = data.frame(
       Season = c("Early", "Peak", "Late", "Non"),
       Months = c("10,11,12", "1,2,3", "4,5,6", "7,8,9") ,
       values = c(  "#56B4E9",  "#009E73","#CC79A7", "#E69F00") )
+    seasonLabel = "(Peak (Jan-Mar), Late (Apr-Jun), Non (Jul-Sep), Early (Oct-Dec)"
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
       Months = c("7,8,9,10,11", "3,4,5,6", "12,1,2") ,
       values = c(  "#CC79A7",  "#009E73","#56B4E9") )
+    seasonLabel = "(Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
   }else {
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+    seasonLabel = "(Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }
  
-  ## spl data ####
-  # HOURLY TOLs with wind estimate (gps)
+  ## SPL data ####
+  # HOURLY TOLs with wind estimate
   inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
@@ -748,7 +752,7 @@ for (uu in 1:length(ONMSsites)) {
     labs(
       title =paste0("Decibels Above Wind Noise" ),
       subtitle =  paste0(toupper(site) ), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
-      caption = paste0("difference between measured sound level and modeled wind noise levels \n at known wind speed for ", 
+      caption = paste0("difference between measured sound level and expected wind noise levels \n given local wind speed ", 
                         "(threshold for ", fqIn2name, " % above = ", ab2, "dB)"),
       x = "",
       y = paste0("Decibels Above Wind Noise at ", fqIn2name),
