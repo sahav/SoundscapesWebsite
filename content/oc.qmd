@@ -141,12 +141,8 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+#display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
 ```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
