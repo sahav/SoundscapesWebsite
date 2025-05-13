@@ -111,11 +111,12 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
 display(HTML(embedMapViewer()))
 ```
-### Summary of ONMS Sound data available through NCEI Passive Acoustic Data Archive <a href="https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?invt=AbwKlA"  target="_blank">Google Cloud Platform</a>  
+### ONMS Sound data available through NCEI Passive Acoustic Data Archive  
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["gantt"]))
 display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
-display(HTML(makeImage("map_ONMS.jpg","Gantt")))
+#| display(HTML(makeImage("map_ONMS.jpg","Gantt")))
 ```
 :::
 
@@ -130,18 +131,19 @@ display(HTML(standardTextDict["Understanding Ocean Sound"]))
 display(HTML(makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
 display(HTML(standardTextDict["Soundscapes"]))
 ```
-### Seasonal soundscape conditions
+### Soundscape conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Seasonal soundscape conditions"]))
 display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "seasons")))
 ```
-### Soundscape comparison
-```{python}
-#| echo: false
-display(HTML(standardTextDict["Soundscape comparison"]))
-display(HTML(makeImage("plot_sb01_Compare.jpg", "sites")))
-```
+<!-- ### Soundscape comparison -->
+<!-- ```{python} -->
+<!-- #| echo: false -->
+<!-- display(HTML(standardTextDict["Soundscape comparison"])) -->
+<!-- display(HTML(makeImage("plot_sb01_Compare.jpg", "sites"))) -->
+<!-- ``` -->
+
 ### Ocean sound indicators
 ```{python}
 #| echo: false
