@@ -7,13 +7,14 @@
 
 # LIBRARIES ####
 rm(list=ls()) 
-options(java.parameters = "-Xmx2g")
+options(java.parameters = "-Xmx4g")
 library(PAMscapes)
 library(scales)
 library(gridExtra)
 library(ggplot2)
 library(tidyverse)
-library(xlsx)
+#library(xlsx)
+library(openxlsx)
 library(reshape)
 library(gtable)
 library(grid)
@@ -41,18 +42,20 @@ windH = 10 #measured wind speeds
 windL = 5
 ## context ####
 metaFile = paste0(outDirG,"\\ONMSSound_IndicatorCategories.xlsx")
-lookup = as.data.frame ( xlsx::read.xlsx(metaFile, sheetName  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
+lookup = as.data.frame ( read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
 lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
+
 ## times of interest ####
-TOI = as.data.frame ( xlsx::read.xlsx(metaFile, sheetName = "Time period of interest") )
+TOI = as.data.frame ( read.xlsx(metaFile, sheet = "Time period of interest") )
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
 ## frequency of interest ####
-FOI = as.data.frame ( xlsx::read.xlsx(metaFile, sheetName = "Frequency of Interest") )
+FOI = as.data.frame ( read.xlsx(metaFile, sheet = "Frequency of Interest") )
 FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
 FOI$Sanctuary = tolower(FOI$Sanctuary)
-FOI = FOI[FOI$Show.on.plot. == "Y",]
+FOI = FOI[FOI$`Show.on.plot?` == "Y",]
+
 ## tol conversion ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
@@ -158,7 +161,7 @@ for (uu in 1:length(ONMSsites)) {
       legend.position = "top"  # Place the legend at the top
     )
   p1
-  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## add SEASON conditions ####
   seas = unique(season$Season)
@@ -189,7 +192,7 @@ for (uu in 1:length(ONMSsites)) {
       legend.position = "none"  # Place the legend at the top
     )
   p2
-  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   ## add WIND category ####
   gps$wind_category = NA
@@ -347,7 +350,7 @@ for (uu in 1:length(ONMSsites)) {
           axis.text = element_text(size = 12)               # Tick mark labels
           ) +  # This line removes the legend
     labs(
-      title = paste0(toupper(site)), #, "- ", 
+      title = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"), #, "- ", 
                      #tolower(FOIs$Oceanographic.setting[1]), " monitoring site" ),
       #subtitle = paste0("data summarized from ", st, " to ", ed, "\n vertical lines indicate frequencies for sounds of interest in this soundscape" ),
       caption = paste0("vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n black lines are expected wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s]"), 
@@ -359,7 +362,7 @@ for (uu in 1:length(ONMSsites)) {
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ### save: plot seasonal spectra ####
-  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   ## YEARLY ANALYSIS ####
   if (sidx == "other"){ #only keep peak
@@ -436,7 +439,7 @@ for (uu in 1:length(ONMSsites)) {
           axis.text = element_text(size = 12)               # Tick mark labels
     ) +
     labs(
-      title =  paste0(toupper(site)), #, "- ", 
+      title = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"), 
                       #tolower(FOIs$Oceanographic.setting[1]), " monitoring site" ),
       #subtitle = paste0( "Data summarized from ", st, " to ", ed),
       caption  = paste0("Vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n",
@@ -482,7 +485,7 @@ for (uu in 1:length(ONMSsites)) {
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
   ### save: plot yearly spectra ####
-  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   ## CONVERT ALL DATA TO 1 Hz  ####
   gpsBB = gps
@@ -562,7 +565,7 @@ for (uu in 1:length(ONMSsites)) {
   p <- p0 + geom_line() +
     
     scale_color_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year)))))  +
-    geom_line(size = 1, na.rm = TRUE) +
+    geom_line(linewidth = 1, na.rm = TRUE) +
     geom_ribbon(aes(ymin = TOL100_25, ymax = TOL100_75), fill = "gray", alpha = 0.5) +
     facet_wrap(~facet_title, nrow = length(unique(dailyFQ$yr)) ) +
     theme_minimal() +
@@ -585,7 +588,7 @@ for (uu in 1:length(ONMSsites)) {
   p
   
   ### save: plot 125 Hz time series ####
-  ggsave(filename = paste0(outDirG, "//plot_", tolower(site), "_125Hz.jpg"), plot = p, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_125Hz.jpg"), plot = p, width = 10, height = 12, dpi = 300)
   
   ## TIME SERIES - interactive ####
   yearly_data <- split(dailyFQ_complete, dailyFQ_complete$yr)
@@ -610,7 +613,7 @@ for (uu in 1:length(ONMSsites)) {
   fig
   
   htmlwidgets::saveWidget(as_widget(fig), 
-  paste0( outDirG, "\\plot_", tolower(site), "_TS125ptly.html") ) 
+  paste0( outDirG, "\\plot_", toupper(site), "_TS125ptly.html") ) 
   
   ## TIME SERIES - exceed at XX Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
@@ -697,7 +700,7 @@ for (uu in 1:length(ONMSsites)) {
   table_grob2 = tableGrob(as.data.frame( seasonalNE_wide), rows = NULL )
   combined_grob = arrangeGrob(title_grob, table_grob, title_grob2, table_grob2, ncol = 2)  
   
-  ggsave(paste0(outDirG, "\\table_", site, "_AboveWind.jpg"), combined_grob, width = 10, height = 8)
+  ggsave(paste0(outDirG, "\\table_", toupper(site) , "_AboveWind.jpg"), combined_grob, width = 10, height = 8)
   
   
   dailyFQ = gpsFQ %>%
@@ -781,9 +784,9 @@ for (uu in 1:length(ONMSsites)) {
       axis.text = element_text(size = 12) ) + # Adjust the spacing between facets) +
     
     labs(
-      title =paste0("Decibels Above Wind Noise" ),
-      subtitle =  paste0(toupper(site) ), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
-      caption = paste0("difference between measured sound level and expected wind noise levels \n given local wind speed ", 
+      title = paste0("Decibels Above Wind Noise" ),
+      subtitle = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
+      caption  = paste0("difference between measured sound level and expected wind noise levels \n given local wind speed ", 
                         "(threshold for ", fqIn2name, " % time above = ", ab2, "dB)"),
       x = "",
       y = paste0("Decibels Above Wind Noise at ", fqIn2name),
@@ -793,12 +796,9 @@ for (uu in 1:length(ONMSsites)) {
   ### save: plot NE time series ####
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pNE = grid.arrange(pE, l, nrow = 1,widths = c(2, 1))
-  ggsave(filename = paste0(outDirG, "\\plot_", tolower(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "\\plot_", toupper(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
   ## SAVE UPDATED DATA ####
   save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
-  
-  
-  
 }
 
 # NOT USED ####
