@@ -11,7 +11,7 @@ import ipywidgets as widgets
 sites = ["sb01", "sb03"]
 
 def embedMapViewer():
-    return f'<embed src="https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw" style="width:900px; height: 800px;">'
+    return f'<embed src="https://apps-nefsc.fisheries.noaa.gov/pacm/" style="width:900px; height: 800px;">'
   
 def makeButtons(generalFormat, identifier):
     buttons = ""
