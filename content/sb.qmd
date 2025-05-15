@@ -10,6 +10,9 @@ import ipywidgets as widgets
 
 sites = ["sb01", "sb03"]
 
+def embedMapViewer():
+    return f'<embed src="https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw" style="width:900px; height: 800px;">'
+  
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = f"""
@@ -46,8 +49,6 @@ def makeButtons(generalFormat, identifier):
         """
     return buttons + initialImage + scripts
   
-  def embedMapViewer():
-    return f'<embed src="https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw" style="width:900px; height: 800px;">'
   
 # input table for standard
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
