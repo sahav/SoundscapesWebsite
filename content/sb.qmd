@@ -46,6 +46,9 @@ def makeButtons(generalFormat, identifier):
         """
     return buttons + initialImage + scripts
   
+  def embedMapViewer():
+    return f'<embed src="https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw" style="width:900px; height: 800px;">'
+  
 # input table for standard
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
@@ -105,6 +108,16 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Annual soundscape conditions
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Seasonal soundscape conditions
 ```{python}
 #| echo: false
@@ -133,15 +146,7 @@ display(HTML(infoHtml))
 ```
 :::
 
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Annual soundscape conditions
 
-```{python}
-#| echo: false
-display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
-```
-:::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Daily soundscape conditions
@@ -185,6 +190,13 @@ display(HTML(makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
+```
+:::
+
+### When are North Atlantic Right whales detected in the soundscape?
+```{python}
+#| echo: false
+display(HTML(embedMapViewer()))
 ```
 :::
 
