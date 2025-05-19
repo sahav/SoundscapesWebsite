@@ -186,7 +186,7 @@ display(HTML(infoHtml))
 ### How do sound levels vary at 125 Hz?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+#display(HTML(standardTextDict[""]))
 display(HTML(makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
 ```
 ### How much noise do nearby ships contribute to the soundscape?
