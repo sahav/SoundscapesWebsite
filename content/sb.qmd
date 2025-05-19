@@ -195,7 +195,6 @@ display(HTML(makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
 display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
 ```
-:::
 
 ### When are North Atlantic Right whales detected in the soundscape?
 ```{python}
