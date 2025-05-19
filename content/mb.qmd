@@ -120,6 +120,16 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Annual soundscape conditions
+
+```{python}
+#| echo: false
+display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
 ## Seasonal soundscape conditions
 ```{python}
 #| echo: false
@@ -145,17 +155,6 @@ infoHtml = f'''
             </dialog>
 '''
 display(HTML(infoHtml))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Annual soundscape conditions
-
-```{python}
-#| echo: false
-display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-
-display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 
