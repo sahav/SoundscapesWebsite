@@ -199,6 +199,7 @@ display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
 ### When are North Atlantic Right whales detected in the soundscape?
 ```{python}
 #| echo: false
+display(HTML(standardTextDict["When are North Atlantic Right whales detected in the soundscape?"]))
 display(HTML(embedMapViewer()))
 ```
 :::
