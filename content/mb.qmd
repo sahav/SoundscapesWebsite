@@ -168,7 +168,7 @@ display(HTML(infoHtml))
 ## Ocean sound indicators
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Indicators from ocean sound"]))
+display(HTML(standardTextDict["Indicator description"]))
 ```
 ### When do fish choruses contribute to the soundscape?
 ```{python}

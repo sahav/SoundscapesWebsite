@@ -165,6 +165,6 @@ display(HTML(infoHtml))
 ## Ocean sound indicators
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["Indicators from ocean sound"]))
+display(HTML(standardTextDict["Indicator description"]))
 ```
 :::
