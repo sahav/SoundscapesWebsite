@@ -173,7 +173,6 @@ display(HTML(standardTextDict["Indicator description"]))
 ### When do fish choruses contribute to the soundscape?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["When do fish choruses contribute to the soundscape?"]))
 display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "FishChoruses")))
 
 ```
