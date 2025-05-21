@@ -10,6 +10,7 @@ import ipywidgets as widgets
 
 sites = ["cb11"]
 
+#functions for website design
 def makeButtons(generalFormat, identifier):
     buttons = ""
     scripts = f"""
@@ -46,13 +47,12 @@ def makeButtons(generalFormat, identifier):
         """
     return buttons + initialImage + scripts
   
-# input table for standard
+# input table for standard text
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
 metadata = pd.read_excel(metaFile, sheet_name="Summary", header=1)
 lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]
 dicts = [l.to_dict() for l in lookup]
-
 df = pd.read_excel(metaFile, sheet_name="Standard Report Text", engine_kwargs={'keep_links': True})
 standardTextDict = pd.Series(df.iloc[:, 3].values, index = df.iloc[:, 1]).to_dict()
 
@@ -64,14 +64,11 @@ for key in standardTextDict:
             value = value.replace("**", "</b>", 1)
 
 # input table for site information
-# input table for site information
 df1 = pd.read_excel(metaFile, sheet_name="CB")
 for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
     df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
-
 summaryTable.extend(df1.values.tolist())
-
 htmlTable = '<div style="overflow-x: auto;">' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
 
 #df1 = pd.read_excel(metaFile, sheet_name="CB")
