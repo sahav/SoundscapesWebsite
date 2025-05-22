@@ -202,11 +202,11 @@ display(HTML(standardTextDict["How much noise do nearby ships contribute to the 
 display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
 ```
 
-### When are North Atlantic Right whales detected in the soundscape?
+### When are North Atlantic Right whales present in the soundscape?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["North Atlantic Right whales"]))
-display(HTML(embedMapViewer()))
+#display(HTML(embedMapViewer()))
 ```
 :::
 
