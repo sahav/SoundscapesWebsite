@@ -174,8 +174,9 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Fish Chorus"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", " Daily Fish Choruses")))
 display(HTML(makeImage("plot_mb01_FinalHist.png", " Seasonal Fish Choruses")))
+display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", " Daily Fish Choruses")))
+
 
 ```
 :::
