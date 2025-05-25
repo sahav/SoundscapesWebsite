@@ -20,7 +20,7 @@ if (site == "cb11"){
   outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" )#products
 )
 outDirG = paste0( outDir,"report\\" ) #graphics
-
+  
 # LOAD SOUND DATA ####
 inFile = list.files(outDirP, pattern = paste0("data_",site,"_HourlySPL-gfs-season_"), full.names = T)
 file_info = file.info(inFile) 
