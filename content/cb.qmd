@@ -154,6 +154,8 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicator description"]))
+display(HTML(makeButtons("plot_***_year1above.jpg", "dBabove")))
+
 ```
 :::
 
