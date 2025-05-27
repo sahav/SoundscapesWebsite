@@ -64,7 +64,7 @@ windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.nam
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
-#PROCESS BY SITE ####
+#PROCESS BY SITE #### uu = 7
 for (uu in 1:length(ONMSsites)) {
   
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -74,6 +74,7 @@ for (uu in 1:length(ONMSsites)) {
     outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" ) #products
     site1 = "NRS11"
     site3 = "cbnrs11"
+    site = "NRS11"
   } else {
     site1 = site
     site3 = site
@@ -176,7 +177,7 @@ for (uu in 1:length(ONMSsites)) {
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
   ### effort by season ####
-  p2 = ggplot(summary2, aes(x = year, y = n, fill = as.factor(Season))) +
+  p2 = ggplot(summary2, aes(x = as.character(year), y = n, fill = as.factor(Season))) +
     geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
     labs(
       title = "monitoring effort by season",
