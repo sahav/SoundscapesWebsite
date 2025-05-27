@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["cb11"]
+sites = ["nrs11"]
 
 #functions for website design
 def makeButtons(generalFormat, identifier):
