@@ -94,6 +94,7 @@ if (length(inFiles) > 0 ) {
 
 ## Manta Files- NCEI ####
 # download before running... 
+# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/as01 F:/ONMS/as01
 # gsutil -m rsync -r gs://noaa-passive-bioacoustic/nrs/products/sound_level_metrics/11 F:/ONMS/nrs11
 # gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/mb01 F:/ONMS/mb01
 # gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/sb01 F:/ONMS/sb01

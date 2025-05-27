@@ -32,6 +32,7 @@ outDirC =  paste0(outDir,"context\\") #context
 DC = Sys.Date()
 project = "ONMS"
 fqIn = "TOL_125" 
+fqInShip = c("TOL_63", "TOL_125")
 ab = 65 # threshold for above frequency in
 fqIn2 = "TOL_500" # no wind model for 125 Hz- ugh!!!
 fqIn2name = "500 Hz"
@@ -616,7 +617,73 @@ for (uu in 1:length(ONMSsites)) {
   htmlwidgets::saveWidget(as_widget(fig), 
   paste0( outDirG, "\\plot_", toupper(site), "_TS125ptly.html") ) 
   
-  ## TIME SERIES - exceed at XX Hz  ####
+  
+  ## TIME SERIES - above year 1 median ####
+  cols_to_select = c("UTC", "windMag","wind_category", "Season", fqInShip)
+  gpsFQ = gps %>% select(all_of(cols_to_select))
+  gpsFQ$yr = year(gpsFQ$UTC) # unique(  gpsFQ$yr)
+  gpsFQ$mth = month(gpsFQ$UTC)
+  names(gpsFQ)
+  monthMed = gpsFQ %>%
+    mutate(Date = as.Date(UTC)) %>%
+    group_by(mth, yr) %>%
+    summarise(
+      hrs = n(),  # Count of observations
+      med1 = quantile(TOL_63, 0.50, na.rm = TRUE),
+      med2 = quantile(TOL_125, 0.50, na.rm = TRUE), # Median
+      
+    )
+  monthDiff <- monthMed %>%
+    group_by(mth) %>%
+    mutate(
+      base_med1 = med1[which.min(yr)],
+      base_med2 = med2[which.min(yr)],
+      med1_diff = med1 - base_med1,
+      med2_diff = med2 - base_med2
+    ) %>%
+    ungroup()
+  
+  monthDiff <- monthDiff %>%
+    mutate(
+      Date = as.Date(paste(yr, mth, "15", sep = "-")),
+      Month = factor(month.abb[mth], levels = month.abb)  # Ensure correct order
+    )
+  
+  monthDiff_long <- monthDiff %>%
+    pivot_longer(cols = c(med1_diff, med2_diff), names_to = "Metric", values_to = "Anomaly") %>%
+    mutate(Direction = ifelse(Anomaly > 0, "Positive", "Negative"))
+  
+  
+  pmed1 = ggplot(monthDiff_long, aes(x = Month, y = Anomaly, fill = Direction)) +
+    geom_col(position = "dodge") +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+    facet_grid(rows = vars(yr), cols = vars(Metric)) +
+    scale_fill_manual(values = c("Positive" = "firebrick", "Negative" = "steelblue")) +
+    ylim(c(-2,4)) +
+    labs(
+      title = paste0 (substr(fqInShip[1], start = 5, stop = 6), "Hz and ", 
+                      substr(fqInShip[2], start = 5, stop = 7), "Hz"),
+      x = "",
+      caption = paste0(toupper(site), 
+                       " (",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"),
+      y = paste0 ("Difference from year-1 (decibel)")
+    ) +
+    theme_minimal() +
+    theme(
+      strip.background = element_rect(fill = "gray90", color = "black", linewidth = 0.5),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_blank(), 
+      panel.border = element_rect(color = "black", fill = NA),
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "none"
+    )
+  pmed1
+
+  ### save: above year-1 median ####
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1above.jpg"), plot = p5, width = 10, height = 12, dpi = 300)
+  
+  
+  ## TIME SERIES - wind dominated XX Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
   gpsFQ = gps %>% select(all_of(cols_to_select))
   #ADD wind speed estimate for each hour of data in frequency of interest
@@ -626,7 +693,6 @@ for (uu in 1:length(ONMSsites)) {
   fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'100'
   wsIdx <- match(gpsFQ$closest_windMag, windInfo$windSpeed)
   gpsFQ$WindModelfq <- windInfo[wsIdx, fqIdx]
-  #names(gpsFQ)
   tol_col = grep("TOL", colnames(gpsFQ))
   gpsFQ$Exceed = gpsFQ[,tol_col] -  gpsFQ$WindModelfq #actual - model
   gpsFQ$yr = year(gpsFQ$UTC)
