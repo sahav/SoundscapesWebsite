@@ -654,7 +654,7 @@ for (uu in 1:length(ONMSsites)) {
     mutate(Direction = ifelse(Anomaly > 0, "Positive", "Negative"))
   
   
-  pmed1 = ggplot(monthDiff_long, aes(x = Month, y = Anomaly, fill = Direction)) +
+  p5 = ggplot(monthDiff_long, aes(x = Month, y = Anomaly, fill = Direction)) +
     geom_col(position = "dodge") +
     geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
     facet_grid(rows = vars(yr), cols = vars(Metric)) +
@@ -677,7 +677,7 @@ for (uu in 1:length(ONMSsites)) {
       axis.text.x = element_text(angle = 45, hjust = 1),
       legend.position = "none"
     )
-  pmed1
+  p5
 
   ### save: above year-1 median ####
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1above.jpg"), plot = p5, width = 10, height = 12, dpi = 300)
