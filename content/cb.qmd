@@ -155,7 +155,7 @@ display(HTML(infoHtml))
 #| echo: false
 display(HTML(standardTextDict["Indicator description"]))
 ```
-### Tracking trends in low frequency ocean noise
+### Tracking low frequency ocean noise
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Above year 1"])) 
