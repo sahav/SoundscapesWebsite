@@ -154,10 +154,13 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicator description"]))
+```
+### Tracking trends in low frequency ocean noise
+```{python}
+#| echo: false
 display(HTML(standardTextDict["Above year 1"])) 
 display(HTML(makeButtons("plot_***_year1above.jpg", "dBabove")))
 display(HTML(makeButtons("plot_***_year1Pctabove.jpg", "dBabove"))) 
-
 ```
 :::
 
