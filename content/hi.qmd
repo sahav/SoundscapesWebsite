@@ -1,0 +1,170 @@
+```{python}
+#| include: false
+import pandas as pd
+from datetime import date
+from tabulate import tabulate
+from IPython.display import display, HTML, Image
+import os
+import ipywidgets as widgets
+
+
+sites = ["pm01"]
+
+def makeImage(imageName, identifier):
+    inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
+    path = f'{inputDir}/{imageName}'
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="toggle{identifier}()">'
+    initialImage += f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
+    return initialImage
+  
+def makeButtons(generalFormat, identifier):
+    buttons = ""
+    scripts = f"""
+                    <script>
+                    function toggle{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        if (!document.fullscreenElement) {{
+                            imgElement.requestFullscreen();
+                        }} else {{
+                            document.exitFullscreen();
+                        }}
+                    }}
+                    </script>
+    """
+    inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
+    path = f'{inputDir}/{generalFormat}'
+    path = path.replace("***", sites[0])
+    initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="toggle{identifier}()">'
+    if len(sites) == 1:
+        return initialImage + scripts
+    
+    for site in sites:
+        path = f'{inputDir}/{generalFormat}'
+        path = path.replace("***", site)
+
+        buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;text-transform: uppercase;">{site}</button>'
+        scripts += f"""
+                    <script>
+                    function {site}{identifier}() {{
+                        var imgElement = document.getElementById('{identifier}');
+                        imgElement.src = "{path}";
+                    }}
+                    </script>
+        """
+    return buttons + initialImage + scripts
+
+inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
+metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
+metadata = pd.read_excel(metaFile, sheet_name="Summary", header=1)
+lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]
+dicts = [l.to_dict() for l in lookup]
+
+df = pd.read_excel(metaFile, sheet_name="Standard Report Text", engine_kwargs={'keep_links': True})
+standardTextDict = pd.Series(df.iloc[:, 3].values, index=df.iloc[:, 1]).to_dict()
+
+for key in standardTextDict:
+    value = standardTextDict[key]
+    if isinstance(value, str):  # Only process if it's a string
+        while "**" in value:
+            value = value.replace("**", "<b>", 1)
+            value = value.replace("**", "</b>", 1)
+
+# input table for site information
+df1 = pd.read_excel(metaFile, sheet_name="PM")
+for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
+    df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format
+summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
+
+summaryTable.extend(df1.values.tolist())
+
+htmlTable = '<div style="overflow-x: auto;">' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
+```
+
+---
+title: "Papahānaumokuākea National Marine Sanctuary Soundscape Report"
+date: "today"
+output: 
+  html_document: 
+    fig_caption: true
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Where are we listening?
+```{python}
+#| echo: false
+display(HTML(standardTextDict["PNMS"]))
+```
+
+### Ocean sound monitoring sites
+```{python}
+#| echo: false
+display(HTML(htmlTable))
+```
+:::
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Annual soundscape conditions
+```{python}
+#| echo: false
+display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+```
+:::
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Seasonal soundscape conditions
+```{python}
+#| echo: false
+display(HTML(standardTextDict["Soundscape Overview"]))
+display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
+infoHtml = f'''
+<button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
+  <dialog id="infoModal">
+  <p>The median power spectral densities (PSD) for all hours across all years are calculated from calibrated audio data using community software tools:
+    <a href="https://github.com/MarineBioAcousticsRC/Triton/tree/master" target="_blank">Triton Soundscape Metrics</a>, <a href="https://pubs.aip.org/asa/jel/article/1/1/011203/219719" target="_blank">MANTA</a>, or <a href="https://github.com/lifewatch/pypam" target="_blank">PyPAM</a>. Triton software calculates the one-third octave band sound pressure levels by integration of PSD levels with a 1 Hz/1 second resolution and a median was used to calculate hourly values over no less than 1,800 1-s values for that hour and converted to decibels (dB re 1 μPa). MANTA and PYPAM software calculates power spectral density (PSD) levels per minute (μPa²) within the hybrid milledecade frequency bands. <a href="https://cran.r-project.org/web/packages/PAMscapes/index.html" target="_blank">PAMscapes</a> was used to calculate the median for each hour within one-third octave bands. These values were then converted to 1-Hz resolution to match the wind model results by converting to pressure and dividing by the band width before converting back to sound spectrum levels in decibels (dB re 1 μPa/Hz).</p>
+    <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
+      Close
+      </button>
+      </dialog>
+      <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).showModal()">
+        How does my sanctuary compare?
+        </button>
+        <dialog id="infoModal2">
+        <p>No one soundscape is alike and we can use other sites in similar oceanographic settings (e.g. nearshore or offshore) to compare conditions. From 2018-2022, the U.S. National Oceanic and Atmospheric Administration (NOAA) and the U.S. Navy engaged in a multi-year effort to monitor underwater sound within the U.S. National Marine Sanctuary System, known <a href="https://sanctuaries.noaa.gov/science/monitoring/sound/sanctsound.html" target="_blank">Sanctuary SoundScape Monitoring Project</a>. Data collected during this dedicated period provide <a href="https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2021.719258/full" target="_blank">initial insights</a> on how soundscapes compare.</p>
+        <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).close()">
+          Close
+          </button>
+          </dialog>
+'''
+display(HTML(infoHtml))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Daily soundscape conditions
+```{python}
+#| echo: false
+#display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+#display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Ocean sound indicators
+```{python}
+#| echo: false
+display(HTML(standardTextDict["Indicator description"]))
+```
+:::
