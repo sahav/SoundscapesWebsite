@@ -65,7 +65,7 @@ windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.nam
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
-#PROCESS BY SITE #### uu = 8
+#PROCESS BY SITE #### uu = 5
 for (uu in 1:length(ONMSsites)) {
   
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -107,7 +107,7 @@ for (uu in 1:length(ONMSsites)) {
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
-  }else if  ( sidx == "other") {
+  }else if  ( sidx == "biological") {
     season = data.frame(
       Season = c("Early", "Peak", "Late", "Non"),
       Months = c("10,11,12", "1,2,3", "4,5,6", "7,8,9") ,
