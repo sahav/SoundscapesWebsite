@@ -55,6 +55,8 @@ website:
         text: Papahānaumokuākea
       - href: content/as.qmd
         text: American Samoa
+      - href: content/hi.qmd
+        text: Hawaiian Islands Humpback Whale
 
 format:
   html:
