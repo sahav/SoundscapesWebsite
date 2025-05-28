@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 
 
-sites = ["as01"]
+sites = ["AS01"]
 
 def makeImage(imageName, identifier):
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
