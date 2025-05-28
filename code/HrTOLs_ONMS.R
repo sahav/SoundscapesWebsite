@@ -18,12 +18,12 @@ library(xlsx)
 
 # SET UP PARAMS ####
 DC = Sys.Date()
-site  = "OC02" #MB02
+site  = "HI01" #MB02
 site = tolower(site) # "mb01"
-dirSS = "F:\\SanctSound" # SANCTSOUND
+dirSS = paste0( "F:/ONMS/", site,"/SanctSound" ) #"F:\\ONMS\\SanctSound" # SANCTSOUND
 dirGCP = paste0( "F:/ONMS/", site,"/") #NCEI GCP 
-outDir =  "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\" 
-outDirC = paste0( outDir,"context\\") #context
+outDir =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\" 
+outDirC = paste0( outDir,"content\\resources\\") #context
 outDirP = paste0( outDir,"products\\", substr(tolower(site),start = 1, stop =2),"\\" )#products
 outDirG = paste0( outDir,"report\\" ) #graphics
 
@@ -37,7 +37,7 @@ siteInfo = lookup[lookup$`NCEI ID` == site,]
 siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
 siteInfo
 
-# CHECK FOR PROCESSED FILES #### 
+ # CHECK FOR PROCESSED FILES #### 
 pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_",site), full.names = T, recursive = T)
 if (length(pFile) > 0 ) {
   load(pFile)
@@ -93,17 +93,6 @@ if (length(inFiles) > 0 ) {
 }
 
 ## Manta Files- NCEI ####
-# download before running... 
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/as01 F:/ONMS/as01
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/nrs/products/sound_level_metrics/11 F:/ONMS/nrs11
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/mb01 F:/ONMS/mb01
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/sb01 F:/ONMS/sb01
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/oc02 F:/ONMS/oc02
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/mb02  F:\ONMS\mb02
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/pm01 F:/ONMS/pm01
-# gsutil -m rsync -r gs://noaa-passive-bioacoustic/onms/products/sound_level_metrics/pm02 F:/ONMS/pm02
-
-
 inFiles = list.files(dirGCP, pattern = "MinRes", recursive = T, full.names = T)
 inFiles = inFiles[!grepl(".png",inFiles) ]
 inFiles = inFiles[!grepl(".csv",inFiles) ]
@@ -161,7 +150,7 @@ if( length(sData) == 0 & length(cData) == 0 ){ # No new files
   aData_cleaned = aData[, !colnames(aData) %in% c("site", "yr","mth")]
   colnames(aData_cleaned)
   gps = matchGFS(aData) #PAMscapes function that matches weather to all 
-  # names(gps)
+   # names(gps)
   gps$yr  = year(gps$UTC)
   gps$mth = month(gps$UTC)
   gps$site = site

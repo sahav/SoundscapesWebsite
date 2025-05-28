@@ -50,9 +50,11 @@ website:
       - href: content/cb.qmd
         text: Cordell Bank
       - text: <br>
-      - text: <b>Pacific Islands Region</b>
+      - text: <b>Greater Pacific Region</b>
       - href: content/pi.qmd
         text: Papahānaumokuākea
+      - href: content/as.qmd
+        text: American Samoa
 
 format:
   html:

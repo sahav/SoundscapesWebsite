@@ -22,7 +22,7 @@ library(plotly)
 
 # SET UP ####
 ##  sites ####
-ONMSsites = c("sb01", "sb03","mb01","mb02", "pm01","oc02", "cb11")
+ONMSsites = c("sb01", "sb03","mb01","mb02", "pm01","oc02", "cb11","as01","hi01")
 ## directories ####
 outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
 outDirG =  paste0(outDir, "content\\resources") #save graphics
@@ -65,7 +65,7 @@ windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.nam
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
-#PROCESS BY SITE #### uu = 7
+#PROCESS BY SITE #### uu = 8
 for (uu in 1:length(ONMSsites)) {
   
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -85,6 +85,8 @@ for (uu in 1:length(ONMSsites)) {
   ## metadata ####
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
+  siteInfo = siteInfo[siteInfo$Project == "ONMS Sound", ]
+ 
   ## frequency of interest ####
   FOIs = FOI [ FOI$Sanctuary == substr(site, 1,2), ]
   ## times of interest ####
@@ -99,7 +101,7 @@ for (uu in 1:length(ONMSsites)) {
   ## seasonality ####
   sidx = siteInfo$Seasonality
   #put in alphetical order so plots line up!!!
-  if ( length(sidx) == 0 ) {
+  if ( length(sidx) == 0 ) { # default
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
@@ -117,7 +119,7 @@ for (uu in 1:length(ONMSsites)) {
       Months = c("7,8,9,10,11", "3,4,5,6", "12,1,2") ,
       values = c(  "#CC79A7",  "#009E73","#56B4E9") )
     seasonLabel = "Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
-  }else {
+  }else if ( sidx == "wssf") {
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
@@ -178,6 +180,8 @@ for (uu in 1:length(ONMSsites)) {
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
   ### effort by season ####
+  season = season[season$Season %in% summary2$Season, ]
+  
   p2 = ggplot(summary2, aes(x = as.character(year), y = n, fill = as.factor(Season))) +
     geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
     labs(
@@ -654,94 +658,95 @@ for (uu in 1:length(ONMSsites)) {
     mutate(Direction = ifelse(Anomaly > 0, "Positive", "Negative"))
  
   monthDiff_long = subset(monthDiff_long, !is.na(Anomaly) & Anomaly != 0)
-  p5 = ggplot(monthDiff_long, aes(x = Month, y = Anomaly, fill = Direction)) +
-    geom_col(position = "dodge") +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
-    facet_grid(rows = vars(yr), cols = vars(Metric)) +
-    scale_fill_manual(values = c("Positive" = "firebrick", "Negative" = "steelblue")) +
-    ylim(c(-2,4)) +
-    labs(
-      title = paste0 (substr(fqInShip[1], start = 5, stop = 6), "Hz and ", 
-                      substr(fqInShip[2], start = 5, stop = 7), "Hz"),
-      x = "",
-      caption = paste0(toupper(site), 
-                       " (",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"),
-      y = paste0 ("Difference from year-1 (decibel)")
-    ) +
-    theme_minimal() +
-    theme(
-      strip.background = element_rect(fill = "gray90", color = "black", linewidth = 0.5),
-      strip.text.y = element_text(angle = 0),
-      strip.text.x = element_blank(), 
-      panel.border = element_rect(color = "black", fill = NA),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
-  p5
-
-  ### save: above year-1 median ####
-  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1above.jpg"), plot = p5, width = 10, height = 12, dpi = 300)
-  
-  ### % time above year 1 median- compare the hourly values
-  baseline = as.data.frame ( monthDiff[monthDiff$med1_diff == 0, 1:5] )
-  gpsFQ$diff63 = -99
-  gpsFQ$diff125= -99
-  for (mm in 1:length(unique(baseline$mth))) {
-    idx = which( gpsFQ$mth == baseline$mth[mm] )
-    gpsFQ$diff63[idx] = gpsFQ$TOL_63[idx]  - baseline$`63Hz`[mm]
-    gpsFQ$diff125[idx] = gpsFQ$TOL_125[idx] - baseline$`125Hz`[mm]
+  if ( nrow(monthDiff_long ) > 0 ) {
+    p5 = ggplot(monthDiff_long, aes(x = Month, y = Anomaly, fill = Direction)) +
+      geom_col(position = "dodge") +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+      facet_grid(rows = vars(yr), cols = vars(Metric)) +
+      scale_fill_manual(values = c("Positive" = "firebrick", "Negative" = "steelblue")) +
+      ylim(c(-2,4)) +
+      labs(
+        title = paste0 (substr(fqInShip[1], start = 5, stop = 6), "Hz and ", 
+                        substr(fqInShip[2], start = 5, stop = 7), "Hz"),
+        x = "",
+        caption = paste0(toupper(site), 
+                         " (",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"),
+        y = paste0 ("Difference from year-1 (decibel)")
+      ) +
+      theme_minimal() +
+      theme(
+        strip.background = element_rect(fill = "gray90", color = "black", linewidth = 0.5),
+        strip.text.y = element_text(angle = 0),
+        strip.text.x = element_blank(), 
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none"
+      )
+    p5
     
-  }
- 
-  timeAbove <- gpsFQ %>%
-    group_by(yr, mth) %>%
-    summarise(
-      pct_above_63  = mean(diff63 > 0, na.rm = TRUE) * 100,
-      pct_above_125 = mean(diff125 > 0, na.rm = TRUE) * 100,
-      .groups = "drop"
-    )
-  
-  timeAbove <- timeAbove %>%
-    mutate(
-      Date = as.Date(paste(yr, mth, "15", sep = "-")),
-      Month = factor(month.abb[mth], levels = month.abb)  # Ensure correct order
-    )
-  
-  
-  timeAbove
-  timeAbove_long <- timeAbove %>%
-    pivot_longer(cols = c(pct_above_63, pct_above_125), names_to = "Metric", values_to = "Anomaly") %>%
-    mutate(Direction = ifelse(Anomaly > 0, "Positive", "Negative"))
-  timeAbove_long = subset(timeAbove_long, !is.na(Anomaly) & Anomaly != 50)
- # timeAbove_long = timeAbove_long[timeAbove_long$Anomaly != 50,]
-  
-  p6 = ggplot(timeAbove_long, aes(x = Month, y = Anomaly)) +
-    geom_col(position = "dodge") +
-    geom_hline(yintercept = 50, linetype = "dashed", color = "gray40") +
-    facet_grid(rows = vars(yr), cols = vars(Metric)) +
-    scale_fill_manual(values = "gray")  +
-    ylim(c(0,100)) +
-    labs(
-      title = paste0 ("% Time Above: ", substr(fqInShip[1], start = 5, stop = 6), "Hz and ", 
-                      substr(fqInShip[2], start = 5, stop = 7), "Hz"),
-      x = "",
-      caption = paste0(toupper(site), 
-                       " (",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"),
-      y = paste0 ("% Time Above year-1 median")
-    ) +
-    theme_minimal() +
-    theme(
-      strip.background = element_rect(fill = "gray90", color = "black", linewidth = 0.5),
-      strip.text.y = element_text(angle = 0),
-      strip.text.x = element_blank(), 
-      panel.border = element_rect(color = "black", fill = NA),
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    )
-  p6
-  ### save: above year-1 median ####
-  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1Pctabove.jpg"), plot = p6, width = 10, height = 12, dpi = 300)
-  
+    ### save: above year-1 median ####
+    ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1above.jpg"), plot = p5, width = 10, height = 12, dpi = 300)
+    
+    ### % time above year 1 median- compare the hourly values
+    baseline = as.data.frame ( monthDiff[monthDiff$med1_diff == 0, 1:5] )
+    gpsFQ$diff63 = -99
+    gpsFQ$diff125= -99
+    for (mm in 1:length(unique(baseline$mth))) {
+      idx = which( gpsFQ$mth == baseline$mth[mm] )
+      gpsFQ$diff63[idx] = gpsFQ$TOL_63[idx]  - baseline$`63Hz`[mm]
+      gpsFQ$diff125[idx] = gpsFQ$TOL_125[idx] - baseline$`125Hz`[mm]
+      
+    }
+    
+    timeAbove <- gpsFQ %>%
+      group_by(yr, mth) %>%
+      summarise(
+        pct_above_63  = mean(diff63 > 0, na.rm = TRUE) * 100,
+        pct_above_125 = mean(diff125 > 0, na.rm = TRUE) * 100,
+        .groups = "drop"
+      )
+    
+    timeAbove <- timeAbove %>%
+      mutate(
+        Date = as.Date(paste(yr, mth, "15", sep = "-")),
+        Month = factor(month.abb[mth], levels = month.abb)  # Ensure correct order
+      )
+    
+    
+    timeAbove
+    timeAbove_long <- timeAbove %>%
+      pivot_longer(cols = c(pct_above_63, pct_above_125), names_to = "Metric", values_to = "Anomaly") %>%
+      mutate(Direction = ifelse(Anomaly > 0, "Positive", "Negative"))
+    timeAbove_long = subset(timeAbove_long, !is.na(Anomaly) & Anomaly != 50)
+    # timeAbove_long = timeAbove_long[timeAbove_long$Anomaly != 50,]
+    
+    p6 = ggplot(timeAbove_long, aes(x = Month, y = Anomaly)) +
+      geom_col(position = "dodge") +
+      geom_hline(yintercept = 50, linetype = "dashed", color = "gray40") +
+      facet_grid(rows = vars(yr), cols = vars(Metric)) +
+      scale_fill_manual(values = "gray")  +
+      ylim(c(0,100)) +
+      labs(
+        title = paste0 ("% Time Above: ", substr(fqInShip[1], start = 5, stop = 6), "Hz and ", 
+                        substr(fqInShip[2], start = 5, stop = 7), "Hz"),
+        x = "",
+        caption = paste0(toupper(site), 
+                         " (",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"),
+        y = paste0 ("% Time Above year-1 median")
+      ) +
+      theme_minimal() +
+      theme(
+        strip.background = element_rect(fill = "gray90", color = "black", linewidth = 0.5),
+        strip.text.y = element_text(angle = 0),
+        strip.text.x = element_blank(), 
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none"
+      )
+    p6
+    ### save: above year-1 median ####
+    ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1Pctabove.jpg"), plot = p6, width = 10, height = 12, dpi = 300)
+  } # not baseline data to compare
   
   ## TIME SERIES - wind dominated XX Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
