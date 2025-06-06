@@ -38,7 +38,7 @@ htmlTable = '<div style="overflow-x: scroll;">' + tabulate(summaryTable, tablefm
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
 headerSizes = ["200","200","200","200","200","200","200","200","200","200","200"]
 for i in range(len(headerLocations)):
-  htmlTable = htmlTable[:headerLocations[i]] + f'<th style="width:{headerSizes[i]}"' + htmlTable[headerLocations[i]+4:]
+  htmlTable = htmlTable[:headerLocations[i]] + f'<th style="width:{headerSizes[i]}px"' + htmlTable[headerLocations[i]+4:]
 ```
 
 ---
