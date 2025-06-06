@@ -10,7 +10,7 @@ from pythonFunctions import generalFunctions as gf
 
 sites = ["sb01", "sb03"]
 
-inputDir = os.path.normpath(os.path.join(os.getcwd(), "content/resources"))
+inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
 metadata = pd.read_excel(metaFile, sheet_name="Summary", header=1)
 lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]
