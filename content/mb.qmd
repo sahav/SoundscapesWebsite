@@ -6,11 +6,7 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-#from .pythonFunctions.generalFunctions import embedMapViewer
-#from .pythonFunctions.generalFunctions import makeButtons
-#from .pythonFunctions.generalFunctions import makeImage
-
-print(os.getcwd())
+from pythonFunctions import generalFunctions as gf
 
 sites = ["mb01", "mb02"]
 
@@ -59,7 +55,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["MBNMS"]))
-#display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
+#display(HTML(gf.makeImage("MBNMS.jpg", "MarineLife")))
 ```
 
 ### Ocean sound monitoring sites
@@ -75,7 +71,7 @@ display(HTML(htmlTable))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(gf.makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 
@@ -84,7 +80,7 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
+display(HTML(gf.makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
             <dialog id="infoModal">
@@ -124,8 +120,8 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Fish Chorus"]))
-display(HTML(makeImage("plot_mb01_FinalHist.png", " Seasonal Fish Choruses")))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", " Daily Fish Choruses")))
+display(HTML(gf.makeImage("plot_mb01_FinalHist.png", " Seasonal Fish Choruses")))
+display(HTML(gf.makeImage("plot_mb01_FinalRosePlot.jpg", " Daily Fish Choruses")))
 
 
 ```

@@ -6,11 +6,7 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-#from .pythonFunctions.generalFunctions import embedMapViewer
-#from .pythonFunctions.generalFunctions import makeButtons
-#from .pythonFunctions.generalFunctions import makeImage
-
-print(os.getcwd())
+from pythonFunctions import generalFunctions as gf
 
 sites = ["sb01", "sb03"]
 
@@ -48,7 +44,7 @@ editor_options:
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What is ocean sound?"]))
-#display(HTML(makeImage("MBNMS.jpg", "MarineLife")))
+#display(HTML(gf.makeImage("MBNMS.jpg", "MarineLife")))
 ```
 :::
 
@@ -57,14 +53,14 @@ display(HTML(standardTextDict["What is ocean sound?"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["When, where, & why are we listening?"]))
-display(HTML(embedMapViewer("https://www.ncei.noaa.gov/maps/passive-acoustic-data/")))
+display(HTML(gf.embedMapViewer("https://www.ncei.noaa.gov/maps/passive-acoustic-data/")))
 ```
 ### ONMS Sound data available through NCEI Passive Acoustic Data Archive  
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["gantt"]))
-display(HTML(makeImage("gantt_ONMS.jpg","Gantt")))
-#| display(HTML(makeImage("map_ONMS.jpg","Gantt")))
+display(HTML(gf.makeImage("gantt_ONMS.jpg","Gantt")))
+#| display(HTML(gf.makeImage("map_ONMS.jpg","Gantt")))
 ```
 :::
 
@@ -76,20 +72,20 @@ display(HTML(standardTextDict["Understanding Ocean Sound"]))
 ```
 ```{python}
 #| echo: false
-display(HTML(makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
+display(HTML(gf.makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
 display(HTML(standardTextDict["Soundscapes"]))
 ```
 ### Soundscape conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Seasonal soundscape conditions"]))
-display(HTML(makeImage("plot_sb01_SeasonalSPL.jpg", "seasons")))
+display(HTML(gf.makeImage("plot_sb01_SeasonalSPL.jpg", "seasons")))
 ```
 ### Ocean sound indicators
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicators from ocean sound"]))
-display(HTML(makeImage("plot_mb01_FinalRosePlot.jpg", "fish")))
+display(HTML(gf.makeImage("plot_mb01_FinalRosePlot.jpg", "fish")))
 ```
 :::
 

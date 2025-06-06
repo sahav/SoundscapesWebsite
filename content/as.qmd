@@ -6,11 +6,7 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-#from .pythonFunctions.generalFunctions import embedMapViewer
-#from .pythonFunctions.generalFunctions import makeButtons
-#from .pythonFunctions.generalFunctions import makeImage
-
-print(os.getcwd())
+from pythonFunctions import generalFunctions as gf
 
 sites = ["AS01"]
 
@@ -70,7 +66,7 @@ display(HTML(htmlTable))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(gf.makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
@@ -78,7 +74,7 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
+display(HTML(gf.makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
   <dialog id="infoModal">
@@ -107,7 +103,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-#display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+#display(HTML(gf.makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
 ```
 :::
 

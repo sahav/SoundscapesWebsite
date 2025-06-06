@@ -6,11 +6,7 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-#from .pythonFunctions.generalFunctions import embedMapViewer
-#from .pythonFunctions.generalFunctions import makeButtons
-#from .pythonFunctions.generalFunctions import makeImage
-
-print(os.getcwd())
+from pythonFunctions import generalFunctions as gf
 
 sites = ["sb01", "sb03"]
   
@@ -70,7 +66,7 @@ display(HTML(htmlTable))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(gf.makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 
@@ -79,7 +75,7 @@ display(HTML(makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-display(HTML(makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
+display(HTML(gf.makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
             <dialog id="infoModal">
@@ -110,7 +106,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-#display(HTML(makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+#display(HTML(gf.makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
 ```
 :::
 
@@ -125,14 +121,14 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
-display(HTML(makeButtons("plot_***_Exceed100.jpg", "Freq")))
+display(HTML(gf.makeButtons("plot_***_Exceed100.jpg", "Freq")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
   Table of results
   </button>
   <dialog id="infoModal3">
   <p>Percent Time Above Wind Noise</p>
-  {makeButtons("table_***_AboveWind.jpg", "MonthTable")}
+  {gf.makeButtons("table_***_AboveWind.jpg", "MonthTable")}
   <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
     Close
     </button>
@@ -144,7 +140,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict[""]))
-display(HTML(makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
+display(HTML(gf.makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
 display(HTML(f"""
             <iframe
                 src="resources/plot_sb01_TS125ptly.html"
@@ -162,14 +158,14 @@ display(HTML(f"""
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(makeButtons("plot_***_AIShist.jpg", "Histogram")))
+display(HTML(gf.makeButtons("plot_***_AIShist.jpg", "Histogram")))
 ```
 
 ### When are North Atlantic Right whales present in the soundscape?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["North Atlantic Right whales"]))
-#display(HTML(embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
+#display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
 ```
 :::
 
