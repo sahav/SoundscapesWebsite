@@ -1,4 +1,4 @@
-def makeButtons(generalFormat, identifier):
+def makeButtons(sites, generalFormat, identifier):
     buttons = ""
     scripts = f"""
                     <script>

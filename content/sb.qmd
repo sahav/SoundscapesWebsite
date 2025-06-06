@@ -66,7 +66,7 @@ display(HTML(htmlTable))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(gf.makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
 ```
 :::
 
@@ -75,7 +75,7 @@ display(HTML(gf.makeButtons("plot_***_YearSPL.jpg", "YearSPL")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-display(HTML(gf.makeButtons("plot_***_SeasonalSPL.jpg", "Seasons")))
+display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
             <dialog id="infoModal">
@@ -121,14 +121,14 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
-display(HTML(gf.makeButtons("plot_***_Exceed100.jpg", "Freq")))
+display(HTML(gf.makeButtons(sites, "plot_***_Exceed100.jpg", "Freq")))
 infoHtml = f'''
 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
   Table of results
   </button>
   <dialog id="infoModal3">
   <p>Percent Time Above Wind Noise</p>
-  {gf.makeButtons("table_***_AboveWind.jpg", "MonthTable")}
+  {gf.makeButtons(sites, "table_***_AboveWind.jpg", "MonthTable")}
   <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
     Close
     </button>
@@ -140,7 +140,7 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict[""]))
-display(HTML(gf.makeButtons("plot_***_125Hz.jpg", "SoundLevelVariance")))
+display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance")))
 display(HTML(f"""
             <iframe
                 src="resources/plot_sb01_TS125ptly.html"
@@ -158,7 +158,7 @@ display(HTML(f"""
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
-display(HTML(gf.makeButtons("plot_***_AIShist.jpg", "Histogram")))
+display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
 ```
 
 ### When are North Atlantic Right whales present in the soundscape?
