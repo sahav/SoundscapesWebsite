@@ -141,18 +141,7 @@ display(HTML(infoHtml))
 #| echo: false
 #display(HTML(standardTextDict[""]))
 display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance")))
-display(HTML(f"""
-            <iframe
-                src="resources/plot_sb01_TS125ptly.html"
-                name="targetframe"
-                allowTransparency="true"
-                scrolling="no"
-                frameborder="0"
-                width="700px"
-                height="850px"
-            >
-            </iframe>
-"""))
+display(HTML(gf.addPlotly("plot_sb01_TS125ptly.html")))
 ```
 ### How much noise do nearby ships contribute to the soundscape?
 ```{python}
