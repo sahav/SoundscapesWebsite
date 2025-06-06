@@ -33,12 +33,14 @@ for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 summaryTable.extend(df1.values.tolist())
 
+headerSizes = ["50","200","200","200","200","200","200","200","200","200","200"]
+tableWidth = sum(int(x) for x in headerSizes)
 htmlTable = '<div>' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
-htmlTable = htmlTable.replace('<table>', '<table style="overflow-x: auto; display: block;">')
+htmlTable = htmlTable.replace('<table>', f'<table style="width:{tableWidth}px ;overflow-x: auto; display: block;">')
 htmlTable = htmlTable.replace("<td>", "<th>", 11)
 htmlTable = htmlTable.replace("</td>", "</th>", 11)
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
-headerSizes = ["50","200","200","200","200","200","200","200","200","200","200"]
+
 for i in range(len(headerLocations)):
   htmlTable = htmlTable[:headerLocations[i]] + f'<th style="width:{headerSizes[i]}px"' + htmlTable[headerLocations[i]+4:]
 
