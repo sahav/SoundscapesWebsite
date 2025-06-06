@@ -6,7 +6,9 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-from pythonFunctions.generalFunctions import makeButtons, makeImage, embedMapViewer
+from pythonFunctions import generalFunctions.embedMapViewer
+from pythonFunctions import generalFunctions.makeButtons
+from pythonFunctions import generalFunctions.makeImage
 
 sites = ["NRS11"]
 
