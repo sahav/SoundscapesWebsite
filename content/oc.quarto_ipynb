@@ -1,0 +1,227 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| include: false\n",
+        "import pandas as pd\n",
+        "from datetime import date\n",
+        "from tabulate import tabulate\n",
+        "from IPython.display import display, HTML, Image\n",
+        "import os\n",
+        "import ipywidgets as widgets\n",
+        "from pythonFunctions import generalFunctions as gf\n",
+        "\n",
+        "sites = [\"oc02\"]\n",
+        "\n",
+        "inputDir = os.path.normpath(os.path.join(os.getcwd(), \"resources\"))\n",
+        "metaFile = os.path.join(inputDir, \"ONMSSound_IndicatorCategories.xlsx\")\n",
+        "metadata = pd.read_excel(metaFile, sheet_name=\"Summary\", header=1)\n",
+        "lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]\n",
+        "dicts = [l.to_dict() for l in lookup]\n",
+        "\n",
+        "df = pd.read_excel(metaFile, sheet_name=\"Standard Report Text\", engine_kwargs={'keep_links': True})\n",
+        "standardTextDict = pd.Series(df.iloc[:, 3].values, index=df.iloc[:, 1]).to_dict()\n",
+        "\n",
+        "for key in standardTextDict:\n",
+        "    value = standardTextDict[key]\n",
+        "    if isinstance(value, str):  # Only process if it's a string\n",
+        "        while \"**\" in value:\n",
+        "            value = value.replace(\"**\", \"<b>\", 1)\n",
+        "            value = value.replace(\"**\", \"</b>\", 1)\n",
+        "\n",
+        "# input table for site information\n",
+        "df1 = pd.read_excel(metaFile, sheet_name=\"OC\")\n",
+        "for col in df1.select_dtypes(include=[\"datetime64[ns]\"]).columns:\n",
+        "    df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format\n",
+        "summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces\n",
+        "\n",
+        "summaryTable.extend(df1.values.tolist())\n",
+        "\n",
+        "htmlTable = '<div style=\"overflow-x: auto;\">' + tabulate(summaryTable, tablefmt=\"unsafehtml\") + '</div>'"
+      ],
+      "id": "f1788dfc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Olympic Coast National Marine Sanctuary Soundscape Report\"\n",
+        "date: \"today\"\n",
+        "output: \n",
+        "  html_document: \n",
+        "    fig_caption: true\n",
+        "editor_options: \n",
+        "  markdown: \n",
+        "    wrap: 72\n",
+        "---\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Where are we listening?"
+      ],
+      "id": "3a0c8634"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"OCNMS\"]))"
+      ],
+      "id": "d8142a8c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "### Ocean sound monitoring sites"
+      ],
+      "id": "c0344ede"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(htmlTable))"
+      ],
+      "id": "9d93bbc5",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Annual soundscape conditions"
+      ],
+      "id": "c001f5d4"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"What are the latest conditions in ocean sound?\"]))\n",
+        "display(HTML(gf.makeButtons(sites, \"plot_***_YearSPL.jpg\", \"YearSPL\")))"
+      ],
+      "id": "98f7fef6",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Seasonal soundscape conditions"
+      ],
+      "id": "8305ed81"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"Soundscape Overview\"]))\n",
+        "display(HTML(gf.makeButtons(sites, \"plot_***_SeasonalSPL.jpg\", \"Seasons\")))\n",
+        "infoHtml = f'''\n",
+        "<button style=\"background-color: #FFFFFF;\" onclick=\"document.getElementById(&#39;infoModal&#39;).showModal()\">How was this calculated?</button>\n",
+        "  <dialog id=\"infoModal\">\n",
+        "  <p>The median power spectral densities (PSD) for all hours across all years are calculated from calibrated audio data using community software tools:\n",
+        "    <a href=\"https://github.com/MarineBioAcousticsRC/Triton/tree/master\" target=\"_blank\">Triton Soundscape Metrics</a>, <a href=\"https://pubs.aip.org/asa/jel/article/1/1/011203/219719\" target=\"_blank\">MANTA</a>, or <a href=\"https://github.com/lifewatch/pypam\" target=\"_blank\">PyPAM</a>. Triton software calculates the one-third octave band sound pressure levels by integration of PSD levels with a 1 Hz/1 second resolution and a median was used to calculate hourly values over no less than 1,800 1-s values for that hour and converted to decibels (dB re 1 μPa). MANTA and PYPAM software calculates power spectral density (PSD) levels per minute (μPa²) within the hybrid milledecade frequency bands. <a href=\"https://cran.r-project.org/web/packages/PAMscapes/index.html\" target=\"_blank\">PAMscapes</a> was used to calculate the median for each hour within one-third octave bands. These values were then converted to 1-Hz resolution to match the wind model results by converting to pressure and dividing by the band width before converting back to sound spectrum levels in decibels (dB re 1 μPa/Hz).</p>\n",
+        "    <button style=\"background-color: #FFFFFF;\" onclick=\"document.getElementById(&#39;infoModal&#39;).close()\">\n",
+        "      Close\n",
+        "      </button>\n",
+        "      </dialog>\n",
+        "      <button style=\"background-color: #FFFFFF;\" onclick=\"document.getElementById(&#39;infoModal2&#39;).showModal()\">\n",
+        "        How does my sanctuary compare?\n",
+        "        </button>\n",
+        "        <dialog id=\"infoModal2\">\n",
+        "        <p>No one soundscape is alike and we can use other sites in similar oceanographic settings (e.g. nearshore or offshore) to compare conditions. From 2018-2022, the U.S. National Oceanic and Atmospheric Administration (NOAA) and the U.S. Navy engaged in a multi-year effort to monitor underwater sound within the U.S. National Marine Sanctuary System, known <a href=\"https://sanctuaries.noaa.gov/science/monitoring/sound/sanctsound.html\" target=\"_blank\">Sanctuary SoundScape Monitoring Project</a>. Data collected during this dedicated period provide <a href=\"https://www.frontiersin.org/journals/marine-science/articles/10.3389/fmars.2021.719258/full\" target=\"_blank\">initial insights</a> on how soundscapes compare.</p>\n",
+        "        <button style=\"background-color: #FFFFFF;\" onclick=\"document.getElementById(&#39;infoModal2&#39;).close()\">\n",
+        "          Close\n",
+        "          </button>\n",
+        "          </dialog>\n",
+        "'''\n",
+        "display(HTML(infoHtml))"
+      ],
+      "id": "1ca77957",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Daily soundscape conditions"
+      ],
+      "id": "1dcc317b"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "#display(HTML(standardTextDict[\"What are the latest conditions in ocean sound?\"]))\n",
+        "#display(HTML(gf.makeImage(\"DAILY_MILLIDEC_MinRes_psd.png\", \"Spectrogram\")))"
+      ],
+      "id": "51301169",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::\n",
+        "\n",
+        "::: {style=\"border: 1px solid black; padding: 10px; margin-bottom: 20px;\"}\n",
+        "## Ocean sound indicators"
+      ],
+      "id": "1c6f4bc3"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#| echo: false\n",
+        "display(HTML(standardTextDict[\"Indicator description\"]))"
+      ],
+      "id": "9bd6dbfb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        ":::"
+      ],
+      "id": "e7c62692"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "display_name": "Python 3",
+      "language": "python",
+      "name": "python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

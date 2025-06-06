@@ -51,6 +51,20 @@ def makeImage(imageName, identifier):
                     </script>
     """
     return initialImage
+    
+def addPlotly(sourceHTML):
+	return f"""
+            <iframe
+                src="resources/{sourceHTML}"
+                name="targetframe"
+                allowTransparency="true"
+                scrolling="no"
+                frameborder="0"
+                width="700px"
+                height="850px"
+            >
+            </iframe>
+			"""
   
 def embedMapViewer(srcLink):
     return f'<embed src="{srcLink}" style="width:900px; height: 800px;">'
