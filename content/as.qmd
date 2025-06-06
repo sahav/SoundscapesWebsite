@@ -6,9 +6,11 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-from .pythonFunctions.generalFunctions import embedMapViewer
-from .pythonFunctions.generalFunctions import makeButtons
-from .pythonFunctions.generalFunctions import makeImage
+#from .pythonFunctions.generalFunctions import embedMapViewer
+#from .pythonFunctions.generalFunctions import makeButtons
+#from .pythonFunctions.generalFunctions import makeImage
+
+print(os.getcwd())
 
 sites = ["AS01"]
 
