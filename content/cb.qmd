@@ -37,6 +37,7 @@ headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th
 headerSizes = ["200","200","200","200","200","200","200","200","200","200","200"]
 for i in range(len(headerLocations)):
   htmlTable = htmlTable[:headerLocations[i]] + f'<th style="width:{headerSizes[i]}px"' + htmlTable[headerLocations[i]+4:]
+display(htmlTable)
 
 #df1 = pd.read_excel(metaFile, sheet_name="CB")
 #summaryTable = [list(df1.columns.values)]
