@@ -53,4 +53,4 @@ def makeImage(imageName, identifier):
     return initialImage
   
 def embedMapViewer(srcLink):
-    return f'<embed src="{link}" style="width:900px; height: 800px;">'
+    return f'<embed src="{srcLink}" style="width:900px; height: 800px;">'
