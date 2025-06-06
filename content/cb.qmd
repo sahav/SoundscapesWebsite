@@ -32,8 +32,11 @@ for col in df1.select_dtypes(include=["datetime64[ns]"]).columns:
     df1[col] = df1[col].dt.date  # or .dt.strftime('%Y-%m-%d') for custom format
 summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spaces
 summaryTable.extend(df1.values.tolist())
-htmlTable = '<div style="overflow-x: scroll;">' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
-htmlTable = htmlTable.replace("td", "th", 22)
+
+htmlTable = '<div>' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
+htmlTable = htmlTable.replace('<table>', '<table style="overflow-x: auto; display: block; white-space: nowrap;">')
+htmlTable = htmlTable.replace("<td>", "<th>", 11)
+htmlTable = htmlTable.replace("</td>", "</th>", 11)
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
 headerSizes = ["200","200","200","200","200","200","200","200","200","200","200"]
 for i in range(len(headerLocations)):
@@ -69,7 +72,6 @@ display(HTML(standardTextDict["CBNMS"]))
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
-display(htmlTable)
 ```
 :::
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
