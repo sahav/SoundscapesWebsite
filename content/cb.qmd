@@ -34,7 +34,7 @@ summaryTable = [list(df1.columns.values)]  # keeps column names as-is, with spac
 summaryTable.extend(df1.values.tolist())
 
 htmlTable = '<div>' + tabulate(summaryTable, tablefmt="unsafehtml") + '</div>'
-htmlTable = htmlTable.replace('<table>', '<table style="overflow-x: auto; display: block; white-space: nowrap;">')
+htmlTable = htmlTable.replace('<table>', '<table style="overflow-x: auto; display: block;">')
 htmlTable = htmlTable.replace("<td>", "<th>", 11)
 htmlTable = htmlTable.replace("</td>", "</th>", 11)
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
