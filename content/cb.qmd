@@ -38,7 +38,7 @@ htmlTable = htmlTable.replace('<table>', '<table style="overflow-x: auto; displa
 htmlTable = htmlTable.replace("<td>", "<th>", 11)
 htmlTable = htmlTable.replace("</td>", "</th>", 11)
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
-headerSizes = ["200","200","200","200","200","200","200","200","200","200","200"]
+headerSizes = ["50","200","200","200","200","200","200","200","200","200","200"]
 for i in range(len(headerLocations)):
   htmlTable = htmlTable[:headerLocations[i]] + f'<th style="width:{headerSizes[i]}px"' + htmlTable[headerLocations[i]+4:]
 
