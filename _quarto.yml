@@ -32,7 +32,7 @@ website:
     collapse-level: 1
     contents:
       - text: <b>General</b>
-      - href: index.qmd
+      - href: content/index.qmd
         text: Home
       - href: https://sanctuaries.noaa.gov/science/monitoring/sound/
         target: _blank
