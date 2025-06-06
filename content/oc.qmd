@@ -6,9 +6,9 @@ from tabulate import tabulate
 from IPython.display import display, HTML, Image
 import os
 import ipywidgets as widgets
-from pythonFunctions import generalFunctions.embedMapViewer
-from pythonFunctions import generalFunctions.makeButtons
-from pythonFunctions import generalFunctions.makeImage
+from .pythonFunctions.generalFunctions import embedMapViewer
+from .pythonFunctions.generalFunctions import makeButtons
+from .pythonFunctions.generalFunctions import makeImage
 
 sites = ["oc02"]
 
