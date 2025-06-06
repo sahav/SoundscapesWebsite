@@ -36,7 +36,7 @@ summaryTable.extend(df1.values.tolist())
 headerSizes = ["500","200","200","200","200","200","200","100","100","150","100"]
 tableWidth = sum(int(x) for x in headerSizes)
 htmlTable = tabulate(summaryTable, tablefmt="unsafehtml")
-htmlTable = htmlTable.replace('<table>', f'<table style="width:{tableWidth}px ;overflow-x: auto; display: block;">')
+htmlTable = htmlTable.replace('<table>', f'<table style="width:100% ;overflow-x: auto; display: block;">')
 htmlTable = htmlTable.replace("<td>", "<th>", 11)
 htmlTable = htmlTable.replace("</td>", "</th>", 11)
 headerLocations = [i for i in range(len(htmlTable)) if htmlTable.startswith("<th>", i)]
