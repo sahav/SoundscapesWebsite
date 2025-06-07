@@ -18,7 +18,7 @@ library(xlsx)
 
 # SET UP PARAMS ####
 DC = Sys.Date()
-site  = "HI01" #MB02
+site  = "HI03" #MB02
 site = tolower(site) # "mb01"
 dirSS = paste0( "F:/ONMS/", site,"/SanctSound" ) #"F:\\ONMS\\SanctSound" # SANCTSOUND
 dirGCP = paste0( "F:/ONMS/", site,"/") #NCEI GCP 

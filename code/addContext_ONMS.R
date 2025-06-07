@@ -65,7 +65,7 @@ windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.nam
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
-#PROCESS BY SITE #### uu = 5
+#PROCESS BY SITE #### uu = 9
 for (uu in 1:length(ONMSsites)) {
   
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -347,7 +347,7 @@ for (uu in 1:length(ONMSsites)) {
     
     # Additional aesthetics
     theme_minimal()+
-    theme(legend.position = "top",
+    theme(legend.position = "right",
           plot.title = element_text(size = 16, face = "bold", hjust = 0),
           plot.caption = element_text(size = 12, face = "italic"), 
           plot.legend = element_text(size =12), # Caption text size
@@ -371,7 +371,7 @@ for (uu in 1:length(ONMSsites)) {
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   ## YEARLY ANALYSIS ####
-  if (sidx == "other"){ #only keep peak
+  if (sidx == "biological"){ #only keep peak
     gpsAll = gps
     gps = gps[gps$Season == "Peak",]
     #unique( gps$yr )
@@ -436,25 +436,24 @@ for (uu in 1:length(ONMSsites)) {
     
     # Additional aesthetics
     theme_minimal() +
-    theme(legend.position = "top",
+    labs(
+      title = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"), 
+      caption  = paste0("Vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n",
+                        "black lines are modeled wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s] "),
+      x = "Frequency Hz",
+      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ) +
+      if (sidx == "biological"){
+        subtitle = paste0( "Data summarized for Peak season only" ) 
+      }
+   ) +
+    theme(legend.position = "right",
           plot.title = element_text(size = 16, face = "bold", hjust = 0),
           plot.caption = element_text(size = 12, face = "italic"), 
           plot.legend = element_text(size =12), # Caption text size
           axis.title.x = element_text(size = 12),           # X-axis label size
           axis.title.y = element_text(size = 12),           # Y-axis label size
-          axis.text = element_text(size = 12)               # Tick mark labels
-    ) +
-    labs(
-      title = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` ==site], ")"), 
-                      #tolower(FOIs$Oceanographic.setting[1]), " monitoring site" ),
-      #subtitle = paste0( "Data summarized from ", st, " to ", ed),
-      caption  = paste0("Vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n",
-                        "black lines are modeled wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s] "),
-      x = "Frequency Hz",
-      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
-    ) +
-    theme(legend.position = "top",
-          plot.title = element_text(size = 16, face = "bold", hjust = 0)) 
+          axis.text = element_text(size = 12)
+        ) 
   p
   
   summary <- gps %>%
@@ -748,18 +747,18 @@ for (uu in 1:length(ONMSsites)) {
     ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1Pctabove.jpg"), plot = p6, width = 10, height = 12, dpi = 300)
   } # not baseline data to compare
   
-  ## TIME SERIES - wind dominated XX Hz  ####
+  ## TIME SERIES - Decibels Above Wind Noise at XX Hz  ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqIn2)
   gpsFQ = gps %>% select(all_of(cols_to_select))
   #ADD wind speed estimate for each hour of data in frequency of interest
   wspeeds = unique( (windModel$windSpeed) )
   gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
   # what is the spl values for that windspeed?
-  fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'100'
-  wsIdx <- match(gpsFQ$closest_windMag, windInfo$windSpeed)
-  gpsFQ$WindModelfq <- windInfo[wsIdx, fqIdx]
+  fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'500'
+  wsIdx = match(gpsFQ$closest_windMag, windInfo$windSpeed)
+  gpsFQ$WindModelfq = windInfo[wsIdx, fqIdx]
   tol_col = grep("TOL", colnames(gpsFQ))
-  gpsFQ$Exceed = gpsFQ[,tol_col] -  gpsFQ$WindModelfq #actual - model
+  gpsFQ$Exceed = gpsFQ[,tol_col] -  gpsFQ$WindModelfq # actual - model for each model
   gpsFQ$yr = year(gpsFQ$UTC)
   
   gpsFQ$Windthres = "unk"
@@ -771,7 +770,7 @@ for (uu in 1:length(ONMSsites)) {
     group_by(Season, yr) %>%
     summarise(
       hrs = n(),  # Count of observations
-      percent_above = sum(Windthres == "above", na.rm = TRUE) / hrs * 100,
+      percent_above = sum(Windthres == "below", na.rm = TRUE) / hrs * 100,
       #Exceed_25 = quantile(Exceed, 0.25, na.rm = TRUE),
       Exceed_50 = quantile(Exceed, 0.50, na.rm = TRUE), # Median
       #Exceed_75 = quantile(Exceed, 0.75, na.rm = TRUE),
@@ -788,7 +787,7 @@ for (uu in 1:length(ONMSsites)) {
   if ( length(sidx) == 0 ) {
     seasonalNE = seasonalNE %>%
       mutate(Season = factor(Season, levels = c("Winter", "Spring", "Summer", "Fall")))
-  }else if  ( sidx == "other") {
+  }else if  ( sidx == "biological") {
     seasonalNE = seasonalNE %>%
       mutate(Season = factor(Season, levels = c("Early", "Peak", "Late-Upwelling", "Non")))
  
@@ -801,8 +800,6 @@ for (uu in 1:length(ONMSsites)) {
       mutate(Season = factor(Season, levels = c("Winter", "Spring", "Summer", "Fall")))
   }
   
-
-  
   seasonalTime_wide = seasonalNE %>%
     select(Season, yr, percent_above) %>%  
     mutate(percent_above = round(percent_above, 0) ) %>% 
@@ -810,7 +807,6 @@ for (uu in 1:length(ONMSsites)) {
     arrange(Season) 
   seasonalTime_wide <- seasonalTime_wide %>%
     select(Season, sort(names(seasonalTime_wide)[-1]))  # Skip the Season column and sort the year columns
-  
   
   seasonalNE_wide <- seasonalNE %>%
     select(Season, yr, Exceed_50) %>%  
@@ -833,7 +829,6 @@ for (uu in 1:length(ONMSsites)) {
   combined_grob = arrangeGrob(title_grob, table_grob, title_grob2, table_grob2, ncol = 2)  
   
   ggsave(paste0(outDirG, "\\table_", toupper(site) , "_AboveWind.jpg"), combined_grob, width = 10, height = 8)
-  
   
   dailyFQ = gpsFQ %>%
     mutate(Date = as.Date(UTC)) %>%
@@ -929,6 +924,46 @@ for (uu in 1:length(ONMSsites)) {
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pNE = grid.arrange(pE, l, nrow = 1,widths = c(2, 1))
   ggsave(filename = paste0(outDirG, "\\plot_", toupper(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
+  
+  ## TIME SERIES - % Time Wind Dominated  ####
+   gpsFQ$Day = as.Date( gpsFQ$UTC )
+  dayNE = gpsFQ %>%
+    mutate(Date = as.Date(UTC)) %>%
+    group_by(Season, Day) %>%
+    summarise(
+      hrs = n(),  # Count of observations
+      percent_below = sum(Windthres == "below", na.rm = TRUE) / hrs * 100,
+      #Exceed_50 = quantile(Exceed, 0.50, na.rm = TRUE), # Median
+      #TOL100_50 = quantile(.data[[fqIn2]], 0.50, na.rm = TRUE),
+      windspeed = quantile(windMag, 0.50, na.rm = TRUE)
+    )
+  
+  dayNE = as.data.frame( dayNE )
+  dayNE$yr = year(dayNE$Day )
+  dayNE$Julian = yday(dayNE$Day)
+  
+  windD = ggplot(dayNE, aes(x = Julian, y = as.numeric( percent_below), color = Season) )+
+    geom_line() +
+    facet_wrap(~yr, ncol = 1)+
+    scale_x_continuous(
+      breaks = c(1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335),
+      labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    ) +
+    labs(
+      title = paste0("Percent Time Wind Noise Dominated at ", fqIn2name),
+      subtitle = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` == site], ")"), #, ", a ", tolower(FOIs$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ) ,
+      caption  = paste0("difference between measured sound level and expected wind noise levels given local wind speed \n in ", unique(dayNE$Season), " season(s)" ),
+      x = "",
+      y = paste0("% of Hours in a day wind noise dominated at ", fqIn2name),
+      color = "Year"  # Label for the color legend
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position = "none")
+  
+  ggsave(filename = paste0(outDirG, "\\plot_", toupper(site), "_WindDomin.jpg"), plot = windD, width = 12, height = 12, dpi = 300)
+  
   ## SAVE UPDATED DATA ####
   save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season_", DC, ".Rda") )
 }
