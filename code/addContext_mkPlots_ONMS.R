@@ -64,7 +64,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE ####
-# uu = 1
+# uu = 2
 for (uu in 1:length(ONMSsites)) {
   
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -104,6 +104,7 @@ for (uu in 1:length(ONMSsites)) {
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+    sidx = "wssf"
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }else if  ( sidx == "biological") {
     season = data.frame(
@@ -155,18 +156,21 @@ for (uu in 1:length(ONMSsites)) {
   colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
  
   # by season
+  tol_columns = grep("TOL", colnames(gps))
   seas = unique(season$Season)
   for( ss in 1:length(seas) ){
     moi = as.numeric(unlist(strsplit(as.character(season$Months[ss]), ","))) 
     gps$Season[gps$mth %in% moi] = season$Season[ss]   }
-  season_split=split(gps, gps$Season)
-  season_quantiles=lapply(season_split, function(season_data) {
+  season_split = split(gps, gps$Season)
+  season_quantiles = lapply(season_split, function(season_data) {
     apply(season_data[, tol_columns, drop = FALSE], 2, quantile, 
           probs = c(0.90, 0.75, 0.50, 0.25, 0.10), na.rm = TRUE)   })
-  # by year
+  
+  # by year - names(gps)
   yr_split = split(gps, gps$yr) # Calculate quantiles for each year
   year_quantiles = lapply(yr_split, function(season_data) {
-    apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  probs = c(0.90, 0.75, 0.50, 0.25, 0.10), na.rm = TRUE)   })
+    apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  
+          probs = c(0.90, 0.75, 0.50, 0.25, 0.10), na.rm = TRUE)   })
   
   ### WIND category ####
   gps$wind_category = NA
@@ -275,9 +279,10 @@ for (uu in 1:length(ONMSsites)) {
   #(2) ANNUAL ANALYSIS & PLOT ####
   if (sidx == "biological"){ #only keep peak
     gpsAll = gps
+    my_subtitle = "Data summarized for Peak season only"
     gps = gps[gps$Season == "Peak",]
-  }
-  
+  } else {
+    my_subtitle = "" }
   tol_columns = grep("TOL", colnames(gps))
   yearAll = NULL
   for (ii in 1: length(year_quantiles) ) {
@@ -334,13 +339,12 @@ for (uu in 1:length(ONMSsites)) {
       title = paste0(toupper(site), "(",siteInfo$`Sanctuary watch habitat`[siteInfo$`Location ID` == site], ")"), 
       caption  = paste0("Vertical lines/shaded area indicate frequencies for sounds of interest in this soundscape \n",
                         "black lines are modeled wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s] \n",
-                         "dotted sound level curve is the median for all data"),
+                        "dotted sound level curve is the median for all data"),
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
-        if (sidx == "biological"){
-          subtitle = paste0( "Data summarized for Peak season only" ) 
-        }
-    ) +
+      if (sidx == "biological"){
+        subtitle = paste0( "Data summarized for Peak season only" ) 
+      }) +
     theme(legend.position = "right",
           plot.title = element_text(size = 16, face = "bold", hjust = 0),
           plot.caption = element_text(size = 12, face = "italic"), 
@@ -446,7 +450,7 @@ for (uu in 1:length(ONMSsites)) {
   threshold_mid =  thresholds$SoundLevel[thresholds$Quantile == "50%"]
   threshold_up  = thresholds$SoundLevel[thresholds$Quantile  == "75%"]
   threshold_lo  = thresholds$SoundLevel[thresholds$Quantile == "25%"]
-  
+ 
   tol_columns = grep("TOL", colnames(gpsFQ))
   bw = TOL_convert$Bandwidth[which(TOL_convert$Nominal == colnames(gpsFQ)[tol_columns]) ]
   gpsFQ$SpecBand = 10*log10 ( (10^( gpsFQ[,tol_columns]/10))/ bw )
@@ -460,8 +464,8 @@ for (uu in 1:length(ONMSsites)) {
       TOL_50 = quantile(SpecBand, 0.50, na.rm = TRUE),
       TOL_75 = quantile(SpecBand, 0.75, na.rm = TRUE),
       windspeed = quantile(windMag, 0.50, na.rm = TRUE),
-      count_above_threshold = sum(SpecBand > threshold_value, na.rm = TRUE),
-      percent_above_threshold = sum(SpecBand > threshold_value, na.rm = TRUE) / 
+      count_above_threshold = sum(SpecBand > threshold_mid, na.rm = TRUE),
+      percent_above_threshold = sum(SpecBand > threshold_mid, na.rm = TRUE) / 
         sum(!is.na(SpecBand)) * 100
     )
   dailyFQ$yr = year(dailyFQ$Date)

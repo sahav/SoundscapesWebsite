@@ -101,25 +101,8 @@ display(HTML(infoHtml))
 ```
 :::
 
-
-
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Daily soundscape conditions
-```{python}
-#| echo: false
-#display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-#display(HTML(gf.makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
-```
-:::
-
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean sound indicators
-```{python}
-#| echo: false
-display(HTML(standardTextDict["Indicator description"]))
-```
-
-### What proportion of time do soundscape conditions suggest the presence of ecologically or management-relevant sources?
+## Pproportion of time soundscape conditions suggest the presence management-relevant sources?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
@@ -137,6 +120,23 @@ infoHtml = f'''
                 '''
 display(HTML(infoHtml))
 ```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Daily soundscape conditions
+```{python}
+#| echo: false
+#display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+#display(HTML(gf.makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+```
+:::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Ocean sound indicators
+```{python}
+#| echo: false
+display(HTML(standardTextDict["Indicator description"]))
+```
 
 ### Is noise from large vessels above typical conditions?
 ```{python}
@@ -153,7 +153,7 @@ display(HTML(standardTextDict["How much noise do nearby ships contribute to the 
 display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
 ```
 
-### When are North Atlantic Right whales present in the soundscape?
+### When do right whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["North Atlantic Right whales"]))
