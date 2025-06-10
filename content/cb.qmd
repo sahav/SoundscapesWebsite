@@ -127,7 +127,7 @@ display(HTML(infoHtml))
 #| echo: false
 display(HTML(standardTextDict["Indicator description"]))
 ```
-### Tracking low frequency ocean noise
+### Is noise from large vessels above typical conditions?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Above year 1"])) 
