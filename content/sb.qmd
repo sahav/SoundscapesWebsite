@@ -142,7 +142,8 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict[""]))
-display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance")))
+#display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance"))) 
+display(HTML(gf.makeButtons(sites, "plot_***_LgVesselNoise125.jpg", "SoundLevelVariance"))) #LgVesselNoise125
 display(HTML(gf.addPlotly("plot_sb01_TS125ptly.html")))
 ```
 ### How much noise do nearby ships contribute to the soundscape?
