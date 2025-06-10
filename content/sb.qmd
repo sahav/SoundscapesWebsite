@@ -119,7 +119,7 @@ display(HTML(infoHtml))
 display(HTML(standardTextDict["Indicator description"]))
 ```
 
-### What proportion of time do soundscape conditions suggest the presence of ecologically or management-relevant sources (e.g., vocalizing species or vessel activity) ?
+### What proportion of time do soundscape conditions suggest the presence of ecologically or management-relevant sources?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
@@ -142,11 +142,11 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict[""]))
-#display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance"))) 
+display(HTML(gf.makeButtons(sites, "plot_***_125Hz.jpg", "SoundLevelVariance"))) 
 display(HTML(gf.makeButtons(sites, "plot_***_LgVesselNoise125.jpg", "SoundLevelVariance"))) #LgVesselNoise125
 #display(HTML(gf.addPlotly("plot_sb01_TS125ptly.html"))) # interactive version
 ```
-### How much noise do nearby ships contribute to the soundscape?
+### How much noise from large vessels may be interfering with whale communication? ?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
