@@ -102,7 +102,7 @@ display(HTML(infoHtml))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Pproportion of time soundscape conditions suggest the presence management-relevant sources?
+## Proportion of time with presence of management-relevant sources
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
