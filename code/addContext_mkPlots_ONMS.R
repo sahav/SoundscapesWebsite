@@ -172,6 +172,12 @@ for (uu in 1:length(ONMSsites)) {
     apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  
           probs = c(0.90, 0.75, 0.50, 0.25, 0.10), na.rm = TRUE)   })
   
+  # by year 1 - names(gps)
+  yr1 = min( gps$yr )
+  tol_columns = grep("TOL", colnames(gps))
+  yr1.df = gps[ gps$yr == yr1,]
+  yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, probs = c(0.90, 0.75, 0.50, 0.25, 0.10), na.rm = TRUE)
+  
   ### WIND category ####
   gps$wind_category = NA
   gps <- gps %>%
@@ -479,7 +485,6 @@ for (uu in 1:length(ONMSsites)) {
   days_of_year_for_months <- yday(monthly_sequence)
   
   ### annual status ####
-  # START HERE INDICATOR GRAPHICS #### 
   gpsFQ$yr = year(gpsFQ$UTC)
   yrFQ = gpsFQ %>% group_by(yr) %>%
     summarise(
@@ -588,13 +593,10 @@ for (uu in 1:length(ONMSsites)) {
   
   plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
  
-  
+  #### save: plot 125 Hz time series with thresholds ####
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_LgVesselNoise125.jpg"), plot = plg, width = 10, height = 12, dpi = 300)
   
-    
-  
-    
-    #percentage_above
+  ## TIME SERIES- percentiles ####
   yrs = unique(dailyFQ_complete$yr)
   dailyFQ_complete$facet_title = NA
   for ( ii in 1:length(yrs ) ) {
@@ -611,7 +613,6 @@ for (uu in 1:length(ONMSsites)) {
   }
   
   p0 = ggplot(dailyFQ_complete, aes(x = Julian, y = TOL100_50, group = yr, color = factor(yr))) 
-  # Add shaded background layer first
   
   if (nrow(TOIs) > 0) {
     p0 <-  p0 + geom_rect(
@@ -646,8 +647,7 @@ for (uu in 1:length(ONMSsites)) {
       color = "Year"  # Label for the color legend
     ) 
   p
-  
-  ### save: plot 125 Hz time series ####
+  #### save: plot 125 Hz ####
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_125Hz.jpg"), plot = p, width = 10, height = 12, dpi = 300)
   
   ## TIME SERIES - interactive ####
@@ -671,10 +671,9 @@ for (uu in 1:length(ONMSsites)) {
   }
   fig=fig %>% layout(annotations = annotations)
   fig
-  
+  #### save: plotly ####
   htmlwidgets::saveWidget(as_widget(fig), 
   paste0( outDirG, "\\plot_", toupper(site), "_TS125ptly.html") ) 
-  
   
   ## TIME SERIES - above year 1 median ####
   cols_to_select = c("UTC", "windMag","wind_category", "Season", fqInShip)
@@ -738,7 +737,7 @@ for (uu in 1:length(ONMSsites)) {
       )
     p5
     
-    ### save: above year-1 median ####
+    #### save: above year-1 median ####
     ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_year1above.jpg"), plot = p5, width = 10, height = 12, dpi = 300)
     
     ### % time above year 1 median- compare the hourly values
