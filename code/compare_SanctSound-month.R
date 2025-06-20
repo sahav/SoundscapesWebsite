@@ -18,6 +18,8 @@ outDirP = paste0(outDir, "products\\onms\\")     #products
 # LOAD ONMS Metadata ####
 habitat = "coastal-shallow"
 monthFocus = 7
+yoi = 2019
+
 metaFile = paste0(outDirR,"ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx::read.xlsx(metaFile, sheet  = "Summary") ) 
 colnames(lookup) = lookup[1, ]         # Set first row as column names
@@ -39,7 +41,6 @@ inFiles = inFiles[sapply(inFiles, function(x) any(grepl(paste(toupper( siteInter
 
 # COMBINE DATA ####
 sData = NULL
-yoi = 2019
 for (ii in 1:length(inFiles)) { # ii = 39
   tmpFile = inFiles[ii]
   typ = sapply( strsplit(basename(tmpFile), "[.]"), "[[",2)
