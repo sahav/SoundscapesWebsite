@@ -17,15 +17,14 @@ outDirP = paste0(outDir, "products\\onms\\")     #products
 
 # LOAD ONMS Metadata ####
 habitat = "coastal-shallow"
-siteFocus = "SB01"
 monthFocus = 7
 metaFile = paste0(outDirR,"ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx::read.xlsx(metaFile, sheet  = "Summary") ) 
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
 lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
-unique( (lookup$) )
-sites = lookup[lookup$`Oceanographic Setting` == habitat ,] # selects specific ecological setting, so comparable
+unique( (lookup$`Oceanographic category`) )
+sites = lookup[lookup$`Oceanographic category` == habitat ,] # selects specific ecological setting, so comparable
 siteInterest = sites[,5]
 
 # FIND SanctSound files - ERDAP ####
@@ -69,19 +68,24 @@ for (ii in 1:length(inFiles)) { # ii = 39
 }
 sData$mth= month(sData$UTC)
 
+# SELECT sites in same setting ####
+sData = sData[tolower(sData$site) %in% siteInterest, ]
+
 # SELECT representative month ####
 month_counts = ( ( sData %>% count(mth) ))
 moi = month_counts %>% filter(n == max(n))
-sDataM = sData[sData$mth == moi$mth,]
+sDataM  = sData[sData$mth == moi$mth,]
 sDataMM = sData[sData$mth == monthFocus,] # unique(sDataMM$site)
 cat("Most data for this month:", moi$mth, ", for these sites:", unique(sDataM$site) )
+sDatat = sData[sData$mth == moi$mth,]
+mthFocus =  moi$mth
 # filter to this month... 
-if (siteFocus %in% unique(sDataM$site) == T ) {
-  sDatat = sData[sData$mth == moi$mth,]
-  mthFocus =  moi$mth
-}else { 
-  sDatat = sData[sData$mth == monthFocus,]
-  mthFocus = monthFocus }
+# if (siteFocus %in% unique(sDataM$site) == T ) {
+#   sDatat = sData[sData$mth == moi$mth,]
+#   mthFocus =  moi$mth
+# }else { 
+#   sDatat = sData[sData$mth == monthFocus,]
+#   mthFocus = monthFocus }
 
 # PERCENTILS for each site ####
 tol_columns = grep("TOL", colnames(sDatat))
