@@ -1,10 +1,9 @@
-rm(list=ls()) 
-
 # PURPOSE -  query NCEI gcp passive acoustic archive to create gantt charts of data in the archive
 # NOTES - use command line approach to access files, assumes open sites (do not need authentication step)
 # INPUT - gcp directory for project- assumes metadata files are present
 # OUTPUT - Rdat file to use in plotting
 
+rm(list=ls()) 
 
 # LOAD LIBRARIES ####
 library(stringr)    
@@ -18,26 +17,26 @@ library(ggplot2)
 library(sf)
 library(rnaturalearth)
 library(rnaturalearthdata)
+DC = Sys.Date()
 
 # SET GCP DIRECTORY ####
-# get directories from NCEI PAM map viewer
-DC = Sys.Date()
+# get directories from NCEI GCP data viewer: 
+#https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?inv=1&invt=Ab0oyg
 typ = "audio"
 gcpDir  = "gs://noaa-passive-bioacoustic/onms/audio" #ONMS
 gcpDir2 = "gs://noaa-passive-bioacoustic/sanctsound/audio" #SANCTSOUND
-projectN = "onms" #nrs # set this to deal with different metadata formats
-projectN2 = "sanctsound" #nrs # set this to deal with different metadata formats
+projectN = "onms" # set this to deal with different metadata formats
+projectN2 = "sanctsound"# set this to deal with different metadata formats
 
-outDir =  "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\" 
-outputDir = paste0( outDir,"products\\onms\\")   
-outputR = paste0( outDir,"report")   
+outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
+outDirR =  paste0(outDir, "content\\resources\\") #save graphics
+outDirP =  paste0(outDir, "products\\onms\\") #products
 
-metadataDir = "F:\\CODE\\GitHub\\SoundscapesWebsite\\resources"
-inFile = paste0(metadataDir, "//ONMSSound_IndicatorCategories.xlsx")
+# CONTEXT ####
+inFile = paste0(outDirR, "//ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( read.xlsx(inFile) )
 colnames(lookup) <- lookup[1, ]  # Set first row as column names
-lookup <- as.data.frame( lookup[-1, ] )          # Remove the first row
-colnames(lookup) 
+lookup <- as.data.frame( lookup[-1, ] ) # Remove the first row
 colnames(lookup)[5] = "NCEI"
 
 # LIST SUB DIRECTORIES ####
@@ -51,8 +50,7 @@ subdirs2 = system2(command, args, stdout = TRUE, stderr = TRUE)
 subdirsALL = c(subdirs, subdirs2) #paste onms + sanctsound
 dirNames  = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
 cat("Processing... ", projectN, length(dirNames), "directories" )
-
-#read one file
+## TEST one file ####
 args = c("ls", "-r", subdirsALL[1])
 sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
 json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
@@ -61,8 +59,12 @@ h = curl(url, "r")
 json_content = readLines(url)
 close(h)
 tmp = fromJSON(paste(url, collapse = ""))
-
+if ( length(tmp)  > 0 ) {
+  cat("Successfully loaded file from GCP" )
+} else {cat("File not loaded from GCP, check directories" ) }
+ 
 # GET INFORMATION FROM METADATA FILES ####
+# loads one file at a time from GCP, no saving to local machine 
 output = NULL
 for (s in 1:length(subdirsALL) ) { # s = 1
   
@@ -141,25 +143,18 @@ colnames(output) = c("Path", "DeploymentNumber", "DeploymentName", "Instrument",
 output$Site = basename((output$Path))
 output$Start_Date = as.Date(output$Start_Date, format = "%Y-%m-%d")
 output$End_Date = as.Date(output$End_Date, format = "%Y-%m-%d")
-
-# ADD INFO from lookup ####
-lookup_selected <- lookup %>% select(NCEI, Region,`Common Name/Identifiers`,`Site Description/Driver for Monitoring Location Choice`)
+## ADD INFO from context file ####
+lookup_selected = lookup %>% select(NCEI, Region,`Common Name/Identifiers`,`Site Description/Driver for Monitoring Location Choice`)
 output = left_join(output, lookup_selected, by = c("Site" = "NCEI"))
 output$Duration = difftime( output$End_Date, output$Start_Date,"days")
-colnames(output)
-#remove non-monitoring sites
-# fix- only once
-# output <- output %>% select(-Region.x)
-# output <- output %>% rename(Region = Region.y)
 
+## SAVE all sites ####
 output$Project [is.na(output$Region)] = "SanctSound" 
 output$Project [!is.na(output$Region)] = "ONMS-sound" 
-save(output, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda") )
-#load( file = paste0(outputDir, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda"))
-
-setdiff(unique(output$Site), unique(lookup$NCEI))
+save(output, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda") ) #all data
+## SAVE only long-term monitoring sites ####
+setdiff(unique(output$Site), unique(lookup$NCEI)) #only long-term monitoring sites
 outputT = output[!is.na(output$Region),] 
-
 save(outputT, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_", DC, ".Rda") )
 write.csv(outputT, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_", DC, ".csv") )
 colnames(outputT)
