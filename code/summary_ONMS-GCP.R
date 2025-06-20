@@ -30,7 +30,7 @@ projectN2 = "sanctsound"# set this to deal with different metadata formats
 
 outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
 outDirR =  paste0(outDir, "content\\resources\\") #save graphics
-outDirP =  paste0(outDir, "products\\onms\\") #products
+outDirP =  paste0(outDir, "products\\onms\\")     #products
 
 # CONTEXT ####
 inFile = paste0(outDirR, "//ONMSSound_IndicatorCategories.xlsx")
@@ -50,6 +50,7 @@ subdirs2 = system2(command, args, stdout = TRUE, stderr = TRUE)
 subdirsALL = c(subdirs, subdirs2) #paste onms + sanctsound
 dirNames  = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
 cat("Processing... ", projectN, length(dirNames), "directories" )
+
 ## TEST one file ####
 args = c("ls", "-r", subdirsALL[1])
 sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
@@ -137,6 +138,7 @@ for (s in 1:length(subdirsALL) ) { # s = 1
   }
 }
 
+ouputTest = output # output = ouputTest
 # SAVE SUMMARY ####
 output = as.data.frame(output)
 colnames(output) = c("Path", "DeploymentNumber", "DeploymentName", "Instrument", "Start_Date", "End_Date","Lat","Lon")
@@ -145,22 +147,22 @@ output$Start_Date = as.Date(output$Start_Date, format = "%Y-%m-%d")
 output$End_Date = as.Date(output$End_Date, format = "%Y-%m-%d")
 ## ADD INFO from context file ####
 lookup_selected = lookup %>% select(NCEI, Region,`Common Name/Identifiers`,`Site Description/Driver for Monitoring Location Choice`)
-output = left_join(output, lookup_selected, by = c("Site" = "NCEI"))
+output = left_join(output, lookup_selected, by = c("Site" = "NCEI"), relationship = "many-to-many")
 output$Duration = difftime( output$End_Date, output$Start_Date,"days")
 
 ## SAVE all sites ####
 output$Project [is.na(output$Region)] = "SanctSound" 
 output$Project [!is.na(output$Region)] = "ONMS-sound" 
-save(output, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda") ) #all data
+save(output, file = paste0(outDirP, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda") ) #all data
 ## SAVE only long-term monitoring sites ####
-setdiff(unique(output$Site), unique(lookup$NCEI)) #only long-term monitoring sites
+cat("Not long-term sites...", setdiff(unique(output$Site), unique(lookup$NCEI)) ) #only long-term monitoring sites
 outputT = output[!is.na(output$Region),] 
-save(outputT, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_", DC, ".Rda") )
-write.csv(outputT, file = paste0(outputDir, "\\data_gantt_ONMS_gantt_", DC, ".csv") )
-colnames(outputT)
+save(outputT, file = paste0(outDirP, "\\data_gantt_ONMS_gantt_", DC, ".Rda") )
+write.csv(outputT, file = paste0(outDirP, "\\data_gantt_ONMS_gantt_", DC, ".csv") )
 
 # GANTT CHART  ####
-load(file = paste0(outputDir, "\\data_gantt_ONMS_gantt_2025-04-28.Rda") )
+# load(file = paste0(outDirP, "\\data_gantt_ONMS_gantt_2025-04-28.Rda") )
+## COLOR ####
 projectN = "onmsRegion"
 uColors = unique(outputT$Instrument)
 if (projectN == "onms"){
@@ -170,7 +172,9 @@ if (projectN == "onms"){
     "SoundTrap 300" = "#44AA99", 
     "HARP" =          "#DDCC77") #DDCC77
 }
-uColors = unique(outputT$Region)
+uColors = unique(outputT$Region) 
+# nmfspalette::nmfs_palette("oceans")(10)
+#[1] "#C6E6F0" "#8CCBE3" "#53B0D7" "#1F95CF" "#0072BB" "#004295" "#002B7B" "#002467" "#001D55" "#001743"
 if (projectN == "onmsRegion"){
   instrument_colors <- c(
     "Pacific Islands" = "#C6E6F0",  
@@ -183,11 +187,7 @@ project_colors <- c(
   "SanctSound" = "#53B0D7",  
   "ONMS-sound"= "#004295") 
 
-
-# nmfspalette::nmfs_palette("oceans")(10)
-#[1] "#C6E6F0" "#8CCBE3" "#53B0D7" "#1F95CF" "#0072BB" "#004295" "#002B7B" "#002467" "#001D55" "#001743"
-
-# geom_tile option 
+## geom_tile option ####
 colnames(outputT)
 outputT <- outputT %>%
   mutate(Site = fct_reorder2(Site, Region, Start_Date))  # Reorders Site within Region
@@ -207,27 +207,27 @@ pT = ggplot(output, aes(y = Site, x = Start_Date, xend = End_Date, fill = Projec
             color = "gray", height = 0.6) +  # Fill color by Instrument and outline in black
   scale_fill_manual(values = project_colors) +  # Use specific colors for instruments
   labs(x = "", y = "", title = "",
-       subtitle = paste0("Data available as of ", format(Sys.Date(), "%B %d, %Y"))) +
+       caption = paste0("Data available as of ", format(Sys.Date(), "%B %d, %Y"))) +
   facet_wrap(~Region,scales = "free_y") +
   theme_minimal(base_size = 16) +
-  theme( legend.position = "top", legend.justification = "left",
+  theme( legend.position = "right", legend.justification = "left",
          axis.text.x = element_text(angle = 0, hjust = 1, size = 12),
          axis.text.y = element_text(angle = 0, size = 12))
 pT
-ggsave(filename = paste0(outputR, "\\gantt_ONMS.jpg"), plot = pT, width = 10, height = 6, dpi = 300)
+ggsave(filename = paste0(outDirR, "\\gantt_ONMS.jpg"), plot = pT, width = 10, height = 6, dpi = 300)
 
-pT = ggplot(outputT, aes(y = Site, x = Start_Date, xend = End_Date, fill = Region ) ) +
+pTb = ggplot(outputT, aes(y = Site, x = Start_Date, xend = End_Date, fill = Region ) ) +
   geom_tile(aes(x = Start_Date, width = as.numeric(End_Date - Start_Date) ) , 
             color = "gray", height = 0.6) +  # Fill color by Instrument and outline in black
   scale_fill_manual(values = instrument_colors) +  # Use specific colors for instruments
   labs(x = "", y = "", title = "",
-       subtitle = paste0("Data available on NCEI-GCP (", typ, ") as of ", format(Sys.Date(), "%B %d, %Y"))) +
+       caption = paste0("Data available on NCEI-GCP (", typ, ") as of ", format(Sys.Date(), "%B %d, %Y"))) +
   facet_wrap(~Region,scales = "free_y") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
         axis.text.y = element_text(angle = 10, size = 12))
-pT
-ggsave(filename = paste0(outputR, "\\gantt_ONMS-sound.jpg"), plot = pT, width = 8, height = 6, dpi = 300)
+pTb
+ggsave(filename = paste0(outDirR, "\\gantt_ONMS-sound.jpg"), plot = pT, width = 8, height = 6, dpi = 300)
 
 # MAP DATA ####
 #reformat for per site- total recordings 
@@ -246,7 +246,7 @@ outputMap$Site = as.character(outputMap$Site)
 lookup_selected <- lookup %>% select(NCEI, Region, Latitude, Longitude)
 outputMap = left_join(outputMap, lookup_selected, by = c("Site" = "NCEI"))
 colnames(outputMap)
-write.csv( outputMap, file = paste0(outputDir, "\\map_ONMS_map_", DC, ".csv") )
+write.csv( outputMap, file = paste0(outDirP, "\\map_ONMS_map_", DC, ".csv") )
 outputMap2a = outputMap
 # Assuming your data frame is named 'data'
 # Convert the data frame to an sf object for mapping
@@ -274,5 +274,4 @@ p = ggplot() +
        caption = paste0("Data available on NCEI-GCP (", typ, ") as of ", format(Sys.Date(), "%B %d, %Y") ) ) +
   scale_size_continuous(range = c(.5, 8))  # Adjust point size range
 p
-
-ggsave(filename = paste0(outputR, "\\map_ONMS.jpg"), plot = p, width = 8, height = 6, dpi = 300)
+ggsave(filename = paste0(outDirR, "\\map_ONMS.jpg"), plot = p, width = 8, height = 6, dpi = 300)
