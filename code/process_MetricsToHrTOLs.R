@@ -1,12 +1,12 @@
 # COMPILE SOUNDSCAPE METRICS
 
 # assumes data are already downloaded from cloud, stored locally
-# runs for SanctSound and SoundCoop data files (combines)
-# runs one site at a time
+# runs for SanctSound (triton remora) and SoundCoop data (manta-NCEI format) files (combines)
+# runs one site at a time 
 # checks for files already processed
 # adds wind estimate from PAMscapes for any new data
 
-# outputs hourly TOLs values with wind speed and list of files processed
+# outputs:  hourly TOLs values with wind speed and list of files processed
 
 devtools::install_github('TaikiSan21/PAMscapes')
 
@@ -21,7 +21,7 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "SB01" 
+site  = "SB03" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -47,7 +47,7 @@ facilitates matching with metadata on gcp
 check gcp to see verify`)
 
 ## SanctSound FILES ####
-# NOTE: might need to change these in some of the files 31_5 to 31.5 and UTC with : not _
+# e.g. SanctSound_HI01_04_TOL_1h.csv
 inFiles = list.files(path = dirSS, pattern = toupper(site), full.names = T, recursive = T)
 filesTOL = inFiles[grepl("TOL_1h", inFiles)] 
 inFiles = filesTOL[!grepl("/analysis/", filesTOL)] 
@@ -57,7 +57,8 @@ inFiles = inFiles[!grepl("json", inFiles)]
 inFilesSS = inFiles[!grepl("1h.nc", inFiles)] 
 cat("Found ", length(inFilesSS), "SanctSound files")
 
-## Manta Files- NCEI ####
+## ONMS Sound FILES- NCEI-GCP ####
+# e.g. ONMS_HI01_20231201_8021.1.48000_20231201_DAILY_MILLIDEC_MinRes.nc
 inFiles = list.files(dirGCP, pattern = "MinRes", recursive = T, full.names = T)
 inFiles = inFiles[!grepl(".png",inFiles) ]
 inFiles = inFiles[!grepl(".csv",inFiles) ]
@@ -65,7 +66,7 @@ inFilesON = inFiles[!grepl("_netCDF",inFiles) ]
 cat("Found ", length(inFilesON), "ONMS files")
 
 # CHECK FOR PROCESSED FILES #### 
-pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_",site), full.names = T, recursive = T)
+pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_", site), full.names = T, recursive = T)
 if ( length(pFile) > 0 ) {
   load(pFile)
   cat("Already processed ", length(processedFiles), " files for ", site, "\n")
@@ -84,6 +85,10 @@ if ( length(pFile) > 0 ) {
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
     processedData = gps
+    cat( "Processed data for ", site, ": ", 
+         as.character( as.Date( min( processedData$UTC))) , " to ", 
+         as.character( as.Date( max( processedData$UTC)) ))
+    
     rm(gps)
     
   } else {
@@ -117,14 +122,14 @@ if ( length(inFilesSS) > 0 ) {
   
 }
 
-# PROCESS ONMS FILES ####
+# PROCESS ONMS Sound FILES ####
 cData = NULL  
 cDatah = NULL
 if ( length(inFilesON) > 0 ) {
   if (length(inFilesON) > 0 ) {
     for (f in 1:length(inFilesON) ){
       ncFile = inFilesON[f]
-      hmdData = loadSoundscapeData(ncFile)
+      hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
       tolData = createOctaveLevel(hmdData, type='tol')
       tolData$site = site
       cData = rbind( cData, tolData )
@@ -137,9 +142,11 @@ if ( length(inFilesON) > 0 ) {
   cDatah$mth = month(cDatah$UTC)
   cDatah$site = site
 }
-rm(cData,hmdData, tmp, tolData)
 
-## COMBINE DATA ####
+#clean up
+rm(cData,hmdData, tolData)
+
+# COMBINE DATA & GET WIND ####
 if ( length(sData) > 0 & length(cDatah) > 0 ) {
   
   cat("SancSound + ONMS data ....")
@@ -172,8 +179,7 @@ if ( length(sData) > 0 & length(cDatah) > 0 ) {
 }
 
 # APPEND & SAVE NEW DATA FILES ####
-if ( length(pFile) > 0 ){
-  #append old and save out all processed data
+if ( length(pFile) > 0 ){   #append old and save out all processed data
   data_mismatched = setdiff(colnames(gps), colnames(processedData))
   gps_clean = gps[, !colnames(gps) %in% data_mismatched]
   
@@ -181,18 +187,25 @@ if ( length(pFile) > 0 ){
   outData = rbind(processedData,gps_clean)
   dys = length( unique( as.Date( outData$UTC) ) )
   cat( "Output data for ", site, " has ", dys, "unique days: ", 
-       as.character( as.Date( min(outData$UTC))) , " to ", 
+       as.character( as.Date( min( outData$UTC))) , " to ", 
        as.character( as.Date( max( outData$UTC)) ))
   save(outData, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
   
   #processed files
+  # writes new file with date
   processedFiles = c(processedFiles, basename(inFilesSS), basename(inFilesON) )
   length(processedFiles) - length(unique(processedFiles))
+  # writes over previous file
   save(processedFiles, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPL.Rda") )
   
-} else {
-  # save out all the newly processed data
+} else {  # save out all the newly processed data
   #data
+  # writes new file with date
+  dys = length( unique( as.Date( gps$UTC) ) )
+  cat( "Output data for ", site, " has ", dys, "unique days: ", 
+       as.character( as.Date( min( gps$UTC))) , " to ", 
+       as.character( as.Date( max( gps$UTC)) ))
+  outData = gps
   save(gps, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
   
   #processed files

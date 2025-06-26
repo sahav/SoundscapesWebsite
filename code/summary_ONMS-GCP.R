@@ -6,7 +6,8 @@
 rm(list=ls()) 
 
 # LOAD LIBRARIES ####
-library(stringr)    
+library(stringr)   
+library(openxlsx)
 library(jsonlite)
 library(curl)
 library(tidyverse)
@@ -33,8 +34,14 @@ outDirR =  paste0(outDir, "content\\resources\\") #save graphics
 outDirP =  paste0(outDir, "products\\onms\\")     #products
 
 # CONTEXT ####
+# assing region apprviations 
+wc = c("oc","ci","mb","cb","fi") #west coast sanctuaries
+ec = c("sb","gr","fk","fg") #east coast sanctuaries
+pi = c("hi","pm","as") #greater pacific
+gl = c("lo") # great lakes
+
 inFile = paste0(outDirR, "//ONMSSound_IndicatorCategories.xlsx")
-lookup = as.data.frame ( read.xlsx(inFile) )
+lookup = as.data.frame ( openxlsx :: read.xlsx(inFile) )
 colnames(lookup) <- lookup[1, ]  # Set first row as column names
 lookup <- as.data.frame( lookup[-1, ] ) # Remove the first row
 colnames(lookup)[5] = "NCEI"
@@ -177,7 +184,8 @@ uColors = unique(outputT$Region)
 #[1] "#C6E6F0" "#8CCBE3" "#53B0D7" "#1F95CF" "#0072BB" "#004295" "#002B7B" "#002467" "#001D55" "#001743"
 if (projectN == "onmsRegion"){
   instrument_colors <- c(
-    "Pacific Islands" = "#C6E6F0",  
+    "Pacific Islands" = "#C6E6F0", 
+    "Greater Pacific" = "#C6E6F0",  
     "West Coast"      = "#53B0D7",  
     "East Coast"      = "#004295", 
     "Gulf Coast"      = "#001743") 
@@ -193,22 +201,18 @@ outputT <- outputT %>%
   mutate(Site = fct_reorder2(Site, Region, Start_Date))  # Reorders Site within Region
 
 output$sanctuaryName = substr(output$Site, start = 1, stop =2)
-wc = c("oc","ci","mb","cb","fi")
-ec = c("sb","gr","fk","fg")
-pi = c("hi","pm","as")
-gl = c("lo")
 output$Region[output$sanctuaryName %in% wc] <- "West Coast"
 output$Region[output$sanctuaryName %in% ec] <- "East Coast"
-output$Region[output$sanctuaryName %in% pi] <- "Pacific Islands"
+output$Region[output$sanctuaryName %in% pi] <- "Greater Pacific"
 output$Region[output$sanctuaryName %in% gl] <- "Great Lakes"
 colnames(output)
 pT = ggplot(output, aes(y = Site, x = Start_Date, xend = End_Date, fill = Project ) ) +
   geom_tile(aes(x = Start_Date, width = as.numeric(End_Date - Start_Date) ) , 
-            color = "gray", height = 0.6) +  # Fill color by Instrument and outline in black
+            color = "gray", height = 0.6) +     # Fill color by Instrument and outline in black
   scale_fill_manual(values = project_colors) +  # Use specific colors for instruments
   labs(x = "", y = "", title = "",
        caption = paste0("Data available as of ", format(Sys.Date(), "%B %d, %Y"))) +
-  facet_wrap(~Region,scales = "free_y") +
+  facet_wrap(~Region, scales = "free_y") +
   theme_minimal(base_size = 16) +
   theme( legend.position = "right", legend.justification = "left",
          axis.text.x = element_text(angle = 0, hjust = 1, size = 12),
