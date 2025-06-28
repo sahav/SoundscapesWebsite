@@ -1,5 +1,234 @@
 # ADD BACK IN ####
 
+# (4) TIME SERIES - fqIn (125 Hz TOL) ####
+# Questions: How many days are above typical conditions for vessel noise?
+cols_to_select = c("UTC", "windMag","wind_category",fqIn)
+gpsFQ = gps %>% select(all_of(cols_to_select))
+wspeeds = unique( (windModel$windSpeed) )
+gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
+#Thresholds from all data percentiles
+mALL$FrequencyName = paste0("TOL_", mALL$Frequency)
+thresholds = mALL[mALL$FrequencyName == fqIn,]
+threshold_mid =  thresholds$SoundLevel[thresholds$Quantile == "50%"]
+threshold_up  = thresholds$SoundLevel[thresholds$Quantile  == "75%"]
+threshold_lo  = thresholds$SoundLevel[thresholds$Quantile == "25%"]
+gpsFQ$SpecBand = gpsFQ[fqIn]
+
+### daily percentiles ####
+dailyFQ = gpsFQ %>%
+  mutate(Date = as.Date(UTC)) %>%
+  group_by(Date) %>%
+  summarise(
+    TOL_25 = quantile(SpecBand, 0.25, na.rm = TRUE),
+    TOL_50 = quantile(SpecBand, 0.50, na.rm = TRUE),
+    TOL_75 = quantile(SpecBand, 0.75, na.rm = TRUE),
+    windspeed = quantile(windMag, 0.50, na.rm = TRUE),
+    count_above_threshold = sum(SpecBand > threshold_up, na.rm = TRUE),
+    percent_above_threshold = sum(SpecBand > threshold_up, na.rm = TRUE) / 
+      sum(!is.na(SpecBand)) * 100
+  )
+dailyFQ$yr = year(dailyFQ$Date)
+dailyFQ$Julian = yday(dailyFQ$Date)
+# Fill in missing days
+dailyFQ_complete = dailyFQ %>%
+  group_by(yr) %>%
+  complete(Julian = seq(min(Julian), max(Julian), by = 1)) %>% 
+  arrange(yr, Julian) 
+monthly_sequence = seq.Date(as.Date("2021-01-01"), as.Date("2021-12-01"), by = "month")
+month_names_seq   = format(monthly_sequence, "%b")  # Extracts full month names
+days_of_year_for_months = yday(monthly_sequence)
+
+### annual status ####
+gpsFQ$yr = year(gpsFQ$UTC)
+yrFQ = gpsFQ %>% group_by(yr) %>%
+  summarise(
+    TOL_25 = quantile(SpecBand, 0.25, na.rm = TRUE),
+    TOL_50 = quantile(SpecBand, 0.50, na.rm = TRUE),
+    TOL_75 = quantile(SpecBand, 0.75, na.rm = TRUE) )
+### thresholds for typical ####
+q90=thresholds$SoundLevel[thresholds$Quantile == "90%"]
+q75=thresholds$SoundLevel[thresholds$Quantile == "75%"]
+q50=thresholds$SoundLevel[thresholds$Quantile == "50%"]
+q25=thresholds$SoundLevel[thresholds$Quantile == "25%"]
+q10=thresholds$SoundLevel[thresholds$Quantile == "10%"]
+#threshold bands with categories
+threshold_bands <- data.frame(
+  category = c("Very Low", "Low", "Within Range", "High", "Very High"),
+  xmin = c(q10-5,    q10,    q25,    q75,    q90),
+  xmax = c(q10,     q25,    q75,    q90,    q90+5),
+  fill = c("#6699CC", "#99CCFF", "#CCCCCC", "#FF9999", "#CC0000")
+)
+threshold_bands$category <- factor(
+  threshold_bands$category,
+  levels = c("Very Low", "Low", "Within Range", "High", "Very High")
+)
+
+### plot: threshold bars ####
+pthrs = ggplot() +
+  # Threshold bands (same for all facets)
+  geom_rect(data = threshold_bands,
+            aes(xmin = xmin, xmax = xmax, ymin = 0.4, ymax = 0.6, fill = category),
+            color = "white") +
+  # Marker line per year
+  geom_vline(data = yrFQ, aes(xintercept = TOL_50), 
+             linetype = "dashed", color = "black", linewidth = .5) +
+  # Facet by year
+  facet_wrap(~yr, ncol = 1) +  
+  # Customize scales and colors
+  scale_fill_manual(values = setNames(threshold_bands$fill, threshold_bands$category)) +
+  coord_cartesian(xlim = c(60, 90), ylim = c(0.3, 0.8)) +
+  # more formatting
+  theme_void() +
+  theme( legend.position = "right",
+         plot.title = element_text(hjust = 0.5),
+         plot.subtitle = element_text(hjust = 0.5)) +
+  labs(title = "Annual Status", fill = "", 
+       subtitle = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"),
+       caption  = "status is set at median for the year",
+       strip.text = element_text(hjust = 0))
+pthrs 
+### plot: time series ####
+plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
+  
+  annotate("rect",
+           xmin = -Inf, xmax = Inf,
+           ymin = threshold_lo, ymax = threshold_up,
+           fill = "#CCCCCC", alpha = 0.2) +
+  annotate("rect",
+           xmin = -Inf, xmax = Inf,
+           ymin = threshold_up, ymax = 90,
+           fill = "lightcoral", alpha = 0.2) +
+  annotate("rect",
+           xmin = -Inf, xmax = Inf,
+           ymin = threshold_lo, ymax = 60,
+           fill = "lightblue", alpha = 0.2) +
+  ylim(60, 90) +
+  
+  geom_hline(aes(yintercept = threshold_mid),linetype = "dashed", color = "gray",linewidth = .2) +
+  geom_hline(aes(yintercept = threshold_up),linetype = "dashed", color = "gray",linewidth = .2) +
+  geom_hline(aes(yintercept = threshold_lo),linetype = "dashed", color = "gray",linewidth = .2) +
+  
+  geom_line() +
+  facet_wrap(~yr, ncol = 1)+
+  theme_minimal() +
+  theme(legend.position = "none",
+        strip.text = element_text(hjust = 0),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0),
+        plot.subtitle = element_text(size = 12, face = "italic"),) +
+  
+  scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +
+  labs(
+    title    = "Is large vessel noise within typical conditions?", 
+    subtitle =  paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), #toupper(site),
+    caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
+    x = "",
+    y = substitute(
+      paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
+      list(f = fqInN) )
+    # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
+  )
+### save: plot 125 Hz time series with thresholds ####
+plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
+plg2
+ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_LgVesselNoise125.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+
+# (4b) TIME SERIES- fqIn ####
+# plot with error bars and median with times of interest, and hours above 75th percentile in title
+# hours above 75th percentile
+yrs = unique(dailyFQ_complete$yr)
+dailyFQ_complete$facet_title = NA
+for ( ii in 1: length(yrs) ) {
+  idx  =  which(dailyFQ_complete$yr == yrs[ii])
+  tmp = dailyFQ_complete[ dailyFQ_complete$yr == yrs[ii] ,] 
+  # count total hours above threshold
+  daysAbove = round( sum( tmp$count_above_threshold , na.rm = T) )
+  dailyFQ_complete$facet_title[idx] = paste0(yrs[ii], "- ", daysAbove," hours above" )
+}
+#time periods of interest
+TOIs = TOIs %>% filter(yr %in% unique(dailyFQ_complete$yr))
+if ( nrow( TOIs)  > 0) {
+  for (ii in 1:nrow(TOIs) ) {
+    TOIs$facet_title[ii] = dailyFQ_complete$facet_title[which(dailyFQ_complete$yr == TOIs$Year[ii])] [1]
+  }
+}
+
+
+p0 = ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr, color = factor(yr))) 
+# add shaded areas for times of interest
+if (nrow(TOIs) > 0) {
+  p0 = p0 + geom_rect(
+    data = TOIs %>% filter(yr %in% unique(dailyFQ_complete$yr)), 
+    inherit.aes = FALSE,
+    aes(xmin = Start_Julian, xmax = End_Julian, ymin = -Inf, ymax = Inf), 
+    fill = "grey", alpha = 0.2  # Optional styling
+  )
+}
+
+p <- p0 + geom_line() +
+  
+  scale_color_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year)))))  +
+  geom_line(linewidth = 1, na.rm = TRUE) +
+  geom_ribbon(aes(ymin = TOL_25 , ymax = TOL_75 ), fill = "gray", alpha = 0.5) +
+  facet_wrap(~facet_title, nrow = length(unique(dailyFQ$yr)) ) +
+  
+  scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +  
+  geom_hline(aes(yintercept = threshold_mid), linetype = "dashed", color = "gray", linewidth = 0.7) +
+  
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 10, hjust = 0, vjust = 0),  # Facet labels inside (centered)
+    strip.background = element_blank(),  # Remove background behind facet labels
+    panel.spacing = unit(.1, "lines") ) + # Adjust the spacing between facets) +
+  labs(
+    title = paste0("How often are sound levels above typical conditions? (", fqInN,")" ) ,
+    subtitle = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"),
+    caption = paste0("Dashed line- median for all data"),
+    x = "",
+    y = substitute(
+      paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, ")"),
+      list(f = fqInN) ),
+    color = "Year"  # Label for the color legend
+  ) 
+p
+#### save: plot 125 Hz ####
+ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_125Hz.jpg"), plot = p, width = 10, height = 12, dpi = 300)
+
+
+# (4c) TIME SERIES - fqIn, interactive ####
+yearly_data <- split(dailyFQ_complete, dailyFQ_complete$yr)
+plots <- lapply(yearly_data, function(df) {
+  plot_ly(df, x = ~Julian, y = ~TOL_50, type = 'scatter', mode = 'lines') %>%
+    layout(showlegend = FALSE,
+           yaxis = list(title = expression(paste("Sound Levels (125 Hz dB re 1", mu, " Pa/Hz)" )) ),
+           title = paste0("Soundscape Conditions at 125 Hz at ", toupper(site) ) )
+})
+fig <- subplot(plots, nrows = length(plots), shareX = TRUE, shareY = TRUE, titleY = TRUE)
+annotations <- list()
+for (i in seq_along(plots)) {
+  annotations[[i]] <- list(
+    x = 0, y = 1 - (i - 1) / length(plots),
+    text = paste("Year:", names(yearly_data)[i]),
+    xref = "paper", yref = "paper",
+    xanchor = "left", yanchor = "top",
+    showarrow = FALSE, font = list(size = 12)
+  )
+}
+fig=fig %>% layout(annotations = annotations)
+fig
+#### save: plotly ####
+htmlwidgets::saveWidget(as_widget(fig), 
+                        paste0( outDirGe, "\\plot_", toupper(site), "_TS125ptly.html") ) 
+
+
+
+
+
+
+
+
+
+
 # (6) TIME SERIES - above year 1 median ####
 cols_to_select = c("UTC", "windMag","wind_category", "Season", fqInShip)
 gpsFQ = gps %>% select(all_of(cols_to_select))
@@ -305,21 +534,7 @@ pNE = grid.arrange(pE, l, nrow = 1,widths = c(2, 1))
 ggsave(filename = paste0(outDirG, "\\plot_", toupper(site), "_Exceed100.jpg"), plot = pNE, width = 12, height = 12, dpi = 300)
 
 ## TIME SERIES - % Time Wind Dominated  ####
-gpsFQ$Day = as.Date( gpsFQ$UTC )
-dayNE = gpsFQ %>%
-  mutate(Date = as.Date(UTC)) %>%
-  group_by(Season, Day) %>%
-  summarise(
-    hrs = n(),  # Count of observations
-    percent_below = sum(Windthres == "below", na.rm = TRUE) / hrs * 100,
-    #Exceed_50 = quantile(Exceed, 0.50, na.rm = TRUE), # Median
-    #TOL100_50 = quantile(.data[[fqIn2]], 0.50, na.rm = TRUE),
-    windspeed = quantile(windMag, 0.50, na.rm = TRUE)
-  )
 
-dayNE = as.data.frame( dayNE )
-dayNE$yr = year(dayNE$Day )
-dayNE$Julian = yday(dayNE$Day)
 
 windD = ggplot(dayNE, aes(x = Julian, y = as.numeric( percent_below), color = Season) )+
   geom_line() +

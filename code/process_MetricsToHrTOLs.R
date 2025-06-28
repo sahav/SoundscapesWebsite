@@ -8,7 +8,7 @@
 
 # outputs:  hourly TOLs values with wind speed and list of files processed
 
-devtools::install_github('TaikiSan21/PAMscapes')
+#devtools::install_github('TaikiSan21/PAMscapes')
 
 library(PAMscapes)
 library(lubridate)
@@ -21,7 +21,7 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "SB03" 
+site  = "MB01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
