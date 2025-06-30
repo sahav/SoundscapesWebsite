@@ -1,28 +1,58 @@
+# Soundscape Condition | tracking how sound levels change when vessel noise is present
+
+# INPUTS: output of plot_ONMS-conditions.R, loads the most recent file; ONMS metadata
+# works for each monitoring site AND output of format_AIStransit.R
+
+
 rm(list=ls()) 
+
+#SITES ####
+ONMSsites = c("sb03","oc02", "cb11" )
+## directories ####
+outDir   =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
+outDirG  =  paste0(outDir, "content\\resources") #where save graphics
+outDirGe =  paste0(outDir, "content\\resources\\extra") #where extra save graphics
+outDirC  =  paste0(outDir,"context\\") #where to get context
+outDirP =   paste0(outDir,"products\\") #where to get context
+outDirGe =  paste0(outDir, "content\\resources\\extra") #where extra save graphics
 
 #INPUT PARAMS ####
 DC = Sys.Date()
 project = "ONMS"
-site = "oc02" # "sb03" nrs11 mb02"
-site1 =  "oc02" #cbnrs11 is weird...
 AISUpp = 5 
 AISLow = 2
 windUpp = 22.6 #which wind model result to show on plot
 windLow = 1
+fqShip = "TOL_125"
+fqShipN = "125 Hz"
 
-# DIRECTORIES ####
-outDir =  "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\" 
-outDirC = paste0( outDir,"context\\") #context
-if (site == "cb11"){
-  outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" ) #products
-  site = "nrs11"
-}else (
-  outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" )#products
-)
-outDirG = paste0( outDir,"report\\" ) #graphics
-  
-# LOAD SOUND DATA ####
-inFile = list.files(outDirP, pattern = paste0("data_",site,"_HourlySPL-gfs-season_"), full.names = T)
+# CONTEXT ####
+#reads information for all sites
+metaFile = paste0(outDirG,"\\ONMSSound_IndicatorCategories.xlsx")
+lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
+colnames(lookup) = lookup[1, ]         # Set first row as column names
+lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
+lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
+## TIMES OF INTEREST ####
+TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of interest") )
+TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
+## FREQUENCIES OF INTEREST ####
+FOI = as.data.frame ( openxlsx ::read.xlsx(metaFile, sheet = "Frequency of Interest") )
+FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
+FOI$Sanctuary = tolower(FOI$Sanctuary)
+FOI = FOI[FOI$`Show.on.plot?` == "Y",]
+## WIND NOISE MODEL ####
+windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.names = T)
+file_info = file.info(windFile)
+load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
+
+# LOOP THROUGH SITES ####
+site   = "sb03" # "sb03" nrs11 mb02"
+site1 =  "sb03" # cbnrs11 is weird...
+stn = substr(site, start = 1, stop= 2)
+
+## LOAD SOUND DATA ####
+inFile = list.files( paste0(outDirP, stn, "\\"), pattern = paste0("data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel.*\\.Rda$"), full.names = T)
 file_info = file.info(inFile) 
 load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
 st = as.Date( min(gps$UTC) )
@@ -31,33 +61,14 @@ udays = length( unique(as.Date(gps$UTC)) )
 cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
 Fq = as.numeric( as.character( gsub("TOL_", "",  colnames(gps)[grep("TOL", colnames(gps))] ) ))
 
-# LOAD ONMS Metadata ####
-metaFile = paste0(outDirC,"ONMSSound_IndicatorCategories.xlsx")
-lookup = as.data.frame ( read.xlsx(metaFile, sheetIndex = 1) )
-colnames(lookup) = lookup[1, ]         # Set first row as column names
-lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
-lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
-siteInfo = lookup[lookup$`NCEI ID` == site,]
+## SITE PARAMETERS ####
+siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
 siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
-## frequency of interest ####
-FOI = as.data.frame ( read.xlsx(metaFile, sheetIndex = "Frequency of Interest") )
-FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
-FOI$Sanctuary = tolower(FOI$Sanctuary)
+#frequency of interest
 FOIs = FOI [ FOI$Sanctuary == substr(site1, 1,2), ]
-## seasonality ####
-sidx = siteInfo$Seasonality
-if ( is.na(sidx) ) {
-  season = data.frame(
-    Season = c("Winter", "Spring", "Summer", "Fall"),
-    Months = c("1,2,3", "4,5,6", "7,8,9", "10,11,12") )
-}else {
-  season = data.frame(
-    Season = c("Winter", "Spring", "Summer", "Fall"),
-    Months = c("1,2,3", "4,5,6", "7,8,9", "10,11,12") )
-}
-## times of interest ####
-TOI = as.data.frame ( read.xlsx(metaFile, sheetIndex = "Time period of interest") )
-TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
+##frequency(s) to track
+FOIst = FOIs [ FOIs$`Track.this.FQ.as.indicator.for.sources?` == "Y", ] 
+#times of interest
 TOIs = TOI [ TOI$Site == (site1), ]
 TOIs <- TOIs %>%
   mutate(
@@ -66,53 +77,60 @@ TOIs <- TOIs %>%
     Mid_Julian = (Start_Julian + End_Julian) / 2  # Midpoint for annotation
   )
 TOIs$yr = TOIs$Year
+cat(site, "context summary:", siteInfo$`Oceanographic category`,"site ;times of interest- ", nrow(TOIs), 
+    ";frequencies of interest- ", nrow(FOIst), "\n")
 
-# LOAD WIND MODEL ####
-windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.names = T)
-file_info = file.info(windFile)
-load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
-# unique(windModel$si)
-windInfo = windModel[tolower(windModel$si) == site1,]
-widx = which( as.numeric(as.character( (colnames(windInfo)) ) )  == max(Fq) )
-windInfo = windInfo[,1:widx]
+## LOAD WIND MODEL ####
+windInfo = windModel[tolower(windModel$si) == site,]
+colnums = suppressWarnings(as.numeric(colnames(windInfo)))
+widx = which(!is.na(colnums) & colnums == max(Fq))
+windInfo = windInfo[,1:widx] #wind noise by frequency (columns) and speed (rows)
 #re-structure for ggplot
 mwindInfo = melt(windInfo, id.vars = c("windSpeed"), measure.vars = colnames(windInfo)[4:ncol(windInfo)])
 mwindInfo$variable = as.numeric( as.character(mwindInfo$variable ))
 
-# LOAD AIS data ####
-if (!is.na(siteInfo[24])) {
-  load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
-  ais = aisONMS[ tolower(aisONMS$loc_id) == site,]
-  ais$Start = as.POSIXct( gsub("[+]00", "", ais$start_time_utc), tz = "GMT" ) 
-  ais$End   = as.POSIXct( gsub("[+]00", "", ais$end_time_utc), tz = "GMT" ) 
-  cat("AIS data for ", site, as.character( min(ais$Start) ), " to ", as.character( max(ais$Start) ))
-}
-## truncate sound data to AIS ####
+## LOAD AIS data ####
+load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
+ais = aisONMS[ tolower(aisONMS$loc_id) == site,]
+ais$Start = as.POSIXct( gsub("[+]00", "", ais$start_time_utc), tz = "GMT" ) 
+ais$End   = as.POSIXct( gsub("[+]00", "", ais$end_time_utc), tz = "GMT" ) 
+cat("AIS data for ", site, as.character( min(ais$Start) ), " to ", as.character( max(ais$Start) ))
+
+## TRUNCATE sound data to AIS ####
 gpsAIS  = gps[ gps$UTC > min(ais$Start) & gps$UTC <=  max(ais$Start), ]
-gpsAIS$numAIS = 0  #number of ship transits during that hour
-gpsAIS$minAIS = NA #minimum distance for ships during that hour
-gpsAIS$avgAIS = NA #average speed of ships during that hour
-cat("removed ", nrow(gps) - nrow(gpsAIS), "hours because no AIS data")
-gpsAIS$GMT =as.POSIXct(gpsAIS$UTC,"GMT")
+#gpsAIS$numAIS = 0  #number of ship transits during that hour
+#gpsAIS$minAIS = NA #minimum distance for ships during that hour
+#gpsAIS$avgAIS = NA #average speed of ships during that hour
+cat("removed ", nrow(gps) - nrow(gpsAIS), "hours because no AIS data \n")
+# gpsAIS$GMT =as.POSIXct(gpsAIS$UTC,"GMT")
+names(gpsAIS)
+## MATCH AIS ####
+# need to speed up this process... takes way to long!
+# ais$Start
+ais = ais %>%
+  mutate(Start_hour = floor_date(Start, unit = "hour"))
 
-# MATCH AIS ####
-if ( nrow(ais) > 0 ){
-  
-  for (ii in 1: nrow(gpsAIS) ){
-    
-    #get all vessel transits that within the hour?
-    AIStmp = ais[ais$Start >= gpsAIS$GMT[ii] & ais$Start < gpsAIS$GMT[ii] + (3600), ] 
-    if (  nrow(AIStmp) > 0 ){
-      gpsAIS$numAIS[ii] =  nrow(AIStmp)
-      gpsAIS$minAIS[ii]  = min(AIStmp$dist_nm, na.rm = T)
-      gpsAIS$avgAIS[ii]  = mean(as.numeric( as.character( AIStmp$avg_sog_dw )), na.rm = T)
-    }
-  }
-  
-} else { cat("No AIS data for this location")}
-# hour with max # ships: gpsAIS[ which.max( gpsAIS$numAIS ),]
+ais_summary = ais %>%
+  group_by(Start_hour) %>%
+  summarise(
+    numAIS = n(),
+    minAIS = min(dist_nm, na.rm = TRUE),
+    avgAIS = mean(as.numeric(as.character(avg_sog_dw)), na.rm = TRUE),
+    .groups = "drop"
+  )
+gpsAIS$Start_hour = gpsAIS$UTC
 
-# DEFINE AIS categories ####
+gpsAIS = gpsAIS %>%
+  left_join(ais_summary, by = "Start_hour")
+
+gpsAIS = gpsAIS %>%
+  mutate(
+    numAIS = ifelse(is.na(numAIS), 0, numAIS)
+  )
+
+cat(site, "hour with max # ships:", max( gpsAIS$numAIS ) )
+
+## DEFINE AIS categories ####
 gpsAIS$ais_category = NA
 gpsAIS <- gpsAIS %>%
   mutate(ais_category = case_when(
@@ -126,47 +144,47 @@ category_counts <- gpsAIS %>%
   count(ais_category) %>%
   mutate(label = paste(ais_category, ":", n))
 subtitle_text <- paste(category_counts$label, collapse = ", ")
-category_counts
 
-# save: updated data ####
-save(gpsAIS, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs-season-ais_", DC, ".Rda") )
+# (optional) save: updated data ####
+#save(gpsAIS, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs-season-ais_", DC, ".Rda") )
 
-# QUANTILES by ais ####
+## QUANTILES by ais ####
 tol_columns = grep("TOL", colnames(gpsAIS))
-season_split = split(gpsAIS, gpsAIS$ais_category) # Calculate quantiles for each season
-season_quantiles = lapply(season_split, function(season_data) {
+cat_split = split(gpsAIS, gpsAIS$ais_category) # Calculate quantiles for each season
+ais_quantiles = lapply(cat_split, function(season_data) {
   apply(season_data[, tol_columns, drop = FALSE], 2, quantile, na.rm = TRUE)
 })
-unique( gpsAIS$numAIS[ gpsAIS$ais_category == "3-high"] )
 
 tol_columns = grep("TOL", colnames(gpsAIS))
-seasonAll = NULL
-for (ii in 1: length(season_quantiles) ) {
-  tmp = as.data.frame ( season_quantiles[ii] ) 
+All = NULL
+for (ii in 1: length(ais_quantiles) ) {
+  tmp = as.data.frame ( ais_quantiles[ii] ) 
   colnames(tmp) = colnames(gpsAIS)[tol_columns]
   tmp$Quantile = rownames(tmp)
-  tmp$Season = names(season_quantiles)[ii]
+  tmp$ais = names(ais_quantiles)[ii]
   rownames(tmp) = NULL
-  seasonAll = rbind(seasonAll,tmp)
+  All = rbind(All,tmp)
 }
 
-# SPECTRAL ANALYSIS ####
-#formating for plot
-tol_columns = grep("TOL", colnames(seasonAll))
-mallData = melt(seasonAll, id.vars = c("Quantile","Season"), measure.vars = tol_columns)
+## SPECTRAL ANALYSIS ####
+#formatting for plot
+tol_columns = grep("TOL", colnames(All))
+mallData = melt(All, id.vars = c("Quantile","ais"), measure.vars = tol_columns)
 mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
 colnames(mallData) = c("Quantile", "AIS", "Frequency" , "SoundLevel" )
-names(mallData)
-unique(mallData$AIS)
+#names(mallData)
+#unique(mallData$AIS)
 stAIS = as.Date( min(gpsAIS$UTC) )
 edAIS = as.Date( max(gpsAIS$UTC) )
-#proportion of samples
+
+## PLOT- % samples ####
 lais = ggplot(gpsAIS, aes(x = "", fill = ais_category)) +
   geom_bar(stat = "count", position = "stack") +  # Stacked bar chart
   coord_flip() +  # Flip the coordinates to make it horizontal
-  ggtitle("AIS vessels categories") +  # Add the main title
+  ggtitle("number of hours in AIS vessels categories") +  # Add the main title
   theme_minimal() +
-  labs(x = NULL, y = NULL, subtitle_text = "low < 3, med 3-5, high >5") +  # Remove x-axis label
+  labs(x = NULL, y = NULL ) +
+       #caption = "low < 3 | med 3-5 | high >5") +  # Remove x-axis label
   theme(
     plot.title = element_text(hjust = 0),  # Align the title to the left
     axis.text.y = element_blank(),
@@ -180,6 +198,8 @@ lais = ggplot(gpsAIS, aes(x = "", fill = ais_category)) +
   scale_x_discrete(labels = category_counts$wind_category) +  # Place the category labels under the plot
   scale_fill_manual(values = c("0-none" = "#56B4E9", "1-low" = "#009E73", "3-high" = "#CC79A7", 
                                "2-med" = "#E69F00"))  # Reverse the legend order
+
+lais
 dBIncrease = NULL
 dBIncrease$dB[1] = round( mallData$SoundLevel[mallData$Frequency == 63 & mallData$Quantile == "50%" & mallData$AIS == "1-low"]  -
                             mallData$SoundLevel[mallData$Frequency == 63 & mallData$Quantile == "50%" & mallData$AIS == "0-none"] )
@@ -188,6 +208,16 @@ dBIncrease$dB[2] = round( mallData$SoundLevel[mallData$Frequency == 125 & mallDa
 dBIncrease$dBval[1] = mallData$SoundLevel[mallData$Frequency == 63 & mallData$Quantile == "50%" & mallData$AIS == "0-none"]
 dBIncrease$dBval[2] = mallData$SoundLevel[mallData$Frequency == 125 & mallData$Quantile == "50%" & mallData$AIS == "0-none"]
 
+caption_text = paste0(
+  "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
+  "<b>Vertical lines </b> indicate typical ship noise frequencies <br>",
+  "<b>RESULT for 63 Hz = </b>", dBIncrease$dB[1],"dB increase <br>",
+  "<b>RESULT for 125 Hz = </b>", dBIncrease$dB[2],"dB increase <br>", 
+  "<b>AIS categories: </b> low = 1-3 ships | med = 3-5 ships | high = >5 ships <br>",
+  "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>"
+   )
+
+## PLOT- spectra in each category ####
 pais = ggplot() +
   # Add shaded area for 25%-75% range
   geom_ribbon(data = mallData %>% 
@@ -197,7 +227,7 @@ pais = ggplot() +
   
   #median TOL values
   geom_line(data = mallData[mallData$Quantile == "50%",], 
-            aes(x = Frequency, y = SoundLevel, color = AIS), linewidth = 1) +
+            aes(x = Frequency, y = SoundLevel, color = AIS), linewidth = 2) +
   
   scale_color_manual(values = c("0-none" = "#56B4E9", 
                                 "1-low" = "#009E73", 
@@ -213,38 +243,38 @@ pais = ggplot() +
   geom_vline(aes(xintercept = 125, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
   
   geom_vline(aes(xintercept = 63, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
-  
-  geom_text(aes(x = 63,  y = dBIncrease$dBval[1]+5, label = "63 Hz"), angle = 0, vjust = 0, hjust = 0, size = 3) +
-  geom_text(aes(x = 125, y = dBIncrease$dBval[1]+5, label = "125 Hz"), angle = 0, vjust = 0, hjust = 0, size = 3) +
   scale_x_log10(labels = label_number()) +  # Log scale for x-axis
   
   # Additional aesthetics
-  theme_minimal()+
-  theme(legend.position = "top",
-        plot.title = element_text(size = 16, face = "bold", hjust = 0)) + 
+  geom_text(aes(x = 63,  y = dBIncrease$dBval[1]+5, label = "63 Hz"), angle = 0, vjust = 0, hjust = 0, size = 3) +
+  geom_text(aes(x = 125, y = dBIncrease$dBval[1]+5, label = "125 Hz"), angle = 0, vjust = 0, hjust = 0, size = 3) +
+  theme_minimal() +
   labs(
-    title =paste0("Contribution of ship noise to the soundscape" ),
-    subtitle =  paste0(toupper(site), ", a ", tolower(FOI$Oceanographic.setting[1]), 
-                       " site (data summarized from ", st, " to ", ed, ")\n",
-                       dBIncrease$dB[1], "dB increase from no AIS at 63 Hz \n",
-                       dBIncrease$dB[2], "dB increase from no AIS at 125 Hz" ) ,
-    caption = paste0("black lines are modeled wind noise at this depth [", windLow,"m/s & ",windUpp, "m/s]\n",
-                     "AIS vessels are those ships transmitting data about position and speed"), 
+    title = paste0("Overview of the contribution of ship noise to the soundscape at ", toupper(site) ),
+    subtitle = paste0( "data summarized from ", st, " to ", ed),
+    caption  =  caption_text,
     x = "Frequency Hz",
     y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
-  )
-arranged_plot = grid.arrange(pais,lais,heights = c(4, .9))
-# save: AIS spectra ####
-ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
+  ) +
+  theme(legend.position = "bottom",
+        plot.caption = ggtext::element_markdown(hjust = 0),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0) )
+     
+pais
 
-# 125Hz DISTRIBUTION ####
+arranged_plot = grid.arrange(pais,lais,heights = c(4, .9))
+
+## SAVE: AIS spectra ####
+ggsave(filename = paste0(outDirGe, "plot_", tolower(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
+
+## PLOT: 125Hz DISTRIBUTION ####
 gpsAIS$ais_category  = ( substr(gpsAIS$ais_category, start = 3, stop = 6) )
 gpsAIS$ais_category2 = factor(gpsAIS$ais_category, 
                               levels = c("none", "low", "med", "high"), 
                               ordered = TRUE)
 medians <- gpsAIS %>%
   group_by(ais_category2) %>%
-  summarise(median_value = median(TOL_125, na.rm = TRUE))
+  summarise(median_value = median(.data[[fqShip]], na.rm = TRUE), .groups = "drop")
 
 # Step 1: Create Pie Chart Data
 pie_data <- gpsAIS %>%
@@ -253,7 +283,7 @@ pie_data <- gpsAIS %>%
   mutate(percentage = count / sum(count))
 
 # Step 2: Create Pie Chart
-pie_chart <- ggplot(pie_data, aes(x = "", y = percentage, fill = ais_category2)) +
+pie_chart = ggplot(pie_data, aes(x = "", y = percentage, fill = ais_category2)) +
   geom_bar(stat = "identity", width = 1) +
   coord_polar("y", start = 0) +  
   scale_fill_brewer(palette = "Set3") +  
@@ -263,15 +293,20 @@ pie_chart <- ggplot(pie_data, aes(x = "", y = percentage, fill = ais_category2))
 
 # Convert pie chart to grob
 pie_grob <- ggplotGrob(pie_chart)
+
+caption_text = paste0(
+  "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
+  "<b>Vertical lines </b> median sound level for each AIS category <br>",
+  "<b>AIS categories: </b> low = 1-3 ships | med = 3-5 ships | high = >5 ships <br>" )
+
 pais2 = ggplot(gpsAIS, aes(x = TOL_125, fill = ais_category2)) +
   geom_histogram(binwidth = 1, alpha = 0.6, position = "identity") + 
   geom_vline(data = medians, aes(xintercept = median_value, color = ais_category2), 
              linetype = "solid", size = 1) +  # Add median lines
   labs(
-    title =paste0("Contribution of ship noise to the soundscape" ),
-    subtitle =  paste0(toupper(site), ", a ", tolower(FOI$Oceanographic.setting[1]), 
-                       " site (data summarized from ", st, " to ", ed, ")\n" ) ,
-    caption = "low<3 ships, med 3-5 ships, high>5 ships",
+    title = paste0("How much do sound levels at ",fqShipN ," increase when ships are nearby?" ),
+    subtitle = paste0(  toupper(site), " (data summarized from ", st, " to ", ed, ")"),
+    caption = caption_text,
     x = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ), 
     y = "Count of Hours",
     fill = "Ships transiting nearby",  # Change legend title for fill
@@ -279,11 +314,14 @@ pais2 = ggplot(gpsAIS, aes(x = TOL_125, fill = ais_category2)) +
   scale_fill_brewer(palette = "Set3") +  
   scale_color_brewer(palette = "Set3") +  # Match colors for clarity
   theme_minimal() +
-  annotation_custom(pie_grob, xmin = max(gpsAIS$TOL_125) - 20, xmax = max(gpsAIS$TOL_125),
-                    ymin = min(pie_data$count), ymax =min(pie_data$count)+300 )  
+  theme(legend.position = "top",
+        plot.caption = ggtext::element_markdown(hjust = 0),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0) ) 
+#annotation_custom(pie_grob, xmin = max(gpsAIS$TOL_125) - 20, xmax = max(gpsAIS$TOL_125),
+#ymin = min(pie_data$count), ymax =min(pie_data$count)+300 )  
 
 pais2
-## save: AIS histogram ####
+## SAVE: AIS histogram ####
 ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AIShist.jpg"), plot = pais2, width = 10, height = 10, dpi = 300)
 
 ## table results ####
@@ -304,65 +342,64 @@ pie_table_wide <- pie_table %>%
   pivot_wider(names_from = ais_category2, values_from = (percentage), values_fill = list(percentage = 0))
 
 print(pie_table_wide)
-title_grob <- textGrob( paste0("Proportion of hours in each AIS category \n (", toupper(site), ")"),
+title_grob <- textGrob( paste0("% of hours in each AIS category \n (", toupper(site), ")"),
                         gp = gpar(fontsize = 16, fontface = "bold"))
 table_grob <- tableGrob(as.data.frame( pie_table_wide) )
 combined_grob <- arrangeGrob(title_grob, table_grob, ncol = 1, heights = c(0.1, 0.9))  # Adjust title height
-## save: table ####
+## SAVE: table ####
 ggsave(paste0(outDirG, "table_", site, "_AIShist.jpg"), combined_grob, width = 8, height = 5)
 
-
-# 125Hz TIME SERIES ####
-# each day median level for each category....
+## MONTHLY ABOVE AT 125 HZ ####
+# calculate - each month-year median level for each category
 gpsAIS$day = as.Date(gpsAIS$UTC)
+gpsAIS$mth = month(gpsAIS$UTC)
+gpsAIS$yr  = year(gpsAIS$UTC)
 gpsAIS$ais = "present"
 gpsAIS$ais[gpsAIS$ais_category2 == "none"] = "none"
-
 medians <- gpsAIS %>%
-  group_by(day, ais) %>%
-  summarise(median_value = median(TOL_125, na.rm = TRUE))
-
+  group_by(mth, yr, ais) %>%
+  summarise(median_value = median(.data[[fqShip]], na.rm = TRUE), .groups = "drop")
+# calculate - difference in median levels 
 medians_diff <- gpsAIS %>%
-  group_by(day, ais) %>%
+  group_by(mth, yr, ais) %>%
   summarise(median_value = median(TOL_125, na.rm = TRUE), .groups = "drop") %>%
   pivot_wider(names_from = ais, values_from = median_value) %>%  # Make columns for "none" & "present"
   mutate(difference = `present` - `none`)  # Calculate difference
-medians_diff$year = year(medians_diff$day )
 
-pais3 = ggplot(medians_diff, aes(x = day, y = difference, fill = difference > 0)) + 
-  geom_col(show.legend = FALSE) +  # Use geom_col to plot bars with height defined by difference
-  scale_fill_manual(values = c("TRUE" = "tomato", "FALSE" = "steelblue")) +  # Color bars based on positive or negative difference
-  labs(
-    title = "Difference in soundscape when vessel nearby",
-    subtitle =  paste0(toupper(site), ", a ", tolower(FOI$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ),
-    x = "",
-    y = ("Daily difference in decibels at 125 Hz \n (vessel - non-vessel)")
+medians_diff = as.data.frame( medians_diff )
+medians_diff$yr = factor(medians_diff$yr, levels = rev(sort(unique(medians_diff$yr))))
+medians_diff$mth = factor(medians_diff$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10, 11,12)))
+pais3 = ggplot(medians_diff, aes(x = factor(mth), y = as.numeric(difference), fill = factor( mth ) ) ) +
+  geom_col(width = 1) +
+  facet_wrap(~yr, ncol = 1) +
+  coord_flip() +
+  scale_fill_viridis_d(option = "D") +
+  scale_x_discrete(
+    breaks = c("1", "3", "5", "7", "9", "11"),
+    labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
   ) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +  
-  geom_vline(data = medians_diff, aes(xintercept = as.Date(paste0(year, "-01-01"))), 
-             color = "black", linetype = "dashed") + # Add dashed line at zero for reference
-  geom_rect(data = TOIs %>% filter(yr %in% unique(gpsAIS$yr)), 
-            inherit.aes = FALSE,
-            aes(xmin = start_date, xmax = end_date , ymin = -Inf, ymax = Inf), 
-            alpha = 0.2) +
+  labs(
+    title = paste0("How much do sound levels at ",fqShipN ," increase when ships are nearby?" ),
+    subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
+    y = "Sound Level difference (dB) ",
+    x = ""
+  ) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  theme(
+    legend.position = "none")
 pais3
-## save: AIS above time series ####
-ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AISTimeSeries.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
+## SAVE: MONTHLY ABOVE ####
+ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AISMonthAbove.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
+
 ## table results ####
-medians_diff$mth = month(medians_diff$day)
-medians_diff$yr = year(medians_diff$day)
-medians <- medians_diff %>%
-  group_by(yr, mth) %>%
-  summarise(median_value = round(mean(difference, na.rm = TRUE), 1), .groups = "drop") %>%
-  mutate(mth = factor(month.abb[mth], levels = month.abb))  # Ensure correct order
+names( medians_diff )
+# Pivot wider first
+medians_wide <- medians_diff %>%
+  pivot_wider(names_from = mth, values_from = difference)
 
 month_order <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-# Pivot wider first
-medians_wide <- medians %>%
-  pivot_wider(names_from = mth, values_from = median_value)
+
 # Reorder columns to match the correct month order
 medians_wide <- medians_wide %>%
   select(yr, all_of(intersect(month_order, names(medians_wide))))
@@ -370,7 +407,10 @@ title_grob <- textGrob( paste0("Monthly average difference in soundscape when ve
                         gp = gpar(fontsize = 16, fontface = "bold"))
 table_grob <- tableGrob(as.data.frame( medians_wide) )
 combined_grob <- arrangeGrob(title_grob, table_grob, ncol = 1, heights = c(0.1, 0.9))  # Adjust title height
-## save: table ####
-ggsave(paste0(outDirG, "table_", site, "_AISabove.jpg"), combined_grob, width = 8, height = 5)
+## SAVE: table ####
+ggsave(paste0(outDirG, "table_", site, "_AISMonthAbove.jpg"), combined_grob, width = 8, height = 5)
+
+
+
 
 

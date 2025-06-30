@@ -69,7 +69,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 8
+for (uu in 1:length(ONMSsites)) { # uu = 1
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
   site =  ONMSsites[uu]
@@ -387,7 +387,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 8
     theme_minimal() +
     labs(
       #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
-      caption  =caption_text,
+      caption  = caption_text,
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
       if (sidx == "biological"){
@@ -629,7 +629,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 8
     }
   }
   
-  #(5) TIME SERIES-  % Time Wind Dominated in fqIn2 ####
+  #(5) Wind Dominated in fqIn2 ####
   # select only data for fqIn2
   cols_to_select = c("UTC", "windMag","wind_category",fqIn2)
   gpsFQ = gps %>% select(all_of(cols_to_select))
@@ -661,22 +661,33 @@ for (uu in 1:length(ONMSsites)) { # uu = 8
     mutate(Date = as.Date(UTC)) %>%
     group_by(yr, mth) %>%
     summarise(
-      # Count of observations
-      hrs = n(),  
+      # Count of non-NA hours (remove NAs)
+      hrs = sum(!is.na(Exceed ) ) ,  
+      
       # hours for the year-day that are at or below wind speed estimate
-      percent_below = sum(Windthres == "below", na.rm = TRUE) / hrs * 100,
+      n_below = sum(Windthres == "below", na.rm = TRUE),
+      n_above = sum(Windthres == "above", na.rm = TRUE),
+      
+      #percent_below = sum(Windthres == "below", na.rm = TRUE) / hrs * 100,
+      #percent_above = sum(Windthres == "above", na.rm = TRUE)/ hrs * 100,
+      
+      percent_below = ifelse(hrs > 0, n_below / hrs * 100, NA_real_),
+      percent_above = ifelse(hrs > 0, n_above / hrs * 100, NA_real_),
+      
       # windspeed during the year-day
-      windspeed = quantile(windMag, 0.50, na.rm = TRUE)
+      windspeed = quantile(windMag, 0.50, na.rm = TRUE),
+      .groups = "drop"
     )
+  # CHECK: dayNE$percent_below + dayNE$percent_above
   
   dayNE = as.data.frame( dayNE )
-  # round(dayNE$windspeed)
-  # is there a relationship between percent below and windspeed?
-  #plot(dayNE$percent_below, dayNE$windspeed)
   dayNE$yr = factor(dayNE$yr, levels = rev(sort(unique(dayNE$yr))))
   dayNE$mth = factor(dayNE$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10, 11,12)))
   
-  windD = ggplot(dayNE, aes(x = factor(mth), y = as.numeric( percent_below), fill = factor( mth ) ) ) +
+  # is there a relationship between percent below and windspeed?
+  #plot(dayNE$percent_below, dayNE$windspeed)
+  
+  windD = ggplot(dayNE, aes(x = factor(mth), y = as.numeric(percent_below), fill = factor( mth ) ) ) +
     geom_col(width = 1) +
     facet_wrap(~yr, ncol = 1) +
     coord_flip() +
@@ -699,11 +710,36 @@ for (uu in 1:length(ONMSsites)) { # uu = 8
     theme(
       legend.position = "none")
   windD
-  
-  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
  
+  windB = ggplot(dayNE, aes(x = factor(mth), y = as.numeric(percent_above), fill = factor( mth ) ) ) +
+    geom_col(width = 1) +
+    facet_wrap(~yr, ncol = 1) +
+    coord_flip() +
+    ylim(0,100) +
+    scale_fill_viridis_d(option = "D") +
+    scale_x_discrete(
+      breaks = c("1", "3", "5", "7", "9", "11"),
+      labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
+    ) +
+    #scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    labs(
+      title = paste0("How often are sources of interest likey present? \n(vocalizing species or vessel activity) "),
+      subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
+      caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
+      x = "",
+      y = paste0("% of hours above wind noise ", fqIn2name),
+      #color = "Year"  # Label for the color legend
+    ) +
+    theme_minimal()+
+    theme(
+      legend.position = "none")
+  windB
+  ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_AboveWind.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
+  
   # SAVE UPDATED DATA ####
-  save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel", DC, ".Rda") )
+  # names(gps)
+  save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
 }
 
 

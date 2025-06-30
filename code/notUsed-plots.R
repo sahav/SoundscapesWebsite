@@ -648,6 +648,54 @@ save(outputT, file = paste0( fileName, ".Rda") )
 write.csv(outputT, file = paste0( fileName, ".csv") )
 ggsave(filename = paste0( fileName, ".jpg"), plot = pT, width = 8, height = 6, dpi = 300)
 
+
+pais3 = ggplot(medians_diff, aes(x = day, y = difference, fill = difference > 0)) + 
+  geom_col(show.legend = FALSE) +  # Use geom_col to plot bars with height defined by difference
+  scale_fill_manual(values = c("TRUE" = "tomato", "FALSE" = "steelblue")) +  # Color bars based on positive or negative difference
+  labs(
+    title = "Difference in soundscape when vessel nearby",
+    subtitle =  paste0(toupper(site), ", a ", tolower(FOI$Oceanographic.setting[1]), " monitoring site \nshaded areas represents ", TOIs$Label[1] ),
+    x = "",
+    y = ("Daily difference in decibels at 125 Hz \n (vessel - non-vessel)")
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray") +  
+  geom_vline(data = medians_diff, aes(xintercept = as.Date(paste0(year, "-01-01"))), 
+             color = "black", linetype = "dashed") + # Add dashed line at zero for reference
+  geom_rect(data = TOIs %>% filter(yr %in% unique(gpsAIS$yr)), 
+            inherit.aes = FALSE,
+            aes(xmin = start_date, xmax = end_date , ymin = -Inf, ymax = Inf), 
+            alpha = 0.2) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+pais3
+
+## save: AIS above time series ####
+ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AISTimeSeries.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
+## table results ####
+medians_diff$mth = month(medians_diff$day)
+medians_diff$yr = year(medians_diff$day)
+medians <- medians_diff %>%
+  group_by(yr, mth) %>%
+  summarise(median_value = round(mean(difference, na.rm = TRUE), 1), .groups = "drop") %>%
+  mutate(mth = factor(month.abb[mth], levels = month.abb))  # Ensure correct order
+
+month_order <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+# Pivot wider first
+medians_wide <- medians %>%
+  pivot_wider(names_from = mth, values_from = median_value)
+# Reorder columns to match the correct month order
+medians_wide <- medians_wide %>%
+  select(yr, all_of(intersect(month_order, names(medians_wide))))
+title_grob <- textGrob( paste0("Monthly average difference in soundscape when vessel nearby \n (", toupper(site), ")"),
+                        gp = gpar(fontsize = 16, fontface = "bold"))
+table_grob <- tableGrob(as.data.frame( medians_wide) )
+combined_grob <- arrangeGrob(title_grob, table_grob, ncol = 1, heights = c(0.1, 0.9))  # Adjust title height
+## save: table ####
+ggsave(paste0(outDirG, "table_", site, "_AISabove.jpg"), combined_grob, width = 8, height = 5)
+
+
+
 # NOT USED ####
 ## calculate % above VSR ####
 # add VSR to hourly data
