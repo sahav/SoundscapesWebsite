@@ -185,7 +185,7 @@ uColors = unique(outputT$Region)
 if (projectN == "onmsRegion"){
   instrument_colors <- c(
     "Pacific Islands" = "#C6E6F0", 
-    "Greater Pacific" = "#C6E6F0",  
+    #"Greater Pacific" = "#C6E6F0",  
     "West Coast"      = "#53B0D7",  
     "East Coast"      = "#004295", 
     "Gulf Coast"      = "#001743") 
@@ -203,7 +203,7 @@ outputT <- outputT %>%
 output$sanctuaryName = substr(output$Site, start = 1, stop =2)
 output$Region[output$sanctuaryName %in% wc] <- "West Coast"
 output$Region[output$sanctuaryName %in% ec] <- "East Coast"
-output$Region[output$sanctuaryName %in% pi] <- "Greater Pacific"
+output$Region[output$sanctuaryName %in% pi] <- "Pacific Islands"
 output$Region[output$sanctuaryName %in% gl] <- "Great Lakes"
 colnames(output)
 pT = ggplot(output, aes(y = Site, x = Start_Date, xend = End_Date, fill = Project ) ) +

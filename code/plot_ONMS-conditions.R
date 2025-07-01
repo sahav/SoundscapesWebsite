@@ -134,6 +134,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
   }
+}else if ( sidx == "southernHem") {
+  season = data.frame(
+    Season = c("Tradewind", "Hurricane",  "Humpback", "Humpback peak"),
+    Months = c("5,6,7,8,9,10", "11,12,1,2,3,4","6,7,8,9,10" , "8,9,10"  ) ,
+    values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+  seasonLabel = "Tradewind (May-Oct), Hurricane (Nov-Apr), Humpback (Jun-Oct), Humpback peak (Aug-Oct)"
+}
   cat(site, "context summary:", siteInfo$`Oceanographic category`,  ";season-", sidx, ";times of interest- ", nrow(TOIs), 
       ";frequencies of interest- ", nrow(FOIst), "\n")
   
@@ -735,7 +742,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     theme(
       legend.position = "none")
   windB
-  ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_AboveWind.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
   
   # SAVE UPDATED DATA ####
   # names(gps)
