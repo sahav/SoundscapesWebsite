@@ -1,92 +1,88 @@
 #compare Manta output with Triton-remora output
 # use PAMscapes to summarise
 rm(list=ls()) 
+library(ncdf4)
 
-site  = "HI03" 
-site = tolower(site) 
+deploy = c("hi01", "HI01_05", "onms_hi01_20221201-20230510_hmd") 
+deploy = c("hi03", "HI03_05", "onms_hi03_20221201-20230502_hmd")
+run = 2
 
 # LOCAL DATA DIRECTORIES ####
-dirSS  = paste0( "F:/ONMS/", site,"/SanctSound" ) # SANCTSOUND hourly TOLs csvs
-dirGCP = paste0( "F:/ONMS/", site,"//onms_hi03_20221201-20230502_hmd") # NCEI GCP min HMD netCDFs
 outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
-outDirG =  paste0(outDir, "content\\resources") #where save graphics
-outDirGe =  paste0(outDir, "content\\resources\\extra") #where extra save graphics
 outDirC =  paste0(outDir,"context\\") #where to get context
-
 ## TOL CONVERSION ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
 
-# SANCTSOUND DATA ####
-# assumnes data are median hourly values in TOL bands as PSD (divided by bandwidth)
-tmpFile = paste0(dirSS, "//SanctSound_HI03_05_TOL_1h.csv")
+# Triton-remora data
+dirSS  = paste0( "F:/ONMS/compare" ) # SANCTSOUND hourly TOLs csvs
+tmpFile = paste0(dirSS, "//SanctSound_", deploy[2], "_TOL_1h.csv")
 typ = sapply( strsplit(basename(tmpFile), "[.]"), "[[",2)
 SSdata = loadSoundscapeData( tmpFile, extension = typ)
-# data are NOT normalized to the bandwidth- need to divide by the bandwidth
+SSdata$Code = "Triton"
 
 # MANTA DATA ####
+dirGCP = paste0( "F:/ONMS/", deploy[1],"//", deploy[3]) 
 inFiles = list.files(dirGCP, pattern = "MinRes", recursive = T, full.names = T)
 inFiles = inFiles[!grepl(".png",inFiles) ]
 inFiles = inFiles[!grepl(".csv",inFiles) ]
 inFilesON = inFiles[!grepl("_netCDF",inFiles) ]
 cat("Found ", length(inFilesON), "ONMS files")
-# ONLY RUN FIRST TIME ####
-cData = NULL
-for (f in 1:length(inFilesON) ){
-  ncFile = inFilesON[f]
-  hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
-  tolData = createOctaveLevel(hmdData, type='tol') #keeps it as broadband levels in each TOL
-  tolData$site = site
-  cData = rbind( cData, tolData )
-}
-save(cData, file = paste0(dirSS, "//", tolower(site), "_05_MantaOutputCombined.Rda") )
+ncFile = nc_open( inFilesON[1] )
+ncFile$var$psd$longname
 
-file = paste0(dirSS, "//", tolower(site), "_05_MantaOutputCombined.Rda")
-load(file)
-# data are NOT normalized to the bandwidth- need to divide by the bandwidth
+hmdData = loadSoundscapeData(inFilesON[2]) 
+tolData = createOctaveLevel(hmdData, type='ol') #,normalized = TRUE) 
+
+
+# ONLY RUN FIRST TIME ####
+if (run == 1) {
+  cData = NULL
+  for (f in 1:length(inFilesON) ){
+    ncFile = inFilesON[f]
+    hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+    tolData = createOctaveLevel(hmdData, type='tol',normalized = TRUE) 
+    # assumes HMD data are per/Hz, so for >455 Hz, 
+    # adds bandwidth back to the levels, before summing the bands in the TOL then outputs TOL levels
+    tolData$site = deploy[1]
+    cData = rbind( cData, tolData )
+  }
+  cData$Code = "Manta"
+  save(cData, file = paste0(dirSS, "//", deploy[3], "_",deploy[2], ".Rda") )
+}else {
+  file = paste0(dirSS, "//", deploy[3], "_",deploy[2], ".Rda")
+  load(file)
+  cData$Code = "Manta"
+}
+
+# Get HOURLY values ####
 cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
 
 # look at one frequency bin and plot
-names( cDatah)
-cols_to_select = c("UTC", "TOL_500")
+fqIN = "TOL_125" # "TOL_2000"
+cols_to_select = c("UTC", fqIN)
 dManta  = cDatah %>% select(all_of(cols_to_select))
 colnames( dManta) = c("UTC", "manta")
 
 dTriton = SSdata %>% select(all_of(cols_to_select))
 colnames( dTriton) = c("UTC", "triton")
 
-dcombine = dManta %>%
-  left_join(dTriton, by = "UTC")
-names(dcombine)
+dcombine <- dManta %>%
+  full_join(dTriton, by = "UTC")
+rm(dcombine)
+dcombine = full_join(dManta, dTriton, by = "UTC")
 
+idx = which( is.na(dcombine$triton) ) #triton is missing a few
+dcombine$UTC[idx]
 dcombine$diff = dcombine$manta - dcombine$triton
-hist(dcombine$diff)
-
+#hist(dcombine$diff)
 ggplot(dcombine, aes(x = UTC, y = diff)) +
   geom_line()+
-  ggtitle (" Difference in 500 Hz TOL (Manta - Triton)- median")
+  ggtitle (paste0( "Difference in ", fqIN, "TOL (Manta - Triton)- median"))+
+  labs(subtitle = paste0( deploy[3], " to ",deploy[2] ) )
+mean(dcombine$diff, na.rm = T )
 
-
-# look at one frequency bin and plot-- 2 kHz
-cols_to_select = c("UTC", "TOL_2000")
-dManta  = cDatah %>% select(all_of(cols_to_select))
-colnames( dManta) = c("UTC", "manta")
-
-dTriton = SSdata %>% select(all_of(cols_to_select))
-colnames( dTriton) = c("UTC", "triton")
-
-dcombine = dManta %>%
-  left_join(dTriton, by = "UTC")
-names(dcombine)
-
-dcombine$diff = dcombine$manta - dcombine$triton
-hist(dcombine$diff)
-
-ggplot(dcombine, aes(x = UTC, y = diff)) +
-  geom_line()+
-  ggtitle (" Difference in TOL_2000 Hz TOL (Manta - Triton)- median")
-
-
+# NOT NEEDED #####
 cDatahMean = binSoundscapeData(cData, bin = "1hour", method = c("mean") )
 # look at one frequency bin and plot
 cols_to_select = c("UTC", "TOL_500")

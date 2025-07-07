@@ -57,7 +57,7 @@ editor_options:
 display(HTML(standardTextDict["SBNMS"]))
 ```
 
-### Ocean sound monitoring sites
+### Summary of ocean sound monitoring sites
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
@@ -65,16 +65,13 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Annual soundscape conditions
+## Ocean sound conditions
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(standardTextDict["conditions overview"]))
 ```
-:::
 
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Seasonal soundscape conditions
+### Seasonal conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
@@ -99,35 +96,27 @@ infoHtml = f'''
 '''
 display(HTML(infoHtml))
 ```
-:::
 
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Proportion of time with presence of management-relevant sources
+### Annual conditions
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How often is ocean sound above wind noise?"]))
-display(HTML(gf.makeButtons(sites, "plot_***_Exceed100.jpg", "Freq")))
-infoHtml = f'''
-<button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">
-  Table of results
-  </button>
-  <dialog id="infoModal3">
-  <p>Percent Time Above Wind Noise</p>
-  {gf.makeButtons(sites, "table_***_AboveWind.jpg", "MonthTable")}
-  <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
-    Close
-    </button>
-                '''
-display(HTML(infoHtml))
+display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
+display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
+
 ```
-:::
 
-::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Daily soundscape conditions
+### How often are sources of interest likely present?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-#display(HTML(gf.makeImage("DAILY_MILLIDEC_MinRes_psd.png", "Spectrogram")))
+display(HTML(standardTextDict["sources of interest likely present"]))
+display(HTML(gf.makeButtons(sites, "plot_***_AboveWind.jpg", "SourncePresent")))
+```
+
+### Are sounds of interest within typical conditions?
+```{python}
+#| echo: false
+display(HTML(standardTextDict["sources of interest typical"]))
+display(HTML(gf.makeButtons(sites, "plot_***_status.jpg", "FOI")))
 ```
 :::
 
@@ -138,17 +127,16 @@ display(HTML(infoHtml))
 display(HTML(standardTextDict["Indicator description"]))
 ```
 
-### Is noise from large vessels above typical conditions?
+### IHow much noise from large vessels may be interfering with whale communication?
 ```{python}
 #| echo: false
-#display(HTML(standardTextDict[""]))
-display(HTML(gf.makeButtons(sites, "plot_***_LgVesselNoise125.jpg", "SoundLevelVariance"))) 
-#display(HTML(gf.addPlotly("plot_sb01_TS125ptly.html"))) # interactive version
+display(HTML(standardTextDict["large vessels interfer"]))
+display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVariance"))) 
 ```
-### How much noise from large vessels may be interfering with whale communication?
+#### How does the level of traffic impact change conditions?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["How much noise do nearby ships contribute to the soundscape?"]))
+display(HTML(standardTextDict["level of traffic"]))
 display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
 ```
 
