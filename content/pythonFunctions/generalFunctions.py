@@ -15,7 +15,18 @@ def makeButtonsFit(sites, generalFormat, identifier):
                     </script>
     """
     inputDir = "https://raw.githubusercontent.com/CI-CMG/SoundscapesWebsite/refs/heads/main/content/resources"
-    path = f'{inputDir}/{generalFormat}'
+    initialFile = generalFormat.replace('***', sites[0], 1)
+    parts = initialFile.split('***')
+    cwd = os.getcwd()
+    directory_path = cwd.split("SoundscapesWebsite")[0]+ "SoundscapesWebsite/SoundscapesWebsite/content/resources"
+    
+    fullFileName = ""
+    for root, dirs, files in os.walk(directory_path):
+        for file in files:
+            if file.startswith(parts[0]) and file.endswith(parts[1]):
+                fullFileName = file
+                
+    path = f'{inputDir}/{fullFileName}'
     path = path.replace("***", sites[0])
     initialImage = f'<img src="{path}" width="700" id="{identifier}" onclick="this.requestFullscreen()">'
     if len(sites) == 1:
