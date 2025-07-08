@@ -272,7 +272,7 @@ for (ss in 1:length(ONMSsites)) {
   arranged_plot = grid.arrange(pais,lais,heights = c(4, .9))
   
   ## SAVE: AIS spectra ####
-  ggsave(filename = paste0(outDirGe, "plot_", tolower(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "plot_", toupper(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
   
   ## PLOT: 125Hz DISTRIBUTION ####
   gpsAIS$ais_category  = ( substr(gpsAIS$ais_category, start = 3, stop = 6) )
@@ -329,7 +329,7 @@ for (ss in 1:length(ONMSsites)) {
   
   pais2
   ## SAVE: AIS histogram ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AIShist.jpg"), plot = pais2, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "plot_", toupper(site), "_AIShist.jpg"), plot = pais2, width = 10, height = 10, dpi = 300)
   
   ## table results ####
   gpsAIS$mth = month( gpsAIS$UTC )
@@ -374,7 +374,7 @@ for (ss in 1:length(ONMSsites)) {
     t = 1, l = 1, r = ncol(table_grob)  # span all columns
   )
   ## SAVE: table ####
-  ggsave(paste0(outDirG, "table_", site, "_AIShist.jpg"), table_grob, width = 8, height = 5)
+  ggsave(paste0(outDirG, "table_", toupper(site), "_AIShist.jpg"), table_grob, width = 8, height = 5)
   
   ## MONTHLY ABOVE AT 125 HZ ####
   # calculate - each month-year median level for each category
@@ -417,7 +417,7 @@ for (ss in 1:length(ONMSsites)) {
       legend.position = "none")
   pais3
   ## SAVE: MONTHLY ABOVE ####
-  ggsave(filename = paste0(outDirG, "plot_", tolower(site), "_AISMonthAbove.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
+  ggsave(filename = paste0(outDirG, "plot_", toupper(site), "_AISMonthAbove.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
   
   ## table results ####
   medians_diff$month_name = month(as.numeric( as.character( medians_diff$mth )) , label = TRUE )
@@ -457,7 +457,7 @@ for (ss in 1:length(ONMSsites)) {
   #grid.newpage()
   #grid.draw(table_grob)
   ## SAVE: table ####
-  ggsave(paste0(outDirG, "table_", site, "_AISMonthAbove.jpg"), table_grob, width = 8, height = 5)
+  ggsave(paste0(outDirG, "table_", toupper(site), "_AISMonthAbove.jpg"), table_grob, width = 8, height = 5)
   
 }
 

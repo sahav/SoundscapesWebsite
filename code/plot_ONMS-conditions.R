@@ -44,6 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
+removess = 1 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
@@ -55,13 +56,14 @@ lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))),
 ## TIMES OF INTEREST ####
 TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of interest") )
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
+endSS = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "SantSound") )
+endSS$endSS =  as.Date(endSS$endSS, origin = "1899-12-30")
 ## FREQUENCIES OF INTEREST ####
 FOI = as.data.frame ( openxlsx ::read.xlsx(metaFile, sheet = "Frequency of Interest") )
 FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
 FOI$Sanctuary = tolower(FOI$Sanctuary)
 FOI = FOI[FOI$`Show.on.plot?` == "Y",]
 FOIp = FOI[FOI$`Track.this.FQ.as.indicator.for.sources?` == "Y",]
-
 ## TOL CONVERSION ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
@@ -71,7 +73,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 3
+for (uu in 1:length(ONMSsites)) { # uu = 1
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -159,6 +161,15 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   #cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
   Fq = as.numeric( as.character( gsub("TOL_", "",  colnames(gps)[grep("TOL", colnames(gps))] ) ))
   
+  #REMOVE SANCT SOUND DATA ####
+  if (removess == 1){
+    idxDD = which(endSS$site == site)
+    if (length(idxDD) > 0) {
+      gpsT = gps[gps$UTC > endSS$endSS[idxDD],] 
+      gps = gpsT
+    }
+    
+  }
   ### calculate spectrum band levels in the TOLs ####
   # assumes all TOL data are in broadband measurements, NOT per/Hz
   # this is needed to compare with the wind model results 
@@ -185,6 +196,21 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     moi = as.numeric(unlist(strsplit(as.character(season$Months[ss]), ","))) 
     gps$Season[gps$mth %in% moi] = season$Season[ss]   }
   
+  #REMOVE YEARS LOW DATA ####
+  # to make sure at least 15 day in a given year.
+  gps$yr = year(gps$UTC)
+  years_to_keep <- gps %>%
+    count(yr) %>%
+    filter(n >= 360) %>%
+    pull(yr)
+  
+  gps = gps %>%
+    filter(yr %in% years_to_keep)
+  
+  st = as.Date( min(gps$UTC) )
+  ed = as.Date( max(gps$UTC) )
+  udays = length( unique(as.Date(gps$UTC)) )
+ 
   cat(site, "context summary:", siteInfo$`Oceanographic category`,  ";season-",  unique(gps$Season), ";times of interest- ", nrow(TOIs), 
       ";frequencies of interest- ", nrow(FOIst), "\n",
       "Input Data - ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
@@ -264,7 +290,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     ) +
     #scale_x_discrete(labels = category_counts$wind_category) +  # Place the category labels under the plot
     scale_fill_manual(values = c("low" = "blue",  "med" = "orange", "high" = "red") )
-  # l
+  l
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
   #(2) EFFORT ALL DATA ####
@@ -297,7 +323,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       legend.position = "none"  # Place the legend at the top
     )
   
-  #p1
+  p1
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## by season (hours/ season in each year ####
@@ -399,7 +425,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
           axis.text = element_text(size = 12)               # Tick mark labels
     )
   
-  #p
+  p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
@@ -501,7 +527,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
           axis.title.y = element_text(size = 12),           # Y-axis label size
           axis.text = element_text(size = 12)
     ) 
-  #p
+  p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
@@ -646,7 +672,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       pthrs 
       ### plot: time series ####
       dailyFQ_complete$yr = factor(dailyFQ_complete$yr, levels = rev(sort(unique(dailyFQ_complete$yr))))
-      # START HERE #### 
+     
       plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
         
         annotate("rect",
@@ -691,7 +717,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
       plg2
       
-      ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_", ft, "status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+      ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
       
     }
   }
