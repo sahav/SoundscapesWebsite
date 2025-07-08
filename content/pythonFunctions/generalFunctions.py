@@ -25,8 +25,8 @@ def makeButtonsFit(sites, generalFormat, identifier):
         initialFile = generalFormat.replace('***', site, 1)
         parts = initialFile.split('***')
         cwd = os.getcwd()
+        return cwd
         directory_path = cwd.split("SoundscapesWebsite")[0]+ "SoundscapesWebsite/refs/heads/main/content/resources"
-        return directory_path+"/"+initialFile
         
         fullFileName = ""
         for root, dirs, files in os.walk(directory_path):
