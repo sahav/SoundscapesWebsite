@@ -7,7 +7,7 @@
 rm(list=ls()) 
 
 #SITES ####
-ONMSsites = c("sb03","oc02", "cb11" )
+ONMSsites = c("sb01","sb03","oc02", "cb11" )
 ## directories ####
 outDir   =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
 outDirG  =  paste0(outDir, "content\\resources\\") #where save graphics
@@ -272,7 +272,7 @@ for (ss in 1:length(ONMSsites)) {
   arranged_plot = grid.arrange(pais,lais,heights = c(4, .9))
   
   ## SAVE: AIS spectra ####
-  ggsave(filename = paste0(outDirGe, "plot_", toupper(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
+  ggsave(filename = paste0(outDirG, "plot_", toupper(site), "_AISNoise.jpg"), plot = arranged_plot, width = 10, height = 10, dpi = 300)
   
   ## PLOT: 125Hz DISTRIBUTION ####
   gpsAIS$ais_category  = ( substr(gpsAIS$ais_category, start = 3, stop = 6) )
