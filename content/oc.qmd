@@ -120,3 +120,11 @@ display(HTML(infoHtml))
 display(HTML(standardTextDict["Indicator description"]))
 ```
 :::
+
+::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
+## Test image query
+```{python}
+#| echo: false
+display(HTML(gf.makeButtonsFit(['OC02', 'HI08'], "plot_***-***status.jpg", "FOI")))
+```
+:::
