@@ -127,7 +127,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_status.jpg", "FOI")))
 display(HTML(standardTextDict["Indicator description"]))
 ```
 
-### IHow much noise from large vessels may be interfering with whale communication?
+### How much noise from large vessels may be interfering with whale communication?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["large vessels interfer"]))
