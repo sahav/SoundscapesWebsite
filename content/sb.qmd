@@ -106,6 +106,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
 ```
 
 ### How often are sources of interest likely present?
+#### (e.g. vocalizing species or human activity)
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest likely present"]))
@@ -116,7 +117,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_AboveWind.jpg", "SourcePresent")))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest typical"]))
-display(HTML(gf.makeButtons(sites, "plot_***_status.jpg", "FOI")))
+display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI")))
 ```
 :::
 
