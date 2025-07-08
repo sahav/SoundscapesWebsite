@@ -22,12 +22,9 @@ def makeButtonsFit(sites, generalFormat, identifier):
         return initialImage + scripts
     
     for site in sites:
-        initialFile = generalFormat
-        initialFile = initialFile.replace('***', site, 1)
-        print(initialFile)
+        initialFile = generalFormat.replace('***', site, 1)
         parts = initialFile.split('***')
         cwd = os.getcwd()
-        print(parts)
         directory_path = cwd.split("SoundscapesWebsite")[0]+ "SoundscapesWebsite/SoundscapesWebsite/content/resources"
         
         fullFileName = ""
