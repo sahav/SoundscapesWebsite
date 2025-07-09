@@ -48,8 +48,7 @@ load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
 
 for (ss in 1:length(ONMSsites)) {
-  
-  
+
   # LOOP THROUGH SITES ####
   site   = ONMSsites[ss] #"sb03" # "sb03" nrs11 mb02"
   if (site == "cb11"){
@@ -193,14 +192,14 @@ for (ss in 1:length(ONMSsites)) {
     labs(x = NULL, y = NULL ) +
     #caption = "low < 3 | med 3-5 | high >5") +  # Remove x-axis label
     theme(
-      plot.title = element_text(hjust = 0),  # Align the title to the left
+      plot.title = element_text(size = 16, hjust = 0),  # Align the title to the left
       axis.text.y = element_blank(),
       axis.text.x = element_blank(),  # Remove x-axis labels (now categories will appear below)
       axis.ticks.x = element_blank(),  # Remove x-axis ticks
       axis.title.x = element_blank(),  # Remove x-axis title
       legend.position = "bottom",  # Position the legend at the bottom
       legend.title = element_blank(),  # Optional: remove legend title
-      legend.text = element_text(size = 10)  # Optional: adjust legend text size
+      legend.text = element_text(size = 12)  # Optional: adjust legend text size
     ) +
     scale_x_discrete(labels = category_counts$wind_category) +  # Place the category labels under the plot
     scale_fill_manual(values = c("0-none" = "#56B4E9", "1-low" = "#009E73", "3-high" = "#CC79A7", 
@@ -264,9 +263,13 @@ for (ss in 1:length(ONMSsites)) {
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) +
     theme(legend.position = "bottom",
-          plot.caption = ggtext::element_markdown(hjust = 0),
-          plot.title = element_text(size = 16, face = "bold", hjust = 0) )
-  
+          plot.caption = ggtext::element_markdown(size = 12, hjust = 0),
+          plot.title = element_text(size = 16, face = "bold", hjust = 0),
+          axis.title.y  = element_text(size = 14),
+          axis.text.y   = element_text(size = 14),
+          axis.text.x   = element_text(size = 14, hjust = 1),  
+          plot.subtitle = element_text(size = 14),
+          legend.text = element_text(size = 12) )
   pais
   
   arranged_plot = grid.arrange(pais,lais,heights = c(4, .9))
@@ -309,21 +312,27 @@ for (ss in 1:length(ONMSsites)) {
   pais2 = ggplot(gpsAIS, aes(x = TOL_125, fill = ais_category2)) +
     geom_histogram(binwidth = 1, alpha = 0.6, position = "identity") + 
     geom_vline(data = medians, aes(xintercept = median_value, color = ais_category2), 
-               linetype = "solid", size = 1) +  # Add median lines
+               linetype = "solid", linewidth = 1) +  # Add median lines
     labs(
-      title = paste0("How much do sound levels at ",fqShipN ," increase when ships are nearby?" ),
+      title = paste0("How much do sound levels increase when ships are nearby?" ),
       subtitle = paste0(  toupper(site), " (data summarized from ", st, " to ", ed, ")"),
       caption = caption_text,
-      x = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ), 
+      x = (paste("Sound Levels (dB re 1 μ Pa/Hz) at ", fqShipN) ), 
       y = "Count of Hours",
-      fill = "Ships transiting nearby",  # Change legend title for fill
-      color = "Ships transiting nearby")  +  # Change legend title for color) +
+      fill = "Number of ships transiting nearby",  # Change legend title for fill
+      color = "Number of ships transiting nearby" )  +  # Change legend title for color) +
     scale_fill_brewer(palette = "Set3") +  
     scale_color_brewer(palette = "Set3") +  # Match colors for clarity
     theme_minimal() +
     theme(legend.position = "top",
-          plot.caption = ggtext::element_markdown(hjust = 0),
-          plot.title = element_text(size = 16, face = "bold", hjust = 0) ) 
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
+          plot.title = element_text(size = 16, face = "bold", hjust = 0),
+          axis.title.y  = element_text(size = 14),
+          axis.title.x  = element_text(size = 14),
+          axis.text.y   = element_text(size = 14),
+          axis.text.x   = element_text(size = 14, hjust = 1),
+          legend.text = element_text(size = 14),
+          legend.title = element_text(size = 14)) 
   #annotation_custom(pie_grob, xmin = max(gpsAIS$TOL_125) - 20, xmax = max(gpsAIS$TOL_125),
   #ymin = min(pie_data$count), ymax =min(pie_data$count)+300 )  
   
@@ -414,7 +423,13 @@ for (ss in 1:length(ONMSsites)) {
     ) + 
     theme_minimal() +
     theme(
-      legend.position = "none")
+      legend.position = "none",
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      axis.title.y  = element_text(size = 14),
+      axis.text.y   = element_text(size = 14),
+      axis.text.x   = element_text(size = 14, hjust = 1, angle = 30),  
+      plot.subtitle = element_text(size = 14),
+      legend.text = element_text(size = 12) )
   pais3
   ## SAVE: MONTHLY ABOVE ####
   ggsave(filename = paste0(outDirG, "plot_", toupper(site), "_AISMonthAbove.jpg"), plot = pais3, width = 12, height = 8, dpi = 300)
