@@ -41,20 +41,32 @@ website:
       - text: <b>East Coast Region</b>
       - href: content/sb.qmd
         text: Stellwagen Bank
+      - href: content/fgb.qmd
+        text: Flower Garden Banks
+      - href: content/gr.qmd
+        text: Grays Reef
+      - href: content/fk.qmd
+        text: Florida Keys
       - text: <br>
       - text: <b>West Coast Region</b>
-      - href: content/mb.qmd
-        text: Monterey Bay
       - href: content/oc.qmd
         text: Olympic Coast
       - href: content/cb.qmd
         text: Cordell Bank
+      - href: content/mb.qmd
+        text: Monterey Bay
+      - href: content/ch.qmd
+        text: Chumash Heritage
+      - href: content/ci.qmd
+        text: Channel Islands
       - text: <br>
       - text: <b>Greater Pacific Region</b>
       - href: content/pi.qmd
         text: Papahānaumokuākea
       - href: content/as.qmd
         text: American Samoa
+      - href: content/pri.qmd
+        text: Pacific Remote Islands
       - href: content/hi.qmd
         text: Hawaiian Islands Humpback Whale
 
