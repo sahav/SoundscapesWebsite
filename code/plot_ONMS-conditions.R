@@ -44,7 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
-removess = 1 # set to 1 if you want to truncate the time series
+removess = 0 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
@@ -73,7 +73,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 3
+for (uu in 1:length(ONMSsites)) { # uu = 1
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -161,7 +161,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   #cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
   Fq = as.numeric( as.character( gsub("TOL_", "",  colnames(gps)[grep("TOL", colnames(gps))] ) ))
   
-  #REMOVE SANCT SOUND DATA ####
+  ##REMOVE sanctsound data ####
   if (removess == 1){
     idxDD = which(endSS$site == site)
     if (length(idxDD) > 0) {
@@ -170,7 +170,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     }
     
   }
-  ### calculate spectrum band levels in the TOLs ####
+  ## calculate spectrum band levels in the TOLs ####
   # assumes all TOL data are in broadband measurements, NOT per/Hz
   # this is needed to compare with the wind model results 
   tol_columns = grep("TOL", colnames(gps))
@@ -190,13 +190,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   #CHECK difference
   # gpsTOL$TOL_250 - gps$TOL_250 #should be the same offset for each frequency
   
-  ### add SEASON ####
+  ## add SEASON ####
   seas = unique(season$Season)
   for( ss in 1:length(seas) ){
     moi = as.numeric(unlist(strsplit(as.character(season$Months[ss]), ","))) 
     gps$Season[gps$mth %in% moi] = season$Season[ss]   }
   
-  #REMOVE YEARS LOW DATA ####
+  ##REMOVE years with low data ####
   # to make sure at least 15 day in a given year.
   gps$yr = year(gps$UTC)
   years_to_keep <- gps %>%
@@ -211,11 +211,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   ed = as.Date( max(gps$UTC) )
   udays = length( unique(as.Date(gps$UTC)) )
  
+  # CHECK: DATA SUMMARY ####
   cat(site, "context summary:", siteInfo$`Oceanographic category`,  ";season-",  unique(gps$Season), ";times of interest- ", nrow(TOIs), 
       ";frequencies of interest- ", nrow(FOIst), "\n",
       "Input Data - ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
   
-  ### percentiles for all the data ####
+  # PERCENTILES for all the data ####
   # all data - NOTE recalculated below if only plotting peak
   tol_columns = grep("TOL", colnames(gps))
   all_quantiles = apply(gps[, tol_columns, drop = FALSE], 2, quantile, 
@@ -274,23 +275,26 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     geom_bar(stat = "count", position = position_stack(reverse = TRUE)) +  # Stacked bar chart
     coord_flip() +  # Flip the coordinates to make it horizontal
     facet_wrap(~yr, ncol = 1)+
-    ggtitle("% time in different wind speed categories ") +  # Add the main title
+    ggtitle("Percent time in different wind speed categories ") +  # Add the main title
     theme_minimal() +
     labs(x = NULL, y = NULL,
-         subtitle = paste0("(low <",windL, ", med ", windL,"-",windH, ", high >",windH, "m/s)")) +  # Remove x-axis label
+         subtitle = paste0("low <", windL, " | med ", windL,"-",windH, " | high >",windH, "m/s")) +  # Remove x-axis label
     theme(
-      plot.title = element_text(hjust = 0),  # Align the title to the left
+      plot.title = element_text(hjust = 0, size = 16),  # Align the title to the left
+      plot.subtitle = element_text(hjust = 0, size = 14),
+      strip.text  = element_text(size = 14),
       axis.text.y = element_blank(),
       axis.text.x = element_blank(),  # Remove x-axis labels (now categories will appear below)
       axis.ticks.x = element_blank(),  # Remove x-axis ticks
       axis.title.x = element_blank(),  # Remove x-axis title
       legend.position = "bottom",  # Position the legend at the bottom
       legend.title = element_blank(),  # Optional: remove legend title
-      legend.text = element_text(size = 10)  # Optional: adjust legend text size
+      legend.text = element_text(size = 12)  # Optional: adjust legend text size
     ) +
     #scale_x_discrete(labels = category_counts$wind_category) +  # Place the category labels under the plot
     scale_fill_manual(values = c("low" = "blue",  "med" = "orange", "high" = "red") )
   l
+  #save figure ####
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
   #(2) EFFORT ALL DATA ####
@@ -319,12 +323,16 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     theme_minimal() +
     theme(
       plot.title = element_text(size = 16, face = "bold", hjust = 0),
-      axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
-      plot.subtitle = element_text(size = 12),
-      legend.position = "right"  # Place the legend at the top
+      axis.title.y = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
+      plot.subtitle = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.position = "right" 
     )
   
   p1
+  ##save figure ####
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## by season (hours/ season in each year ####
@@ -350,11 +358,15 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     theme_minimal() +
     theme(
       plot.title = element_text(size = 16, face = "bold", hjust = 0),
-      axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
-      plot.subtitle = element_text(size = 12),
-      legend.position = "right"   # Place the legend at the top
+      axis.title.y = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
+      plot.subtitle = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.position = "right" 
     )
   p2
+  ##save figure ####
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   #(3) SEASONAL CONDITION PLOT ####
@@ -419,20 +431,18 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     # Additional aesthetics
     theme_minimal()+
     theme(legend.position = "right",
-          #plot.title = element_text(size = 16, face = "bold", hjust = 0),
-          plot.caption = ggtext::element_markdown(hjust = 0, size = 12,),
-          #plot.caption = element_text(size = 12, face = "italic"), 
-          #plot.legend = element_text(size =12), # Caption text size
-          axis.title.x = element_text(size = 16),           # X-axis label size
-          axis.title.y = element_text(size = 16),           # Y-axis label size
-          axis.text = element_text(size = 16)               # Tick mark labels
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 14),
+          axis.title.x = element_text(size = 14),           
+          axis.title.y = element_text(size = 14), 
+          legend.text = element_text(size = 12),
+          axis.text = element_text(size = 14)             
     )
   
   p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
-  ### save: plot seasonal spectra ####
+  ## save figure ####
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   #(4) ANNUAL COMPARISION plots ####
@@ -466,15 +476,17 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       theme_minimal() +
       theme(
         plot.title = element_text(size = 16, face = "bold", hjust = 0),
-        axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
-        plot.subtitle = element_text(size = 12),
-        legend.position = "right"  # Place the legend at the top
+        axis.title.y = element_text(size = 14),
+        axis.text.y = element_text(size = 14),
+        axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
+        plot.subtitle = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        legend.position = "right" 
       )
     
     p1
+    ## re-save effort figure ####
     ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
-    
-
   } else {
     gpsAll = gps
     my_subtitle = "all data" 
@@ -486,7 +498,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
  
-  ### re-calculate percentiles for all the data ####
+  ## re-calculate percentiles for all the data ####
   # all data - mALL 
   tol_columns = grep("TOL", colnames(gps))
   all_quantiles = apply(gps[, tol_columns, drop = FALSE], 2, quantile, 
@@ -556,17 +568,18 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         subtitle = paste0( "Data summarized for Peak season only" ) 
       }) +
     theme(legend.position = "right",
-          plot.caption = ggtext::element_markdown(hjust = 0,size = 12),
-          #plot.title = element_text(size = 16, face = "bold", hjust = 0),
-          axis.title.x = element_text(size = 16),           # X-axis label size
-          axis.title.y = element_text(size = 16),           # Y-axis label size
-          axis.text = element_text(size = 16)
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
+          axis.title.x = element_text(size = 14),           # X-axis label size
+          axis.title.y = element_text(size = 14),           # Y-axis label size
+          axis.text = element_text(size = 14),
+          legend.text = element_text(size = 12)
     ) 
   p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
-  ### save: plot yearly spectra ####
+  
+  ### save figure ####
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   #(5) TIME SERIES- FOI ####
@@ -698,9 +711,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         # more formatting
         theme_void() +
         theme( legend.position = "right",
-               plot.title = element_text(hjust = 0.5),
+               plot.title = element_text(hjust = 0.5, size = 16),
                plot.caption = element_text(size = 12, hjust = 1),
-               plot.subtitle = element_text(hjust = 0.5, size = 12),
+               plot.subtitle = element_text(hjust = 0.5, size = 14),
+               axis.title.x = element_text(size = 14),
                strip.text = element_text(size = 14) ) +
         labs(title = paste0("Annual Status for ", ft, "Hz" ), fill = "", 
              #subtitle = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
@@ -746,9 +760,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         theme_minimal() +
         theme(legend.position = "none",
               plot.title = element_text(size = 16, face = "bold", hjust = 0),
-              axis.text.x = element_text(size = 16, hjust = 1),
-              axis.text.y = element_text(size = 16, hjust = 1),
-              strip.text = element_text(hjust = 0, size = 14),
+              axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
+              axis.text.y = element_text(size = 14, hjust = 1),
+              strip.text = element_text(hjust = 0, size = 12),
               plot.caption = element_text(size = 12, hjust = 0),
               plot.subtitle = element_text(size = 12)) 
         
@@ -841,7 +855,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     ) +
     theme_minimal()+
     theme(
-      legend.position = "none")
+      legend.position = "none",
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      strip.text  = element_text(size = 14),
+      axis.title.x  = element_text(size = 14),
+      axis.title.y  = element_text(size = 14),
+      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
+      axis.text.y = element_text(size = 14, hjust = 1) )
   windD
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
  
@@ -857,15 +877,21 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     ) +
     #scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     labs(
-      title = paste0("How often are sources of interest likey present? \n(vocalizing species or vessel activity) "),
+      title = paste0("How often are sources of interest likey present? \n(e.g. vocalizing species or vessel activity) "),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
-      caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
+      #caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
       x = "",
-      y = paste0("% of hours above wind noise ", fqIn2name),
+      y = paste0("% of hours above wind noise ", fqIn2name, "\n (calculated as % hours when measured sound levels are above predicted level based on wind speed)"),
       #color = "Year"  # Label for the color legend
     ) +
     theme_minimal()+
     theme(
+      strip.text  = element_text(size = 14),
+      plot.caption = element_text(size = 12, face = "italic", hjust = 0), 
+      axis.text.x = element_text(size = 16, hjust = 1),
+      axis.title.x  = element_text(size = 14),
+      axis.title.y  = element_text(size = 14),
+      axis.text.y = element_text(size = 14, hjust = 1), 
       legend.position = "none")
   windB
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
