@@ -66,7 +66,7 @@ display(HTML(htmlTable))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean sound conditions
+## Ocean Sound Conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["conditions overview"]))
@@ -123,7 +123,7 @@ display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI")))
 :::
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Ocean sound indicators
+## Ocean Sound Indicators
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicator description"]))
