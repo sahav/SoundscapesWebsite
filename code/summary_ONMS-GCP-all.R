@@ -24,12 +24,12 @@ DC = Sys.Date()
 # get directories from NCEI GCP data viewer: 
 #https://console.cloud.google.com/storage/browser/noaa-passive-bioacoustic?inv=1&invt=Ab0oyg
 typ = "audio"
-gcpDir  = "gs://noaa-passive-bioacoustic/onms/audio" #ONMS
-gcpDir2 = "gs://noaa-passive-bioacoustic/sanctsound/audio" #SANCTSOUND
-gcpDir3 = "gs://noaa-passive-bioacoustic/nrs/audio" #SANCTSOUND
-projectN = "onms" # set this to deal with different metadata formats
-projectN2 = "sanctsound"# set this to deal with different metadata formats
-projectN3 = "nrs"# set this to deal with different metadata formats
+gcpDirONMS  = "gs://noaa-passive-bioacoustic/onms/audio" #ONMS
+gcpDirSS    = "gs://noaa-passive-bioacoustic/sanctsound/audio" #SANCTSOUND
+gcpDirNRS   = "gs://noaa-passive-bioacoustic/nrs/audio" #SANCTSOUND
+projectNONMS = "onms" # set this to deal with different metadata formats
+projectNSS  = "sanctsound"# set this to deal with different metadata formats
+projectNNRS = "nrs"# set this to deal with different metadata formats
 
 outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
 outDirR =  paste0(outDir, "content\\resources\\") #save graphics
@@ -51,20 +51,20 @@ colnames(lookup)[5] = "NCEI"
 # LIST SUB DIRECTORIES ####
 #these should be the "monitoring sites" you want to gather information about
 command = "gsutil"
-args =  c("ls", gcpDir)
-subdirs = system2(command, args, stdout = TRUE, stderr = TRUE) 
+args =  c("ls", gcpDirONMS)
+subdirsONMS = system2(command, args, stdout = TRUE, stderr = TRUE) 
 
 command = "gsutil"
-args =  c("ls", gcpDir2)
-subdirs2 = system2(command, args, stdout = TRUE, stderr = TRUE)  
+args =  c("ls", gcpDirSS)
+subdirsSS = system2(command, args, stdout = TRUE, stderr = TRUE)  
 
 command = "gsutil"
-args =  c("ls", gcpDir3)
-subdirs3 = system2(command, args, stdout = TRUE, stderr = TRUE)  
+args =  c("ls", gcpDirNRS)
+subdirsNRS = system2(command, args, stdout = TRUE, stderr = TRUE)  
 
-subdirsALL = c(subdirs, subdirs2, subdirs3) 
-dirNames  = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
-cat("Processing... ", projectN, length(dirNames), "directories" )
+subdirsALL = c(subdirsONMS, subdirsSS, subdirsNRS) 
+dirNames   = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
+cat("Processing... ", projectNONMS, length(dirNames), "directories" )
 
 ## TEST one file ####
 args = c("ls", "-r", subdirsALL[1])
@@ -81,6 +81,8 @@ if ( length(tmp)  > 0 ) {
  
 # GET INFORMATION FROM METADATA FILES ####
 # loads one file at a time from GCP, no saving to local machine 
+#ONMS + SS
+subdirsALL = c(subdirsONMS, subdirsSS) 
 output = NULL
 for (s in 1:length(subdirsALL) ) { # s = 1
   
@@ -90,7 +92,7 @@ for (s in 1:length(subdirsALL) ) { # s = 1
   json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
   cat("Processing... ", dirNames[s], "[", s, " of ", length(dirNames),"]", "\n" )
   
-  if ( length(grep(projectN, subdirsALL[s]) ) > 0 ) { # check for format - onms
+  if ( length(grep(projectNONMS, subdirsALL[s]) ) > 0 ) { # check for format - onms
     
     for (jf in 1:length( json_files) ) {
       
@@ -115,7 +117,7 @@ for (s in 1:length(subdirsALL) ) { # s = 1
     }
     
     
-  } else if ( length(grep(projectN2, subdirsALL[s]) ) > 0 ) {  # check for format - sanctsound
+  } else if ( length(grep(projectNSS, subdirsALL[s]) ) > 0 ) {  # check for format - sanctsound
     
     for (jf in 1:length( json_files) ) {
       
@@ -152,7 +154,6 @@ for (s in 1:length(subdirsALL) ) { # s = 1
     }
   }
 }
-
 ouputTest = output # output = ouputTest
 # SAVE SUMMARY ####
 output = as.data.frame(output)

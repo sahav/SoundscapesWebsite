@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 from pythonFunctions import generalFunctions as gf
 
-sites = ["sb01", "sb03"]
+sites = ["SB01", "SB03"]
 
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
 metaFile = os.path.join(inputDir, "ONMSSound_IndicatorCategories.xlsx")
@@ -75,17 +75,17 @@ display(HTML(standardTextDict["Understanding Ocean Sound"]))
 display(HTML(gf.makeImage("sanctsound_scene.jpg", "soundscapeInfographic")))
 display(HTML(standardTextDict["Soundscapes"]))
 ```
-### Soundscape conditions
+### Ocean Sound Conditions
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Seasonal soundscape conditions"]))
-display(HTML(gf.makeImage("plot_sb01_SeasonalSPL.jpg", "seasons")))
+display(HTML(gf.makeImage("plot_SB01_SeasonalSPL.jpg", "seasons")))
 ```
-### Ocean sound indicators
+### Ocean Sound Indicators
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Indicators from ocean sound"]))
-display(HTML(gf.makeImage("plot_mb01_FinalRosePlot.jpg", "fish")))
+display(HTML(gf.makeImage("MB01_FinalRosePlot.png", "fish")))
 ```
 :::
 
