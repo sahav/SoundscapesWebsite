@@ -17,6 +17,7 @@ metadata = pd.read_excel(metaFile, sheet_name="Summary", header=1)
 lookup = [row for index, row in metadata.iterrows() if row.iloc[4] in sites]
 dicts = [l.to_dict() for l in lookup]
 df = pd.read_excel(metaFile, sheet_name="Standard Report Text", engine_kwargs={'keep_links': True})
+
 standardTextDict = pd.Series(df.iloc[:, 3].values, index = df.iloc[:, 1]).to_dict()
 for key in standardTextDict:
     value = standardTextDict[key]
@@ -133,12 +134,14 @@ display(HTML(standardTextDict["Indicator description"]))
 #| echo: false
 display(HTML(standardTextDict["large vessels interfer"]))
 display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVariance"))) 
+# NEED TO ADD BUTTON: "See Table Results" table_***_AISMonthAbove.jpg
 ```
 #### How does the level of traffic change conditions?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["level of traffic"]))
 display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
+# NEED TO ADD BUTTON: "See Table Results" table_***_AIShist.jpg
 ```
 
 ### When do right whales contribute to the soundscape, indicating their presence nearby?
