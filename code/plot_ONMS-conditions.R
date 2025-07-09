@@ -26,10 +26,10 @@ library(viridis)
 #SITES ####
 ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
 ## directories ####
-outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
-outDirG =  paste0(outDir, "content\\resources") #where save graphics
-outDirGe =  paste0(outDir, "content\\resources\\extra") #where extra save graphics
-outDirC =  paste0(outDir,"context\\") #where to get context
+outDir   =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
+outDirG  =  paste0(outDir,"content\\resources\\noSanctSound") #where save graphics
+outDirGe =  paste0(outDir,"content\\resources\\noSanctSound") #where extra save graphics
+outDirC  =  paste0(outDir,"context\\") #where to get context
 
 #PARAMETERS ####
 DC = Sys.Date()
@@ -44,7 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
-removess = 0 # set to 1 if you want to truncate the time series
+removess = 1 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
@@ -73,7 +73,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 1
+for (uu in 1:length(ONMSsites)) { # uu = 7
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -143,8 +143,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       Months = c("6,7,8,9,10" , "8,9,10" ,"11,12,1,2,3,4",  "5,6,7,8,9,10") ,
       values = c(   "#56B4E9",  "#009E73", "#CC79A7", "#E69F00") )
     seasonLabel = "Humpback (Jun-Oct), Humpback peak (Aug-Oct), Hurricane (Nov-Apr), Tradewind (May-Oct)"
-    
-    
   }
   
   ## SPL data product ####
