@@ -44,7 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
-removess = 1 # set to 1 if you want to truncate the time series
+removess = 0 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
@@ -73,7 +73,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 1
+for (uu in 1:length(ONMSsites)) { # uu = 3
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -303,11 +303,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     count(year, month)  # Count occurrences (hours) in each year-month
   summary$dy = round(summary$n/ 24)
   p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
-    geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
+    geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
     #coord_flip() +
     labs(
-      title = "monitoring effort by year",
-      caption = paste0(toupper(site), " has ", udays, 
+      title = "monitoring effort by year (all data)",
+      subtitle = paste0(toupper(site), " has ", udays, 
                        " unique days: ", as.character(st), " to ", as.character(ed)),
       x = "",
       y = "Days",
@@ -319,8 +319,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     theme_minimal() +
     theme(
       plot.title = element_text(size = 16, face = "bold", hjust = 0),
-      axis.text.x = element_text(angle = 30, hjust = 1),  # Rotate x-axis labels for readability
-      legend.position = "none"  # Place the legend at the top
+      axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
+      plot.subtitle = element_text(size = 12),
+      legend.position = "right"  # Place the legend at the top
     )
   
   p1
@@ -339,8 +340,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
     #coord_flip()+ 
     labs(
-      title = "monitoring effort by season",
-      caption  = paste0(toupper(site), " has ", udays, 
+      title = "monitoring effort by season (all data)",
+      subtitle  = paste0(toupper(site), " has ", udays, 
                         " unique days: ", as.character(st), " to ", as.character(ed), "\n",
                         seasonLabel),
       x = "",      y = "Days",      fill = "Year"
@@ -348,8 +349,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     scale_fill_manual(values = seasont$values) +
     theme_minimal() +
     theme(
-      axis.text.x = element_text(angle = 30, hjust = 1),  # Rotate x-axis labels for readability
-      legend.position = "none"  # Place the legend at the top
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
+      plot.subtitle = element_text(size = 12),
+      legend.position = "right"   # Place the legend at the top
     )
   p2
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
@@ -417,12 +420,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     theme_minimal()+
     theme(legend.position = "right",
           #plot.title = element_text(size = 16, face = "bold", hjust = 0),
-          plot.caption = ggtext::element_markdown(hjust = 0),
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12,),
           #plot.caption = element_text(size = 12, face = "italic"), 
           #plot.legend = element_text(size =12), # Caption text size
-          axis.title.x = element_text(size = 12),           # X-axis label size
-          axis.title.y = element_text(size = 12),           # Y-axis label size
-          axis.text = element_text(size = 12)               # Tick mark labels
+          axis.title.x = element_text(size = 16),           # X-axis label size
+          axis.title.y = element_text(size = 16),           # Y-axis label size
+          axis.text = element_text(size = 16)               # Tick mark labels
     )
   
   p
@@ -438,6 +441,39 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     gpsAll = gps
     my_subtitle = "peak season only"
     gps = gps[gps$Season == "Peak",]
+    #redo effort plot so not confusing
+    summary <- gps %>%
+      mutate(
+        year = year(UTC),  # Extract Year
+        month = format(UTC, "%m")  # Extract Month (numeric format)
+      ) %>%
+      count(year, month)  # Count occurrences (hours) in each year-month
+    summary$dy = round(summary$n/ 24)
+    p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
+      geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
+      #coord_flip() +
+      labs(
+        title = "monitoring effort by year (peak only)",
+        subtitle = paste0(toupper(site), " has ", udays, 
+                          " unique days: ", as.character(st), " to ", as.character(ed)),
+        x = "",
+        y = "Days",
+        fill = "Year"
+      ) +
+      scale_x_discrete(labels = month.abb) +  # Show month names instead of numbers
+      #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
+      scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+      theme_minimal() +
+      theme(
+        plot.title = element_text(size = 16, face = "bold", hjust = 0),
+        axis.text.x = element_text(size = 16, hjust = 1),  # Rotate x-axis labels for readability
+        plot.subtitle = element_text(size = 12),
+        legend.position = "right"  # Place the legend at the top
+      )
+    
+    p1
+    ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+    
 
   } else {
     gpsAll = gps
@@ -448,7 +484,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
-    "<b>Dotted sound level</b> curve is the median for ", my_subtitle   )
+    "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
  
   ### re-calculate percentiles for all the data ####
   # all data - mALL 
@@ -520,12 +556,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         subtitle = paste0( "Data summarized for Peak season only" ) 
       }) +
     theme(legend.position = "right",
-          plot.caption = ggtext::element_markdown(hjust = 0),
-          #plot.caption = element_text(size = 12, hjust = 0),
-          plot.title = element_text(size = 16, face = "bold", hjust = 0),
-          axis.title.x = element_text(size = 12),           # X-axis label size
-          axis.title.y = element_text(size = 12),           # Y-axis label size
-          axis.text = element_text(size = 12)
+          plot.caption = ggtext::element_markdown(hjust = 0,size = 12),
+          #plot.title = element_text(size = 16, face = "bold", hjust = 0),
+          axis.title.x = element_text(size = 16),           # X-axis label size
+          axis.title.y = element_text(size = 16),           # Y-axis label size
+          axis.text = element_text(size = 16)
     ) 
   p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
@@ -664,10 +699,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         theme_void() +
         theme( legend.position = "right",
                plot.title = element_text(hjust = 0.5),
-               plot.subtitle = element_text(hjust = 0.5)) +
+               plot.caption = element_text(size = 12, hjust = 1),
+               plot.subtitle = element_text(hjust = 0.5, size = 12),
+               strip.text = element_text(size = 14) ) +
         labs(title = paste0("Annual Status for ", ft, "Hz" ), fill = "", 
              #subtitle = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
-             caption  = "status is set at median for the year",
+             subtitle  = "status is set at median for the year",
              strip.text = element_text(hjust = 0))
       pthrs 
       ### plot: time series ####
@@ -695,12 +732,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         
         geom_line() +
         facet_wrap(~yr, ncol = 1)+
-        theme_minimal() +
-        theme(legend.position = "none",
-              strip.text = element_text(hjust = 0),
-              plot.title = element_text(size = 16, face = "bold", hjust = 0),
-              plot.subtitle = element_text(size = 12, face = "italic"),) +
-        
         scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +
         labs(
           title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
@@ -711,7 +742,16 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
             paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
             list(f = ft) )
           # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
-        )
+        ) +
+        theme_minimal() +
+        theme(legend.position = "none",
+              plot.title = element_text(size = 16, face = "bold", hjust = 0),
+              axis.text.x = element_text(size = 16, hjust = 1),
+              axis.text.y = element_text(size = 16, hjust = 1),
+              strip.text = element_text(hjust = 0, size = 14),
+              plot.caption = element_text(size = 12, hjust = 0),
+              plot.subtitle = element_text(size = 12)) 
+        
       ## save: plot 125 Hz time series with thresholds ####
       plg
       plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
