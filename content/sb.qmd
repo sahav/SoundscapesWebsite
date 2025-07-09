@@ -52,13 +52,13 @@ editor_options:
 ---
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Where are we listening?
+## Ocean Sound Monitoring
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["SBNMS"]))
 ```
 
-### Summary of ocean sound monitoring sites
+### Summary of monitoring sites
 ```{python}
 #| echo: false
 display(HTML(htmlTable))

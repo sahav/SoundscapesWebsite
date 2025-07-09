@@ -52,13 +52,13 @@ editor_options:
 ---
 
 ::: {style="border: 1px solid black; padding: 10px; margin-bottom: 20px;"}
-## Where are we listening?
+## Ocean Sound Monitoring
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["MBNMS"]))
 ```
 
-### Summary of ocean sound monitoring sites
+### Summary of monitoring sites
 ```{python}
 #| echo: false
 display(HTML(htmlTable))
@@ -133,8 +133,8 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Fish Chorus"]))
-display(HTML(gf.makeImage("plot_mb01_FinalHist.png", " Seasonal Fish Choruses")))
-display(HTML(gf.makeImage("plot_mb01_FinalRosePlot.jpg", " Daily Fish Choruses")))
+display(HTML(gf.makeImage("plot_MB01_FinalHist.png", " Seasonal Fish Choruses")))
+display(HTML(gf.makeImage("plot_MB01_FinalRosePlot.jpg", " Daily Fish Choruses")))
 ```
 
 ### When do whales contribute to the soundscape, indicating their presence nearby?
