@@ -55,7 +55,7 @@ editor_options:
 ## Ocean Sound Monitoring
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["SBNMS"]))
+display(HTML(standardTextDict["PNMS"]))
 ```
 
 ### Summary of monitoring sites
