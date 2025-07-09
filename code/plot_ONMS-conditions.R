@@ -44,7 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
-removess = 0 # set to 1 if you want to truncate the time series
+removess = 1 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
