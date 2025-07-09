@@ -27,8 +27,8 @@ library(viridis)
 ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
 ## directories ####
 outDir   =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
-outDirG  =  paste0(outDir,"content\\resources\\noSanctSound") #where save graphics
-outDirGe =  paste0(outDir,"content\\resources\\noSanctSound") #where extra save graphics
+outDirG  =  paste0(outDir,"content\\resources\\") #where save graphics
+outDirGe =  paste0(outDir,"content\\resources\\extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context\\") #where to get context
 
 #PARAMETERS ####
