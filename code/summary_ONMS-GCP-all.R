@@ -90,13 +90,14 @@ if ( length(tmp)  > 0 ) {
 ## ONMS + SS ####
 subdirsALL = c(subdirsONMS, subdirsSS) 
 output = NULL
+dirNames   = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
 for (s in 1:length(subdirsALL) ) { # s = 1
   
   # read in files
   args = c("ls", "-r", subdirsALL[s])
   sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
   json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
-  cat("Processing... ", dirNames[s], "[", s, " of ", length(dirNames),"]", "\n" )
+  cat("Processing... ", dirNames[s], "[", s, " of ", length(subdirsALL),"]", "\n" )
   
   if ( length(grep(projectNONMS, subdirsALL[s]) ) > 0 ) { # check for format - onms
     
@@ -161,6 +162,7 @@ for (s in 1:length(subdirsALL) ) { # s = 1
   }
 }
 ouputTest = output # output = ouputTest
+
 ### FORMAT OUTPUT ####
 output = as.data.frame(output)
 colnames(output) = c("Path", "DeploymentNumber", "DeploymentName", "Instrument", "Start_Date", "End_Date","Lat","Lon")
@@ -171,20 +173,22 @@ output$End_Date = as.Date(output$End_Date, format = "%Y-%m-%d")
 lookup_selected = lookup %>% select(NCEI, Region,`Common Name/Identifiers`,`Site Description/Driver for Monitoring Location Choice`)
 output = left_join(output, lookup_selected, by = c("Site" = "NCEI"), relationship = "many-to-many")
 output$Duration = difftime( output$End_Date, output$Start_Date,"days")
-output$Project [is.na(output$Region)] = "SanctSound" 
+output$Project1 = sapply(strsplit(output$Path, "/"), `[`, 4)
+output$Project [is.na(output$Region)]  = "SanctSound" 
 output$Project [!is.na(output$Region)] = "ONMS-sound" 
 names(output )
 
 ## NRS ####
 outNRS = NULL
 subdirsALL = subdirsNRS 
+dirNames   = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
 for (s in 1:length(subdirsALL) ) { # s=1
   
   ## read in files
   args = c("ls", "-r", subdirsALL[s])
   sFiles = ( system2(command, args, stdout = TRUE, stderr = TRUE)  )
   json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
-  cat("Processing... ", dirNames[s], "[", s, " of ", length(dirNames),"]", length(sFiles), "\n" )
+  cat("Processing... ", dirNames[s], "[", s, " of ", length(subdirsALL),"]", length(sFiles), "\n" )
   
   for (jf in 1:length( json_files) ) { # jf = 1
     
@@ -241,105 +245,87 @@ for (s in 1:length(subdirsALL) ) { # s=1
     } 
   }
 }
+ouputTest2 = outNRS # outNRS = ouputTest2
+
 #### FORMAT OUTPUT ####
-ouputTest = output # output = ouputTest
-output = as.data.frame(output)
-colnames(output) = c("Path", "FileCount", "SiteName", "DeploymentName", "Instrument", "Start_Date", "End_Date","Lat","Lon")
-output$Site = paste0(basename((output$Path)))
-output$Start_Date = as.Date(output$Start_Date, format = "%Y-%m-%d")
-output$End_Date = as.Date(output$End_Date, format = "%Y-%m-%d")
-output$Days = difftime( output$End_Date, output$Start_Date,"days")
-output$Instrument = "AUH"
+# ouputTest2 = output # output = ouputTest
+outNRS = as.data.frame(outNRS)
+colnames(outNRS) = c("Path", "FileCount", "SiteName", "DeploymentName", "Instrument", "Start_Date", "End_Date","Lat","Lon")
+outNRS$Site = paste0(basename((outNRS$Path)))
+outNRS$Start_Date = as.Date(outNRS$Start_Date, format = "%Y-%m-%d")
+outNRS$End_Date = as.Date(outNRS$End_Date, format = "%Y-%m-%d")
+outNRS$Days = difftime( outNRS$End_Date, outNRS$Start_Date,"days")
+outNRS$Instrument = "AUH"
 # ADD OLD DEPLOYMENTS
-if (projectN == "NRS"){ output2 = rbind(output, NRSold )}
-output2$Site = paste0( tolower( projectN ), "_", output2$SiteName ) 
-output = output2
-output$Site = gsub("_", "", output$Site)
+outNRS = rbind(outNRS, NRSold )
+outNRS$Site = paste0( tolower( projectNNRS ), "_", outNRS$SiteName ) 
+outNRS$Site = gsub("_", "", outNRS$Site)
+
 ### ADD INFO from context file ####
 lookup_selected = lookup %>% select(NCEI, Region,`Common Name/Identifiers`,`Site Description/Driver for Monitoring Location Choice`)
-output = left_join(output, lookup_selected, by = c("Site" = "NCEI"), relationship = "many-to-many")
-output$Duration = difftime( output$End_Date, output$Start_Date,"days")
-output$Project [is.na(output$Region)]  = "NRS" 
-output$Project [!is.na(output$Region)] = "ONMS-sound" 
-
+outNRS2 = left_join(outNRS, lookup_selected, by = c("Site" = "NCEI"), relationship = "many-to-many")
+outNRS2$Duration = difftime( outNRS2$End_Date, outNRS2$Start_Date,"days")
+outNRS2$Project1 = "NRS"
+outNRS2$Project [is.na(outNRS2$Region)]  = "NRS" 
+outNRS2$Project [!is.na(outNRS2$Region)] = "ONMS-sound" 
+names(outNRS2 )
 # COMBINE DATASETS ####
-outputC 
+outputS  = subset(output,  select = c(Path, Site, DeploymentName, Instrument, Start_Date, End_Date, Lat,Lon,Duration, Project, Region, Project1 ))
+outNRS2S = subset(outNRS2, select = c(Path, Site, DeploymentName, Instrument, Start_Date, End_Date, Lat,Lon,Duration, Project, Region, Project1 ))
+outputC = rbind(outputS,  outNRS2S)
+#outputC$Region
 ## SAVE ALL ####
-save(outputC, file = paste0(outDirP, "\\data_gantt_ONMS_gantt_ALL", DC, ".Rda") ) #all data
+save(outputC, file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS_gantt_ALL", DC, ".Rda") ) #all data
 
 ## SAVE ONMS long-term only ####
-cat("Not long-term sites...", setdiff(unique(outputC$Site), unique(lookup$NCEI)) ) #only long-term monitoring sites
-outputONMS = outputC[!is.na(outputC$Region),] 
-
-outputONMS
-save(outputONMS,      file = paste0(outDirP, "\\data_gantt_ONMS_gantt_", DC, ".Rda") )
-write.csv(outputONMS, file = paste0(outDirP, "\\data_gantt_ONMS_gantt_", DC, ".csv") )
+outputONMS = outputC[!is.na(outputC$Region),]
+# unique(outputONMS$Site)
+# cat("Not long-term sites...", setdiff(unique(outputC$Site), unique(lookup$NCEI)) ) #only long-term monitoring sites
+save(outputONMS,      file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS_gantt_", DC, ".Rda") )
+write.csv(outputONMS, file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS__gantt_", DC, ".csv") )
 
 # GANTT CHART  ####
 # load(file = paste0(outDirP, "\\data_gantt_ONMS_gantt_2025-04-28.Rda") )
 ## COLOR ####
-projectN = "onmsRegion"
-uColors = unique(outputT$Instrument)
-if (projectN == "onms"){
-  instrument_colors <- c(
-    "SoundTrap 500" = "#88CCEE",  
-    "SoundTrap 600" = "#CC6677",#88CCEE",  
-    "SoundTrap 300" = "#44AA99", 
-    "HARP" =          "#DDCC77") #DDCC77
-}
-uColors = unique(outputT$Region) 
+uColors = unique(outputONMS$Region) 
 # nmfspalette::nmfs_palette("oceans")(10)
 #[1] "#C6E6F0" "#8CCBE3" "#53B0D7" "#1F95CF" "#0072BB" "#004295" "#002B7B" "#002467" "#001D55" "#001743"
-if (projectN == "onmsRegion"){
-  instrument_colors <- c(
-    "Pacific Islands" = "#C6E6F0", 
-    #"Greater Pacific" = "#C6E6F0",  
-    "West Coast"      = "#53B0D7",  
-    "East Coast"      = "#004295", 
-    "Gulf Coast"      = "#001743") 
-}
+region_colors <- c(
+  "Pacific Islands" = "#C6E6F0",  
+  "West Coast"      = "#53B0D7",  
+  "East Coast"      = "#004295", 
+  "Gulf Coast"      = "#001743") 
 
+uProject = unique(outputONMS$Project1) 
+uProject
+outputONMS$Project1[outputONMS$Project1 == "onms"] = "ONMS-Sound"
+outputONMS$Project1[outputONMS$Project1 == "sanctsound"] = "SanctSound"
 project_colors <- c(
-  "SanctSound" = "#53B0D7",  
-  "ONMS-sound"= "#004295") 
+  "SanctSound" = "#C6E6F0",  
+  "ONMS-Sound" = "#53B0D7",
+  "NRS" = "#004295") 
 
 ## geom_tile option ####
-colnames(outputT)
-outputT <- outputT %>%
-  mutate(Site = fct_reorder2(Site, Region, Start_Date))  # Reorders Site within Region
 
-output$sanctuaryName = substr(output$Site, start = 1, stop =2)
-output$Region[output$sanctuaryName %in% wc] <- "West Coast"
-output$Region[output$sanctuaryName %in% ec] <- "East Coast"
-output$Region[output$sanctuaryName %in% pi] <- "Pacific Islands"
-output$Region[output$sanctuaryName %in% gl] <- "Great Lakes"
-colnames(output)
-pT = ggplot(output, aes(y = Site, x = Start_Date, xend = End_Date, fill = Project ) ) +
-  geom_tile(aes(x = Start_Date, width = as.numeric(End_Date - Start_Date) ) , 
-            color = "gray", height = 0.6) +     # Fill color by Instrument and outline in black
-  scale_fill_manual(values = project_colors) +  # Use specific colors for instruments
-  labs(x = "", y = "", title = "",
-       caption = paste0("Data available as of ", format(Sys.Date(), "%B %d, %Y"))) +
-  facet_wrap(~Region, scales = "free_y") +
-  theme_minimal(base_size = 16) +
-  theme( legend.position = "right", legend.justification = "left",
-         axis.text.x = element_text(angle = 0, hjust = 1, size = 12),
-         axis.text.y = element_text(angle = 0, size = 12))
-pT
-ggsave(filename = paste0(outDirR, "\\gantt_ONMS.jpg"), plot = pT, width = 10, height = 6, dpi = 300)
-
-pTb = ggplot(outputT, aes(y = Site, x = Start_Date, xend = End_Date, fill = Region ) ) +
+pTb = ggplot(outputONMS, aes(y = Site, x = Start_Date, xend = End_Date, fill = Project1 ) ) +
   geom_tile(aes(x = Start_Date, width = as.numeric(End_Date - Start_Date) ) , 
             color = "gray", height = 0.6) +  # Fill color by Instrument and outline in black
-  scale_fill_manual(values = instrument_colors) +  # Use specific colors for instruments
+  scale_fill_manual(values = project_colors) +  # Use specific colors for instruments
   labs(x = "", y = "", title = "",
        caption = paste0("Data available on NCEI-GCP (", typ, ") as of ", format(Sys.Date(), "%B %d, %Y"))) +
   facet_wrap(~Region,scales = "free_y") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
-        axis.text.y = element_text(angle = 10, size = 12))
+  theme(axis.text.x = element_text(angle = 0, hjust = 1, size = 12),
+        axis.text.y = element_text(angle = 0, size = 12),
+        legend.position = "bottom", 
+        legend.text = element_text(size = 14),
+        legend.title = element_blank(),
+        strip.text = element_text(size = 14),
+        plot.caption = element_text(size = 14, hjust = 0),
+        #panel.border = element_rect(color = "gray", fill = NA, size = .1),
+        panel.spacing = unit(2, "cm") )
 pTb
-ggsave(filename = paste0(outDirR, "\\gantt_ONMS-sound.jpg"), plot = pT, width = 8, height = 6, dpi = 300)
+ggsave(filename = paste0(outDirR, "\\gantt_ONMS-SS-NRS.jpg"), plot = pTb, width = 8, height = 6, dpi = 300)
 
 # MAP DATA ####
 #reformat for per site- total recordings 
