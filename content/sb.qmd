@@ -137,7 +137,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVari
 infoHtml = f'''
         <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">Table of Results</button>
             <dialog id="infoModal">
-                {gf.makeButtons(sites, "table_***_AISMonthAbove.jpg", "AISMonthlyTables)}
+                {gf.makeButtons(sites, "table_***_AISMonthAbove.jpg", "AISMonthlyTables")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
                     Close
                 </button>
@@ -154,7 +154,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
 infoHtml = f'''
         <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">Table of Results</button>
             <dialog id="infoModal">
-                {gf.makeButtons(sites, "table_***_AIShist.jpg", "AISMonthlyTables)}
+                {gf.makeButtons(sites, "table_***_AIShist.jpg", "AISHistTables")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
                     Close
                 </button>
