@@ -107,7 +107,6 @@ display(HTML(standardTextDict["What are the latest conditions in ocean sound?"])
 ```
 
 ### How often are sources of interest likely present?
-#### (e.g. vocalizing species or human activity)
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest likely present"]))

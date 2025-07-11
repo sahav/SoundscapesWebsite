@@ -107,7 +107,6 @@ display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
 ```
 
 ### How often are sources of interest likely present?
-#### (e.g. vocalizing species or human activity)
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest likely present"]))
