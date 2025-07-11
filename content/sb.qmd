@@ -90,6 +90,7 @@ infoHtml = f'''
                 </button>
             <dialog id="infoModal2">
                 <p>{standardTextDict['How does my sanctuary compare?']}</p>
+                {gf.makeImage("plot_SB01_compare.jpg")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).close()">
                     Close
                 </button>
@@ -132,15 +133,44 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["large vessels interfer"]))
+<<<<<<< HEAD
 display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVariance"))) 
 # NEED TO ADD BUTTON: "Table of Results" table_***_AISMonthAbove.jpg
+=======
+display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVariance")))
+infoHtml = f'''
+        <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">Table of Results</button>
+            <dialog id="infoModal">
+                {gf.makeButtons(sites, "table_***_AISMonthAbove.jpg", "AISMonthlyTables)}
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
+                    Close
+                </button>
+            </dialog>
+'''
+display(HTML(infoHtml))
+# NEED TO ADD BUTTON: "See Table Results" table_***_AISMonthAbove.jpg
+>>>>>>> 635326f (Added more buttons in sb)
 ```
 #### How does the level of traffic change conditions?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["level of traffic"]))
 display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
+<<<<<<< HEAD
 # NEED TO ADD BUTTON: "Table of Results" table_***_AIShist.jpg
+=======
+infoHtml = f'''
+        <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">Table of Results</button>
+            <dialog id="infoModal">
+                {gf.makeButtons(sites, "table_***_AIShist.jpg", "AISMonthlyTables)}
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
+                    Close
+                </button>
+            </dialog>
+'''
+display(HTML(infoHtml))
+# NEED TO ADD BUTTON: "See Table Results" table_***_AIShist.jpg
+>>>>>>> 635326f (Added more buttons in sb)
 ```
 
 ### When do right whales contribute to the soundscape, indicating their presence nearby?
