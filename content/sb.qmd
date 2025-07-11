@@ -90,7 +90,7 @@ infoHtml = f'''
                 </button>
             <dialog id="infoModal2">
                 <p>{standardTextDict['How does my sanctuary compare?']}</p>
-                {gf.makeImage("plot_SB01_compare.jpg")}
+                {gf.makeImage("plot_SB01_compare.jpg", "sbo1compare)}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).close()">
                     Close
                 </button>
