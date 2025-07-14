@@ -60,7 +60,7 @@ website:
       - href: content/ci.qmd
         text: Channel Islands
       - text: <br>
-      - text: <b>Greater Pacific Region</b>
+      - text: <b>Pacific Islands Region</b>
       - href: content/pi.qmd
         text: Papahānaumokuākea
       - href: content/as.qmd
