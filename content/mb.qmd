@@ -135,7 +135,12 @@ display(HTML(standardTextDict["Fish Chorus"]))
 display(HTML(gf.makeImage("MB01_FinalHist.png", " Seasonal Fish Choruses")))
 display(HTML(gf.makeImage("MB01_FinalRosePlot.png", " Daily Fish Choruses")))
 ```
-
+### When do whales contribute to the soundscape, indicating their presence nearby?
+```{python}
+#| echo: false
+display(HTML(standardTextDict["MARS-whales"]))
+display(HTML(gf.makeImage("MARS_BlueFinCI.jpg", "Seasonal blue and fin")))
+```
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
 #| echo: false
