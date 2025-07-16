@@ -66,6 +66,7 @@ cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min(
 #check for duplicate days, remove MANTA
 ixdR = which(dysON %in% dysPy)
 inFiles = c( inFilesPY, inFilesON[-ixdR] )
+ckFiles = as.data.frame(inFiles)
 dys = c(dysPy, dysON[-ixdR])
 cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
 
