@@ -71,21 +71,16 @@ dys = c(dysPy, dysON[-ixdR])
 cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
 
 ## CHECK FOR PROCESSED FILES #### 
-# NEED TO UPDATE WHEN I ADD NEW FILES
 #updates list of files to process
 pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_", site), full.names = T, recursive = T)
 if ( length(pFile) > 0 ) {
   load(pFile)
-  cat("Already processed ", length(processedFiles), " files for ", site, "\n")
   
   # are there any new files to process?
-  inFilesPY = inFilesPY[!basename(inFilesPY) %in% processedFiles]
-  inFilesON = inFilesON[!basename(inFilesON) %in% processedFiles]
-  inFilesN  = c(inFilesPY,inFilesON)
-
+  inFilesN = inFiles[!basename(inFiles) %in% processedFiles]
   
   if ( length(inFilesN ) > 0 ) {
-    cat("Found ", length(inFilesN), "new files to process")
+    
     # read in processed data to append results
     inFileP = list.files((outDir), 
                          pattern = paste0("data_", site, "_HourlySPL-gfs_\\d{4}-\\d{2}-\\d{2}\\.Rda$"), 
@@ -93,15 +88,17 @@ if ( length(pFile) > 0 ) {
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
     if( exists("outData") ) {
-      gps = outData
+      processedData = outData
       rm(outData)
     }
-    processedData = gps
+    
     cat( "Processed data for ", site, ": ", 
          as.character( as.Date( min( processedData$UTC))) , " to ", 
-         as.character( as.Date( max( processedData$UTC)) ))
+         as.character( as.Date( max( processedData$UTC)) ), 
+         " Found ", length(inFilesN), "new files to process\n")
     
-    rm(gps)
+    # these are the files that will be processed!
+    inFiles = inFilesN 
     
   } else {
     stop("No new files to process... come back when you have more data")
@@ -110,62 +107,62 @@ if ( length(pFile) > 0 ) {
 } else {
   cat("No processed files for ", site, " processing all new files")
   processedData = NULL
-  aData = NULL # this is the already processed data that needs to be binded to new data
 }
 
 # PROCESS ONMS Sound FILES ####
-cData_list = vector("list", length(inFiles))
-if (length(inFiles) > 0) {
-  for (f in seq_along(inFiles)) {
-    cat("Processing", f, "of", length(inFiles), "\n")
-    ncFile = inFiles[f]
-    hmdData = loadSoundscapeData(ncFile)  # only keeps quality 1 as default
-    tolData = createOctaveLevel(hmdData, type = 'tol')
-    tolData$site = site
-    if ( grepl("MinRes.nc", basename(inFiles[f]) ) ) {
- 
-      tolData$software = "manta"
-    } else {  tolData$software = "pypam"}
-    
+cData = NULL  
+cDatah = NULL
 
-    cData_list[[f]] = tolData
-  }
+if (length(inFiles) > 0) { 
+  for (f in 1:length(inFiles) ){ # 1245:1246 
+   
+     cat("Processing", f, "of", length(inFiles),basename(inFiles[f]), "\n")
+    
+    ncFile = inFiles[f]
+    hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+    tolData = createOctaveLevel(hmdData, type='tol')
+    
+    # add software column
+    if ( grepl("MinRes.nc", basename(inFiles[f]) ) ) {
+      tolData$software = "manta"
+    } else {  
+      tolData$software = "pypam" }
+    
+    #combine data- but remove columns first
+    # assumes they are in the same order and this will break if they are not (future fix recommended!)
+    tolData = tolData[, setdiff(names(tolData), "platform"), drop = FALSE]
+    cData = rbind(cData, tolData)
+    
+  } 
   
-  cData  = bind_rows(cData_list)
-  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("mean"))
+  #bin to hourly median values
+  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
 }
+# the time binning seems to remove any "extra columns" so just the UTC and TOL bands for the output
+#names(cDatah)
+#ADD a few basicc columns about the data
 cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
 
-# append wind data (only because I ran this already!!!!)
-inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
+# GET WIND ####
+# ## (ALT GET WIND) 
+# ##append wind data - only if already ran previously but the SPL data were inaccurate!
+# inWind = list.files("F:\\ONMS\\SS_Manta\\", pattern = paste0("data_", tolower(site), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
+# load( inWind[1] )
+# ##names(gps)
+# cols_to_keep = c("UTC",  "Latitude", "Longitude", "windU", "windV",
+#                   "precRate", "matchLong", "matchLat",
+#                   "matchTime", "windMag")
+# gps_subset = gps[, intersect(cols_to_keep, names(gps))]
+# ##names(gps_subset)
+# rm(gps)
+# merged_data = merge(cDatah, gps_subset, by = "UTC", all.x = TRUE )
+# gps = merged_data
+# ##names(gps)
 
-# COMBINE DATA & GET WIND ####
-if ( length(sData) > 0 & length(cDatah) > 0 ) {
-  
-  cat("SancSound + ONMS data ....")
-  
-  aData = NULL  
-  sData$Latitude   = cDatah$Latitude[1]
-  sData$Longitude  = cDatah$Longitude[1]
-  cData_mismatched = setdiff(colnames(cDatah), colnames(sData))
-  cData_cleaned    = cDatah[, !colnames(cDatah) %in% cData_mismatched]
-  
-  cData_cleaned = cData_cleaned[, colnames(sData)]
-  aData = rbind(cData_cleaned, sData)
-  aData$Latitude  = as.numeric( as.character( siteInfo$Latitude ))
-  aData$Longitude = as.numeric( as.character( siteInfo$Longitude ))
-  
-  #GET WIND/WEATHER DATA
-  cat("This takes a bit ... maybe grab a coffee or go for walk") 
-  gps = matchGFS(aData)
-  gps$yr  = year(gps$UTC)
-  gps$mth = month(gps$UTC)
-  gps$site = site
-  
-  
-} else if (length(sData) == 0 & length(cDatah) > 0 ) {
+
+if ( length(cDatah) > 0 ) {
 
   cat("ONMS data only ...") 
   cat("This takes a bit ... maybe grab a coffee or go for walk") 
@@ -174,37 +171,51 @@ if ( length(sData) > 0 & length(cDatah) > 0 ) {
 }
 
 # APPEND & SAVE NEW DATA FILES ####
-if ( length(pFile) > 0 ){   #append old and save out all processed data
-  data_mismatched = setdiff(colnames(gps), colnames(processedData))
-  gps_clean = gps[, !colnames(gps) %in% data_mismatched]
+if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data
   
-  #data
-  outData = rbind(processedData,gps_clean)
+  #remove any no matching headings
+  data_mismatched = setdiff(colnames(gps), colnames(processedData))
+  gps_clean = gps[, !colnames(gps) %in% data_mismatched] #new data with matching headings
+
+  #re-order columns
+  # setdiff(colnames(gps_clean), colnames(processedData))
+  print(names(processedData))
+  col_order = colnames(processedData)
+  gps_clean1 = gps_clean[, col_order]
+  names( processedData)
+  names( gps_clean)
+  
+  # combine data
+  outData = rbind(processedData, gps_clean)
+  
+  #track days added
   dys = length( unique( as.Date( outData$UTC) ) )
+  dysA = dys - length( unique( as.Date( gps_clean$UTC) ) )
+  
+  # summary of data processed
   cat( "Output data for ", site, " has ", dys, "unique days: ", 
        as.character( as.Date( min( outData$UTC))) , " to ", 
-       as.character( as.Date( max( outData$UTC)) ))
+       as.character( as.Date( max( outData$UTC)) ), "with ", dysA, " new days added")
+ 
+   # writes new file with appended data
   save(outData, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
   
-  #processed files
-  # writes new file with date
-  processedFiles = c(processedFiles, basename(inFilesSS), basename(inFilesON) )
-  length(processedFiles) - length(unique(processedFiles))
+  # write out processed files
+  processedFiles = c(processedFiles, basename(inFiles) )
   # writes over previous file
   save(processedFiles, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPL.Rda") )
   
 } else {  # save out all the newly processed data
-  #data
-  # writes new file with date
-  dys = length( unique( as.Date( gps$UTC) ) )
-  cat( "Output data for ", site, " has ", dys, "unique days: ", 
+  # summary of data processed
+  dysA = length( unique( as.Date( gps$UTC) ) )
+  cat( "Output data for ", site, " has ", dysA, "unique days: ", 
        as.character( as.Date( min( gps$UTC))) , " to ", 
        as.character( as.Date( max( gps$UTC)) ))
+  # writes new file with data
   outData = gps
-  save(gps, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
-  
-  #processed files
-  processedFiles  = c(basename(inFilesSS), basename(inFilesON))
+  save(outData, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
+  # write out processed files
+  processedFiles  = basename(inFiles)
   save(processedFiles, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPL.Rda") )
 }
 

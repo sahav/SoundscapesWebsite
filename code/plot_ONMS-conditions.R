@@ -44,7 +44,7 @@ windUpp = 22.6 #which wind model result to show on plot
 windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
-removess = 1 # set to 1 if you want to truncate the time series
+removess = 0 # set to 1 if you want to truncate the time series
 
 # CONTEXT ####
 #reads information for all sites
@@ -73,7 +73,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 7
+for (uu in 1:length(ONMSsites)) { # uu = 2
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -886,10 +886,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 7
     theme(
       strip.text  = element_text(size = 14),
       plot.caption = element_text(size = 12, face = "italic", hjust = 0), 
-      axis.text.x = element_text(size = 16, hjust = 1),
+      axis.text.x = element_text(size = 14, hjust = 1),
       axis.title.x  = element_text(size = 14),
-      axis.title.y  = element_text(size = 14),
-      axis.text.y = element_text(size = 14, hjust = 1), 
+      axis.title.y  = element_text(size = 12),
+      axis.text.y   = element_text(size = 12, hjust = 1), 
       legend.position = "none")
   windB
   ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
