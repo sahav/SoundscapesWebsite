@@ -45,6 +45,7 @@ windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
 removess = 0 # set to 1 if you want to truncate the time series
+removeShort = 360 #minium number of hours needed to included a year in the graphics 
 
 # CONTEXT ####
 #reads information for all sites
@@ -73,7 +74,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 2
+for (uu in 1:length(ONMSsites)) { # uu = 3
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
@@ -119,30 +120,35 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
     sidx = "wssf"
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonShift = 0
   }else if  ( sidx == "biological") {
     season = data.frame(
-      Season = c("Early", "Peak", "Late", "Non"),
-      Months = c("10,11,12", "1,2,3", "4,5,6", "7,8,9") ,
-      values = c(  "#56B4E9",  "#009E73","#CC79A7", "#E69F00") )
-    seasonLabel = "Peak (Jan-Mar), Late (Apr-Jun), Non (Jul-Sep), Early (Oct-Dec)"
+      Season = c("Early", "Late", "Peak", "Non"),
+      Months = c("12,1", "4,5", "2,3", "6,7,8,9,10,11") ,
+      values = c(  "#56B4E9", "#009E73", "#B3B3B3", "#CC79A7") )
+    seasonLabel = "Early (Dec-Jan), Peak (Feb-Mar), Late (Apr-May), Non (Jun-Nov) "
+    seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
       Months = c("7,8,9,10,11", "3,4,5,6", "12,1,2") ,
-      values = c(  "#CC79A7",  "#009E73","#56B4E9") )
+      values = c(  "#CC79A7",  "#009E73", "#56B4E9") )
     seasonLabel = "Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
+    seasonShift = 0
   }else if ( sidx == "wssf") {
     season = data.frame(
       Season = c("Fall", "Spring",  "Summer", "Winter"  ),
       Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
       values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonShift = 0
   }else if ( sidx == "southernHem") {
     season = data.frame(
       Season = c( "Humpback", "Humpback peak", "Hurricane", "Tradewind" ),
       Months = c("6,7,8,9,10" , "8,9,10" ,"11,12,1,2,3,4",  "5,6,7,8,9,10") ,
       values = c(   "#56B4E9",  "#009E73", "#CC79A7", "#E69F00") )
     seasonLabel = "Humpback (Jun-Oct), Humpback peak (Aug-Oct), Hurricane (Nov-Apr), Tradewind (May-Oct)"
+    seasonShift = 0
   }
   
   ## SPL data product ####
@@ -199,7 +205,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
   gps$yr = year(gps$UTC)
   years_to_keep <- gps %>%
     count(yr) %>%
-    filter(n >= 360) %>%
+    filter(n >= removeShort) %>%
     pull(yr)
   
   gps = gps %>%
@@ -210,8 +216,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
   udays = length( unique(as.Date(gps$UTC)) )
  
   # CHECK: DATA SUMMARY ####
-  cat(site, "context summary:", siteInfo$`Oceanographic category`,  ";season-",  unique(gps$Season), ";times of interest- ", nrow(TOIs), 
-      ";frequencies of interest- ", nrow(FOIst), "\n",
+  cat(site, "Context Summary:\n", siteInfo$`Oceanographic category`,  "; season-",  unique(gps$Season), 
+      "; times of interest-", nrow(TOIs), 
+      "; frequencies of interest- ", nrow(FOIst), "\n",
       "Input Data - ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
   
   # PERCENTILES for all the data ####
@@ -334,12 +341,17 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## by season (hours/ season in each year ####
-  summary2 <- gps %>%
+  # season for HI sites includes December from the previous years- so make adjustment here,
+  # if not HI this adds 0 so does nothing
+  gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
+ 
+  summary2 = gps %>%
     mutate(
-      year = year(UTC),  # Extract Year
-      month = format(UTC, "%m")  # Extract Month (numeric format)
+      year  = yr,  # Extract Year
+      month = mth  # Extract Month (numeric format)
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
+  
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
   p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
@@ -378,8 +390,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
   for (ii in 1: length(season_quantiles) ) {
     tmp = as.data.frame ( season_quantiles[ii] ) 
     colnames(tmp) = colnames(gps)[tol_columns]
-    tmp$Quantile = rownames(tmp)
-    tmp$Season = names(season_quantiles)[ii]
+    tmp$Quantile  = rownames(tmp)
+    tmp$Season    = names(season_quantiles)[ii]
     rownames(tmp) = NULL
     seasonAll = rbind(seasonAll,tmp)
   }
@@ -403,7 +415,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
     geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
               linetype = "dotted")+ 
     # Set color and fill to match season
-    
     scale_color_manual(values  = seasont$values ) +
     scale_fill_manual (values  = seasont$values ) +
     
@@ -447,8 +458,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
   # truncates data to peak season for biological sites- all plots after this are peak only!!!
   if (sidx == "biological"){ #only keep peak
     gpsAll = gps
-    my_subtitle = "peak season only"
-    gps = gps[gps$Season == "Peak",]
+    my_subtitle = "humpback season"
+    gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
     #redo effort plot so not confusing
     summary <- gps %>%
       mutate(
@@ -461,7 +472,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 2
       geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
       #coord_flip() +
       labs(
-        title = "monitoring effort by year (peak only)",
+        title = paste0( "monitoring effort by year ", my_subtitle) ,
         subtitle = paste0(toupper(site), " has ", udays, 
                           " unique days: ", as.character(st), " to ", as.character(ed)),
         x = "",
