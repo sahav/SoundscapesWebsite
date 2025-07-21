@@ -787,15 +787,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   
   #(5) Wind Dominated in fqIn2 ####
   # select only data for fqIn2
-  cols_to_select = c("UTC", "windMag","wind_category",fqIn2)
+  cols_to_select = c("UTC", "yr","windMag","wind_category",fqIn2)
   gpsFQ = gps %>% select(all_of(cols_to_select))
   gpsFQ$Day = as.Date( gpsFQ$UTC )
-  gpsFQ$yr = year(gpsFQ$UTC )
   gpsFQ$mth = month(gpsFQ$UTC )
-  # what wind speed catergory is the measured value closest to?
+  # what wind speed category is the measured value closest to?
   wspeeds = unique( (windModel$windSpeed) )
   gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
-  # what is the spl values for that windspeed?
+  # what is the SPL values for that windspeed?
   fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'500'
   wsIdx = match(gpsFQ$closest_windMag, windInfo$windSpeed)
   gpsFQ$WindModelfq = windInfo[wsIdx, fqIdx]
@@ -837,10 +836,16 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   # CHECK: dayNE$percent_below + dayNE$percent_above
   
   dayNE = as.data.frame( dayNE )
-  dayNE$yr = factor(dayNE$yr, levels = rev(sort(unique(dayNE$yr))))
-  dayNE$mth = factor(dayNE$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10, 11,12)))
+  #put most recent year at the top of the plot
+  dayNE$yr  = factor(dayNE$yr,  levels = rev(sort(unique(dayNE$yr)))) 
+  if (sidx == "biological") {
+    dayNE$mth = factor(dayNE$mth, levels = rev(c(12,1,2,3,4,5)))
+  } else {
+    #puts January at the top of the plot... maybe remove if confusing to go to previous year
+    dayNE$mth = factor(dayNE$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10,11,12)))
+  }
   
-  # is there a relationship between percent below and windspeed?
+  # CHECK: is there a relationship between percent below and windspeed?
   #plot(dayNE$percent_below, dayNE$windspeed)
   
   windD = ggplot(dayNE, aes(x = factor(mth), y = as.numeric(percent_below), fill = factor( mth ) ) ) +
@@ -849,11 +854,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     coord_flip() +
     ylim(0,100) +
     scale_fill_viridis_d(option = "D") +
-    scale_x_discrete(
-      breaks = c("1", "3", "5", "7", "9", "11"),
-      labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
-    ) +
-    #scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     labs(
       title = paste0("How often can the habitat be considered acoustically inactive? \n(wind-driven noise at ", fqIn2name, ")"),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
@@ -874,17 +874,24 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   windD
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
  
+  x_scale = if (sidx == "biological") {
+    scale_x_discrete(
+      breaks = c("12", "2", "4"),
+      labels = c("Dec", "Feb", "Apr")
+    )
+  } else {
+    scale_x_discrete(
+      breaks = c("1", "3", "5", "7", "9", "11"),
+      labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
+    )
+  }
+  
   windB = ggplot(dayNE, aes(x = factor(mth), y = as.numeric(percent_above), fill = factor( mth ) ) ) +
     geom_col(width = 1) +
     facet_wrap(~yr, ncol = 1) +
     coord_flip() +
     ylim(0,100) +
-    scale_fill_viridis_d(option = "D") +
-    scale_x_discrete(
-      breaks = c("1", "3", "5", "7", "9", "11"),
-      labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
-    ) +
-    #scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    x_scale +
     labs(
       title = paste0("How often are sources of interest likey present? \n(e.g. vocalizing species or vessel activity) "),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
