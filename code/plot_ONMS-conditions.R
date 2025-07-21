@@ -93,7 +93,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     site5 = site
     outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" )#products
   }
-
+  
   ## SITE PARAMETERS ####
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
@@ -214,7 +214,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   st = as.Date( min(gps$UTC) )
   ed = as.Date( max(gps$UTC) )
   udays = length( unique(as.Date(gps$UTC)) )
- 
+  
   # CHECK: DATA SUMMARY ####
   cat(site, "Context Summary:\n", siteInfo$`Oceanographic category`,  "; season-",  unique(gps$Season), 
       "; times of interest-", nrow(TOIs), 
@@ -317,7 +317,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     labs(
       title = "monitoring effort by year (all data)",
       subtitle = paste0(toupper(site), " has ", udays, 
-                       " unique days: ", as.character(st), " to ", as.character(ed)),
+                        " unique days: ", as.character(st), " to ", as.character(ed)),
       x = "",
       y = "Days",
       fill = "Year"
@@ -344,7 +344,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   # season for HI sites includes December from the previous years- so make adjustment here,
   # if not HI this adds 0 so does nothing
   gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
- 
+  
   summary2 = gps %>%
     mutate(
       year  = yr,  # Extract Year
@@ -360,8 +360,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     labs(
       title = "monitoring effort by season (all data)",
       subtitle  = paste0(toupper(site), " has ", udays, 
-                        " unique days: ", as.character(st), " to ", as.character(ed), "\n",
-                        seasonLabel),
+                         " unique days: ", as.character(st), " to ", as.character(ed), "\n",
+                         seasonLabel),
       x = "",      y = "Days",      fill = "Year"
     ) +
     scale_fill_manual(values = seasont$values) +
@@ -506,7 +506,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
- 
+  
   ## re-calculate percentiles for all the data ####
   # all data - mALL 
   tol_columns = grep("TOL", colnames(gps))
@@ -519,7 +519,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   mALL = melt(All, id.vars = c("Quantile","Year"), measure.vars = tol_columns)
   mALL$variable = as.numeric( as.character( gsub("TOL_", "", mALL$variable )))
   colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
- # by year- mallData 
+  # by year- mallData 
   tol_columns = grep("TOL", colnames(gps))
   yr_split = split(gps, gps$yr) # Calculate quantiles for each year
   year_quantiles = lapply(yr_split, function(season_data) {
@@ -595,12 +595,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   # plot with error bars and median and hours above 75th percentile in title
   if ( nrow(FOIst) > 0 ) {
     for (tt in 1: nrow(FOIst) ){
-     
+      
       #check to see if the FOI is broad band
       if (FOIst$FQstart [tt] == FOIst$FQend [tt] ){
         ftN = paste0("TOL_", FOIst$FQstart [tt]) #fqIn
         ft = FOIst$FQstart [tt]
-        cols_to_select = c("UTC", "windMag","wind_category",ftN )
+        cols_to_select = c("UTC", "yr", "windMag","wind_category",ftN )
         gpsFQ = gps %>% select(all_of(cols_to_select))
         wspeeds = unique( (windModel$windSpeed) )
         gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
@@ -630,7 +630,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         toln =  as.numeric( gsub("TOL_", "", colnames(gps)[tolc]) )
         idx = tolc[( toln >= FOIst$FQstart[tt] & toln <= FOIst$FQend [tt] ) ]
         ftN = colnames(gps)[idx]
-        cols_to_select = c("UTC", "windMag","wind_category",ftN )
+        cols_to_select = c("UTC", "yr", "windMag","wind_category",ftN )
         gpsFQ = gps %>% select(all_of(cols_to_select))
         tmpBB = gpsFQ %>% select(all_of(ftN))
         # calculate a BB measurement for TOL FQ- unlog, sum, re-log
@@ -670,19 +670,30 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         )
       dailyFQ$yr = year(dailyFQ$Date)
       dailyFQ$Julian = yday(dailyFQ$Date)
-      #(hist(dailyFQ$percent_above_threshold))
-    
+      
       # Fill in missing days
       dailyFQ_complete = dailyFQ %>%
         group_by(yr) %>%
         complete(Julian = seq(min(Julian), max(Julian), by = 1)) %>% 
-        arrange(yr, Julian) 
+        arrange(yr, Julian) %>%
+        mutate(Date = as.Date(Julian - 1, origin = paste0(yr, "-01-01")))
+      names( dailyFQ_complete )
+      
+      # adjust for Hawaii year
+      dailyFQ_complete$mth = month(dailyFQ_complete$Date)
+      dailyFQ_complete$yr[dailyFQ_complete$mth == 12] = dailyFQ_complete$yr[dailyFQ_complete$mth == 12] + seasonShift
+      
+      # make labels for graphics (changed below for HI)
       monthly_sequence = seq.Date(as.Date("2021-01-01"), as.Date("2021-12-01"), by = "month")
-      month_names_seq   = format(monthly_sequence, "%b")  # Extracts full month names
+      month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
       days_of_year_for_months = yday(monthly_sequence)
       
       ### annual status
       gpsFQ$yr = year(gpsFQ$UTC)
+      gpsFQ$mth = month(gpsFQ$UTC )
+      #adjust for Hawaii year
+      gpsFQ$yr[gpsFQ$mth == 12] = gpsFQ$yr[gpsFQ$mth == 12] + seasonShift
+      
       yrFQ = gpsFQ %>% group_by(yr) %>%
         summarise(
           TOL_25 = quantile(SpecBand, 0.25, na.rm = TRUE),
@@ -702,8 +713,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         levels = c("Very Low", "Low", "Within Range", "High", "Very High")
       )
       yrFQ$yr = factor(yrFQ$yr, levels = rev(sort(unique(yrFQ$yr))))
-     
-      ### plot: threshold bars
+      
+      ### plot: annual threshold bars
       pthrs = ggplot() +
         # Threshold bands (same for all facets)
         geom_rect(data = threshold_bands,
@@ -716,7 +727,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         facet_wrap(~yr, ncol = 1) +  
         # Customize scales and colors
         scale_fill_manual(values = setNames(threshold_bands$fill, threshold_bands$category)) +
-        #coord_cartesian(xlim = c(threshold_lo-1, threshold_up +1), ylim = c(0.2, 0.9)) +
         # more formatting
         theme_void() +
         theme( legend.position = "right",
@@ -725,63 +735,122 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
                plot.subtitle = element_text(hjust = 0.5, size = 14),
                axis.title.x = element_text(size = 14),
                strip.text = element_text(size = 14) ) +
-        labs(title = paste0("Annual Status for ", ft, "Hz" ), fill = "", 
-             #subtitle = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
+        labs(title = paste0("Annual Status for ", ft, "Hz" ), fill = "",
              subtitle  = "status is set at median for the year",
              strip.text = element_text(hjust = 0))
       pthrs 
+      
       ### plot: time series ####
       dailyFQ_complete$yr = factor(dailyFQ_complete$yr, levels = rev(sort(unique(dailyFQ_complete$yr))))
-     
-      plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
+      if (sidx != "biological") {
+        plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
+          
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q25, ymax = q75,
+                   fill = "#CCCCCC", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q75, ymax = q99 ,
+                   fill = "lightcoral", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q01, ymax = q25,
+                   fill = "lightblue", alpha = 0.2) +
+          ylim(q01, q99) +
+          
+          geom_hline(aes(yintercept = q50),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q75),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q25),linetype = "dashed", color = "gray",linewidth = .2) +
+          
+          geom_line() +
+          facet_wrap(~yr, ncol = 1)+
+          scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +
+          labs(
+            title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
+            subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
+            caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
+            x = "",
+            y = substitute(
+              paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
+              list(f = ft) )
+            # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
+          ) +
+          theme_minimal() +
+          theme(legend.position = "none",
+                plot.title = element_text(size = 16, face = "bold", hjust = 0),
+                axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
+                axis.text.y = element_text(size = 14, hjust = 1),
+                strip.text = element_text(hjust = 0, size = 12),
+                plot.caption = element_text(size = 12, hjust = 0),
+                plot.subtitle = element_text(size = 12)) 
         
-        annotate("rect",
-                 xmin = -Inf, xmax = Inf,
-                 ymin = q25, ymax = q75,
-                 fill = "#CCCCCC", alpha = 0.2) +
-        annotate("rect",
-                 xmin = -Inf, xmax = Inf,
-                 ymin = q75, ymax = q99 ,
-                 fill = "lightcoral", alpha = 0.2) +
-        annotate("rect",
-                 xmin = -Inf, xmax = Inf,
-                 ymin = q01, ymax = q25,
-                 fill = "lightblue", alpha = 0.2) +
-        ylim(q01, q99) +
+        ## save: plot 125 Hz time series with thresholds ####
+        plg
+        plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
+        plg2
         
-        geom_hline(aes(yintercept = q50),linetype = "dashed", color = "gray",linewidth = .2) +
-        geom_hline(aes(yintercept = q75),linetype = "dashed", color = "gray",linewidth = .2) +
-        geom_hline(aes(yintercept = q25),linetype = "dashed", color = "gray",linewidth = .2) +
+        ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+      } else {
+        # alternative methods for plg for Hawaii sites
+        monthly_sequence = seq.Date(as.Date("2020-12-01"), as.Date("2021-06-01"), by = "month")
+        month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
+        days_of_year_for_months = c(-30, 1, 32, 60, 91, 121, 152)
+        # Adjust Julian so December days are negative (for clean continuous x-axis)
+        dailyFQ_modified = dailyFQ_complete %>%
+          mutate(
+            shifted_julian = ifelse(Julian >= 335, Julian - 365, Julian)
+          )
         
-        geom_line() +
-        facet_wrap(~yr, ncol = 1)+
-        scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +
-        labs(
-          title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
-          subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
-          caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
-          x = "",
-          y = substitute(
-            paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
-            list(f = ft) )
-          # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
-        ) +
-        theme_minimal() +
-        theme(legend.position = "none",
-              plot.title = element_text(size = 16, face = "bold", hjust = 0),
-              axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
-              axis.text.y = element_text(size = 14, hjust = 1),
-              strip.text = element_text(hjust = 0, size = 12),
-              plot.caption = element_text(size = 12, hjust = 0),
-              plot.subtitle = element_text(size = 12)) 
+        plg = ggplot(dailyFQ_modified, aes(x = shifted_julian, y = TOL_50, group = yr)) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q25, ymax = q75,
+                   fill = "#CCCCCC", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q75, ymax = q99 ,
+                   fill = "lightcoral", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q01, ymax = q25,
+                   fill = "lightblue", alpha = 0.2) +
+          ylim(q01, q99) +
+          
+          geom_hline(aes(yintercept = q50),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q75),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q25),linetype = "dashed", color = "gray",linewidth = .2) +
+          
+          geom_line() +
+          facet_wrap(~yr, ncol = 1)+
+          scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq,
+                             limits = c(-40,150)) +
+          labs(
+            title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
+            subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
+            caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
+            x = "",
+            y = substitute(
+              paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
+              list(f = ft) )
+            # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
+          ) +
+          theme_minimal() +
+          theme(legend.position = "none",
+                plot.title = element_text(size = 16, face = "bold", hjust = 0),
+                axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
+                axis.text.y = element_text(size = 14, hjust = 1),
+                strip.text = element_text(hjust = 0, size = 12),
+                plot.caption = element_text(size = 12, hjust = 0),
+                plot.subtitle = element_text(size = 12))
         
-      ## save: plot 125 Hz time series with thresholds ####
-      plg
-      plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
-      plg2
-      
-      ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
-      
+        ## save: plot 125 Hz time series with thresholds ####
+        plg
+        plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
+        plg2
+        ggsave(filename = paste0(outDirG, "//plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+        
+      }
     }
   }
   
@@ -811,7 +880,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   threshold_up  = thresholds$SoundLevel[thresholds$Quantile  == "75%"]
   threshold_lo  = thresholds$SoundLevel[thresholds$Quantile == "25%"]
   gpsFQ$SpecBand = gpsFQ[fqIn2]
-
+  
   dayNE = gpsFQ %>%
     mutate(Date = as.Date(UTC)) %>%
     group_by(yr, mth) %>%
@@ -873,7 +942,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       axis.text.y = element_text(size = 14, hjust = 1) )
   windD
   ggsave(filename = paste0(outDirGe, "//plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
- 
+  
   x_scale = if (sidx == "biological") {
     scale_x_discrete(
       breaks = c("12", "2", "4"),
