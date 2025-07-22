@@ -198,7 +198,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   seas = unique(season$Season)
   for( ss in 1:length(seas) ){
     moi = as.numeric(unlist(strsplit(as.character(season$Months[ss]), ","))) 
-    gps$Season[gps$mth %in% moi] = season$Season[ss]   }
+    gps$Season[gps$mth %in% moi] = season$Season[ss]
+    rm(moi)}
   
   ##REMOVE years with low data ####
   # to make sure at least 15 day in a given year.
@@ -306,11 +307,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   ## by month (days/ month-year) ####
   summary <- gps %>%
     mutate(
-      year = year(UTC),  # Extract Year
+      year  = year(UTC),  # Extract Year
       month = format(UTC, "%m")  # Extract Month (numeric format)
     ) %>%
     count(year, month)  # Count occurrences (hours) in each year-month
   summary$dy = round(summary$n/ 24)
+  month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+  
   p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
     geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
     #coord_flip() +
@@ -322,7 +325,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       y = "Days",
       fill = "Year"
     ) +
-    scale_x_discrete(labels = month.abb) +  # Show month names instead of numbers
+    scale_x_discrete(labels = month.abb[month_nums]) +  # Show month names instead of numbers
     #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
     scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     theme_minimal() +
@@ -460,6 +463,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     gpsAll = gps
     my_subtitle = "humpback season"
     gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
+    unique( gps$mth )
     #redo effort plot so not confusing
     summary <- gps %>%
       mutate(
@@ -468,6 +472,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       ) %>%
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
+    month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+    
     p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
       geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
       #coord_flip() +
@@ -479,7 +485,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         y = "Days",
         fill = "Year"
       ) +
-      scale_x_discrete(labels = month.abb) +  # Show month names instead of numbers
+      scale_x_discrete(labels = month.abb[ month_nums ]) +  # Show month names instead of numbers
       #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
       scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
       theme_minimal() +
@@ -767,9 +773,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
           facet_wrap(~yr, ncol = 1)+
           scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq) +
           labs(
-            title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
+            title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
             subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
-            caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
+            caption  = "Typical conditions shown as gray area (25th and 75th percentiles of all the data)", 
             x = "",
             y = substitute(
               paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
@@ -826,9 +832,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
           scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq,
                              limits = c(-40,150)) +
           labs(
-            title    = paste0("Are sound levels above \ntypical conditions for ", ft, "Hz?" ) , 
+            title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
             subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
-            caption  = "Typical conditions are in gray area (25th and 75th percentiles of all the data)", 
+            caption  = "Typical conditions shown as gray area (25th and 75th percentiles of all the data)", 
             x = "",
             y = substitute(
               paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
@@ -924,7 +930,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     ylim(0,100) +
     scale_fill_viridis_d(option = "D") +
     labs(
-      title = paste0("How often can the habitat be considered acoustically inactive? \n(wind-driven noise at ", fqIn2name, ")"),
+      title = paste0("Habitat acoustically inactive (wind-driven at ", fqIn2name, ")"),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
       x = "",
       y = paste0("% of hours in a month wind noise dominate at ", fqIn2name, 
@@ -962,7 +968,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     ylim(0,100) +
     x_scale +
     labs(
-      title = paste0("How often are sources of interest likey present? \n(e.g. vocalizing species or vessel activity) "),
+      title = paste0("How often sources of interest are likey present (vocalizing species or vessels)"),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
       #caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
       x = "",
@@ -972,6 +978,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     theme_minimal()+
     theme(
       strip.text  = element_text(size = 14),
+      plot.title   = element_text(size = 16, face = "bold", hjust = 0),
       plot.caption = element_text(size = 12, face = "italic", hjust = 0), 
       axis.text.x = element_text(size = 14, hjust = 1),
       axis.title.x  = element_text(size = 14),
