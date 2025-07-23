@@ -85,7 +85,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" ) #products
     site1 = "NRS11"
     site3 = "cbnrs11"
-    site = "NRS11"
+    site  = "NRS11"
     site5 = "cb11"
   } else {
     site1 = site
