@@ -21,7 +21,7 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "sb03" 
+site  = "sb01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
