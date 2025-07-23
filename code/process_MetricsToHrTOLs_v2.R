@@ -21,17 +21,19 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "sb01" 
+site  = "fgb01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
-dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+# dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
 
 # LOCAL CODE REPO DIRECTORIES ####
-outDir =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\" 
-outDirC = paste0( outDir,"content\\resources\\") #context
-outDirP = paste0( outDir,"products\\", substr(tolower(site),start = 1, stop =2),"\\" )#products
-outDirG = paste0( outDir,"report\\" ) #graphics
+# outDir =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\" 
+outDir =  "/Users/quca3108/SoundscapesWebsite/" 
+outDirC = paste0( outDir,"content/resources/") #context
+outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
+outDirG = paste0( outDir,"report/" ) #graphics
 
 # ONMS Metadata ####
 metaFile = paste0(outDirC,"ONMSSound_IndicatorCategories.xlsx")
@@ -51,9 +53,11 @@ check gcp to see verify`)
 # e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
 inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
-dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
-cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
-    "with", sum( duplicated(dysPy)), "duplicated days\n")
+if (length(tmp) != 0){
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
+  cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
+      "with", sum( duplicated(dysPy)), "duplicated days\n")
+}
 
 ## ONMS Sound FILES- NCEI-GCP ####
 # e.g. ONMS_HI01_20231201_8021.1.48000_20231201_DAILY_MILLIDEC_MinRes.nc
@@ -64,11 +68,16 @@ cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min(
 
 ## COMBINE FILE LISTS ####
 #check for duplicate days, remove MANTA
-ixdR = which(dysON %in% dysPy)
-inFiles = c( inFilesPY, inFilesON[-ixdR] )
-ckFiles = as.data.frame(inFiles)
-dys = c(dysPy, dysON[-ixdR])
-cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+if (length(tmp) != 0){
+  ixdR = which(dysON %in% dysPy)
+  inFiles = c( inFilesPY, inFilesON[-ixdR] )
+  ckFiles = as.data.frame(inFiles)
+  dys = c(dysPy, dysON[-ixdR])
+  cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+} else {
+  inFiles = inFilesON
+  dys = dysON
+}
 
 ## CHECK FOR PROCESSED FILES #### 
 #updates list of files to process
