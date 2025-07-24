@@ -59,7 +59,7 @@ lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))),
 ## TIMES OF INTEREST ####
 TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of interest") )
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
-endSS = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "SantSound") )
+endSS = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "SanctSound") )
 endSS$endSS =  as.Date(endSS$endSS, origin = "1899-12-30")
 ## FREQUENCIES OF INTEREST ####
 FOI = as.data.frame ( openxlsx ::read.xlsx(metaFile, sheet = "Frequency of Interest") )
