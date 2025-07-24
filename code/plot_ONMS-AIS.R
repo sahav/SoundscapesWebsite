@@ -7,7 +7,7 @@
 rm(list=ls()) 
 
 #SITES ####
-ONMSsites = c("sb01","sb03","oc02", "cb11" )
+ONMSsites = "sb01" #c("sb01","sb03","oc02", "cb11" )
 ## directories ####
 outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
 outDirG  =  paste0(outDir, "content/resources/") #where save graphics

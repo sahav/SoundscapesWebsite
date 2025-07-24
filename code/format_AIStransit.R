@@ -1,9 +1,12 @@
-rm(list=ls()) 
-
 #AIS combine data
 rm(list=ls()) 
-outDir =  "F:\\CODE\\GitHub\\SoundscapeScenes\\ONMS-Sound\\" 
-outDirC = paste0( outDir,"context\\") #context
+
+## directories ####
+outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
+outDirG  =  paste0(outDir, "content/resources/") #where save graphics
+outDirGe =  paste0(outDir, "content/resources/extra/") #where extra save graphics
+outDirC  =  paste0(outDir,"context/") #where to get context
+outDirP =   paste0(outDir,"products/") #where to get context
 
 # only run the first time #### 
 ## ONMS data ####
@@ -50,4 +53,4 @@ newONMS$End   = as.POSIXct( gsub("[+]00", "", newONMS$end_time_utc), tz = "GMT" 
 newONMS$Buffer = 10
 
 ## previously combined data ####
-AIStran = load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
+# AIStran = load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
