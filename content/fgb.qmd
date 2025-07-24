@@ -76,33 +76,33 @@ display(HTML(standardTextDict["conditions overview"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-#display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
-# infoHtml = f'''
-#                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
-#             <dialog id="infoModal">
-#                 <p>{standardTextDict['How was this calculated?']}</p>
-#                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
-#                     Close
-#                 </button>
-#             </dialog>
-#                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).showModal()">
-#                     How does my sanctuary compare?
-#                 </button>
-#             <dialog id="infoModal2">
-#                 <p>{standardTextDict['How does my sanctuary compare?']}</p>
-#                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).close()">
-#                     Close
-#                 </button>
-#             </dialog>
-# '''
-# display(HTML(infoHtml))
+display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
+infoHtml = f'''
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
+            <dialog id="infoModal">
+                <p>{standardTextDict['How was this calculated?']}</p>
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).close()">
+                    Close
+                </button>
+            </dialog>
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).showModal()">
+                    How does my sanctuary compare?
+                </button>
+            <dialog id="infoModal2">
+                <p>{standardTextDict['How does my sanctuary compare?']}</p>
+                <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal2&#39;).close()">
+                    Close
+                </button>
+            </dialog>
+'''
+display(HTML(infoHtml))
 ```
 
 ### How are ocean sound conditions changing across years?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-#display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
+display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
 
 ```
 
@@ -110,14 +110,14 @@ display(HTML(standardTextDict["What are the latest conditions in ocean sound?"])
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest likely present"]))
-#display(HTML(gf.makeButtons(sites, "plot_***_AboveWind.jpg", "SourcePresent")))
+display(HTML(gf.makeButtons(sites, "plot_***_AboveWind.jpg", "SourcePresent")))
 ```
 
 ### Are sounds of interest within typical range?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["sources of interest typical"]))
-#display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI")))
+display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI")))
 ```
 :::
 
