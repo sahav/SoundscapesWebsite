@@ -25,10 +25,10 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("sb01")
+ONMSsites = c("fgb01")
 ## directories ####
-outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
-#outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
+outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
@@ -100,7 +100,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
   ##frequency of interest ####
-  FOIs = FOI [ FOI$Sanctuary == substr(site5, 1,2), ]
+  if (substr(site, 1,3) == "fgb"){
+    FOIs = FOI [ FOI$Sanctuary == substr(site5, 1,3), ]
+  } else {
+    FOIs = FOI [ FOI$Sanctuary == substr(site5, 1,2), ]
+  }
   ##frequency(s) to track
   FOIst = FOIs [ FOIs$`Track.this.FQ.as.indicator.for.sources?` == "Y", ] 
   ##times of interest ####
