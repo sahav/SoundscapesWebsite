@@ -72,10 +72,11 @@ dirNames   = sapply(strsplit(basename( subdirsALL ), "/"), `[`, 1)
 cat("Processing... ", projectNONMS, length(dirNames), "directories" )
 
 ## TEST one file ####
+#noaa-passive-bioacoustic/onms/audio/as01/onms_as01_20230317/metadata
 args = c("ls", "-r", subdirsALL[1])
 sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
-json_files = grep("/.json$", sFiles, value = TRUE) #metadata files
-url = paste0("https:/storage.googleapis.com/", gsub ("gs://", '', paste(json_files[1], collapse = "") ) )
+json_files = grep("\\.json$", sFiles, value = TRUE) # metadata files
+url = paste0("https://storage.googleapis.com/", gsub ("gs://", '', paste(json_files[1], collapse = "") ) )
 h = curl(url, "r")
 json_content = readLines(url)
 close(h)
@@ -269,23 +270,24 @@ outNRS2$Project1 = "NRS"
 outNRS2$Project [is.na(outNRS2$Region)]  = "NRS" 
 outNRS2$Project [!is.na(outNRS2$Region)] = "ONMS-sound" 
 names(outNRS2 )
+
 # COMBINE DATASETS ####
 outputS  = subset(output,  select = c(Path, Site, DeploymentName, Instrument, Start_Date, End_Date, Lat,Lon,Duration, Project, Region, Project1 ))
 outNRS2S = subset(outNRS2, select = c(Path, Site, DeploymentName, Instrument, Start_Date, End_Date, Lat,Lon,Duration, Project, Region, Project1 ))
 outputC = rbind(outputS,  outNRS2S)
 #outputC$Region
+
 ## SAVE ALL ####
 save(outputC, file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS_gantt_ALL", DC, ".Rda") ) #all data
-
 ## SAVE ONMS long-term only ####
 outputONMS = outputC[!is.na(outputC$Region),]
-# unique(outputONMS$Site)
-# cat("Not long-term sites...", setdiff(unique(outputC$Site), unique(lookup$NCEI)) ) #only long-term monitoring sites
 save(outputONMS,      file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS_gantt_", DC, ".Rda") )
 write.csv(outputONMS, file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS__gantt_", DC, ".csv") )
 
+#option to load the file, if you already ran and just want to plot ####
+# load(paste0(outDirP, "/data_gantt_ONMS-SS-NRS_gantt_2025-07-23.Rda") )
+
 # GANTT CHART  ####
-# load(file = paste0(outDirP, "/data_gantt_ONMS_gantt_2025-04-28.Rda") )
 ## COLOR ####
 uColors = unique(outputONMS$Region) 
 # nmfspalette::nmfs_palette("oceans")(10)
@@ -297,7 +299,6 @@ region_colors <- c(
   "Gulf Coast"      = "#001743") 
 
 uProject = unique(outputONMS$Project1) 
-uProject
 outputONMS$Project1[outputONMS$Project1 == "onms"] = "ONMS-Sound"
 outputONMS$Project1[outputONMS$Project1 == "sanctsound"] = "SanctSound"
 project_colors <- c(
@@ -324,7 +325,7 @@ pTb = ggplot(outputONMS, aes(y = Site, x = Start_Date, xend = End_Date, fill = P
         #panel.border = element_rect(color = "gray", fill = NA, size = .1),
         panel.spacing = unit(2, "cm") )
 pTb
-ggsave(filename = paste0(outputONMS, "/gantt_ONMS-SS-NRS.jpg"), plot = pTb, width = 8, height = 6, dpi = 300)
+ggsave(filename = paste0(outDirR, "/gantt_ONMS-SS-NRS.jpg"), plot = pTb, width = 8, height = 6, dpi = 300)
 
 # MAP DATA -- not working need to update data frame names ####
 #reformat for per site- total recordings 
@@ -348,7 +349,6 @@ outputMap2a$Latitude  = as.numeric(as.character( gsub("−", '-', outputMap2a$La
 outputMap2a$Longitude = as.numeric(as.character( gsub("−", '-', outputMap2a$Longitude )) )
 outputMap2a$TotalDays = as.numeric(as.character(outputMap2a$total_days))
 data_sf <- st_as_sf(outputMap2a, coords = c("Longitude", "Latitude"), crs = 4326)
-data_sf
 # Create the map
 # Get world land data (in low resolution, change to 'medium' or 'large' if needed)
 world <- ne_countries(scale = "medium", returnclass = "sf")
