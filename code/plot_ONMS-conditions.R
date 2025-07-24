@@ -27,8 +27,8 @@ library(viridis)
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
 ONMSsites = c("fgb01")
 ## directories ####
-# outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
-outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo 
+outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo 
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
@@ -76,7 +76,7 @@ file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
 # PROCESS BY SITE #### 
-for (uu in 1:length(ONMSsites)) { # uu = 3
+for (uu in 1:length(ONMSsites)) { # uu = 1
   
   suppressWarnings ( rm(gps, outData) )
   cat("Processing... ", ONMSsites[uu],"\n" )
