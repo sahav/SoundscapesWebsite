@@ -31,9 +31,9 @@ projectNONMS = "onms" # set this to deal with different metadata formats
 projectNSS  = "sanctsound"# set this to deal with different metadata formats
 projectNNRS = "nrs"# set this to deal with different metadata formats
 
-outDir =   "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
-outDirR =  paste0(outDir, "content\\resources\\") #save graphics
-outDirP =  paste0(outDir, "products\\onms\\")     #products
+outDir =   "F:/CODE/GitHub/SoundscapesWebsite/"
+outDirR =  paste0(outDir, "content/resources/") #save graphics
+outDirP =  paste0(outDir, "products/onms/")     #products
 
 # CONTEXT ####
 # assign region abbreviations 
@@ -42,13 +42,13 @@ ec = c("sb","gr","fk","fg") #east coast sanctuaries
 pi = c("hi","pm","as") #greater pacific
 gl = c("lo") # great lakes
 
-inFile = paste0(outDirR, "//ONMSSound_IndicatorCategories.xlsx")
+inFile = paste0(outDirR, "/ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx :: read.xlsx(inFile) )
 colnames(lookup) <- lookup[1, ]  # Set first row as column names
 lookup <- as.data.frame( lookup[-1, ] ) # Remove the first row
 colnames(lookup)[5] = "NCEI"
 
-inFile = paste0(outDirP, "//early_nrs_datasets.xlsx")
+inFile = paste0(outDirP, "/early_nrs_datasets.xlsx")
 NRSold = as.data.frame ( openxlsx :: read.xlsx(inFile) )
 NRSold$Start_Date = as.Date(NRSold$Start_Date, origin = "1899-12-30")
 NRSold$End_Date = as.Date(NRSold$End_Date, origin = "1899-12-30")
@@ -74,8 +74,8 @@ cat("Processing... ", projectNONMS, length(dirNames), "directories" )
 ## TEST one file ####
 args = c("ls", "-r", subdirsALL[1])
 sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
-json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
-url = paste0("https://storage.googleapis.com/", gsub ("gs://", '', paste(json_files[1], collapse = "") ) )
+json_files = grep("/.json$", sFiles, value = TRUE) #metadata files
+url = paste0("https:/storage.googleapis.com/", gsub ("gs://", '', paste(json_files[1], collapse = "") ) )
 h = curl(url, "r")
 json_content = readLines(url)
 close(h)
@@ -96,7 +96,7 @@ for (s in 1:length(subdirsALL) ) { # s = 1
   # read in files
   args = c("ls", "-r", subdirsALL[s])
   sFiles = system2(command, args, stdout = TRUE, stderr = TRUE)  
-  json_files = grep("\\.json$", sFiles, value = TRUE) #metadata files
+  json_files = grep("/.json$", sFiles, value = TRUE) #metadata files
   cat("Processing... ", dirNames[s], "[", s, " of ", length(subdirsALL),"]", "\n" )
   
   if ( length(grep(projectNONMS, subdirsALL[s]) ) > 0 ) { # check for format - onms
@@ -275,17 +275,17 @@ outNRS2S = subset(outNRS2, select = c(Path, Site, DeploymentName, Instrument, St
 outputC = rbind(outputS,  outNRS2S)
 #outputC$Region
 ## SAVE ALL ####
-save(outputC, file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS_gantt_ALL", DC, ".Rda") ) #all data
+save(outputC, file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS_gantt_ALL", DC, ".Rda") ) #all data
 
 ## SAVE ONMS long-term only ####
 outputONMS = outputC[!is.na(outputC$Region),]
 # unique(outputONMS$Site)
 # cat("Not long-term sites...", setdiff(unique(outputC$Site), unique(lookup$NCEI)) ) #only long-term monitoring sites
-save(outputONMS,      file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS_gantt_", DC, ".Rda") )
-write.csv(outputONMS, file = paste0(outDirP, "\\data_gantt_ONMS-SS-NRS__gantt_", DC, ".csv") )
+save(outputONMS,      file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS_gantt_", DC, ".Rda") )
+write.csv(outputONMS, file = paste0(outDirP, "/data_gantt_ONMS-SS-NRS__gantt_", DC, ".csv") )
 
 # GANTT CHART  ####
-# load(file = paste0(outDirP, "\\data_gantt_ONMS_gantt_2025-04-28.Rda") )
+# load(file = paste0(outDirP, "/data_gantt_ONMS_gantt_2025-04-28.Rda") )
 ## COLOR ####
 uColors = unique(outputONMS$Region) 
 # nmfspalette::nmfs_palette("oceans")(10)
@@ -306,7 +306,6 @@ project_colors <- c(
   "NRS" = "#004295") 
 
 ## geom_tile option ####
-
 pTb = ggplot(outputONMS, aes(y = Site, x = Start_Date, xend = End_Date, fill = Project1 ) ) +
   geom_tile(aes(x = Start_Date, width = as.numeric(End_Date - Start_Date) ) , 
             color = "gray", height = 0.6) +  # Fill color by Instrument and outline in black
@@ -325,31 +324,28 @@ pTb = ggplot(outputONMS, aes(y = Site, x = Start_Date, xend = End_Date, fill = P
         #panel.border = element_rect(color = "gray", fill = NA, size = .1),
         panel.spacing = unit(2, "cm") )
 pTb
-ggsave(filename = paste0(outDirR, "\\gantt_ONMS-SS-NRS.jpg"), plot = pTb, width = 8, height = 6, dpi = 300)
+ggsave(filename = paste0(outputONMS, "/gantt_ONMS-SS-NRS.jpg"), plot = pTb, width = 8, height = 6, dpi = 300)
 
-# MAP DATA ####
+# MAP DATA -- not working need to update data frame names ####
 #reformat for per site- total recordings 
-rm ( outputMap )
 outputMap =  as.data.frame(
-  outputT %>%
+  outputONMS %>%
     group_by(Site) %>%
     summarise(
       total_days = sum(Duration, na.rm = TRUE),   # Summing total duration for each site
       min_start_date = min(Start_Date, na.rm = TRUE)  # Getting the minimum start date for each site
     )
 )
-head(outputMap)
-outputMap$Site = as.character(outputMap$Site)
 
+outputMap$Site = as.character(outputMap$Site)
 lookup_selected <- lookup %>% select(NCEI, Region, Latitude, Longitude)
 outputMap = left_join(outputMap, lookup_selected, by = c("Site" = "NCEI"))
-colnames(outputMap)
-write.csv( outputMap, file = paste0(outDirP, "\\map_ONMS_map_", DC, ".csv") )
+write.csv( outputMap, file = paste0(outDirP, "/map_ONMS_map_", DC, ".csv") )
 outputMap2a = outputMap
 # Assuming your data frame is named 'data'
 # Convert the data frame to an sf object for mapping
-outputMap2a$Latitude = as.numeric(as.character( gsub("B0", '', outputMap2a$Latitude )) )
-outputMap2a$Longitude = as.numeric(as.character( gsub("B0", '', outputMap2a$Longitude )) )
+outputMap2a$Latitude  = as.numeric(as.character( gsub("−", '-', outputMap2a$Latitude )) )
+outputMap2a$Longitude = as.numeric(as.character( gsub("−", '-', outputMap2a$Longitude )) )
 outputMap2a$TotalDays = as.numeric(as.character(outputMap2a$total_days))
 data_sf <- st_as_sf(outputMap2a, coords = c("Longitude", "Latitude"), crs = 4326)
 data_sf
@@ -361,7 +357,7 @@ bbox <- st_bbox(data_sf)
 p = ggplot() +
   geom_sf(data = world, fill = "gray80", color = "gray40") +   # Add land background
   geom_sf(data = data_sf, aes(color = Region, size = TotalDays)) +  # Color by Region, size by total days
-  scale_color_manual(values = instrument_colors) +  # Use specific colors for instruments
+  scale_color_manual(values = region_colors) +  # Use specific colors for instruments
   theme_minimal() +
   coord_sf(xlim = c(bbox["xmin"], bbox["xmax"]+5), 
            ylim = c(bbox["ymin"], bbox["ymax"]+5), 
@@ -372,4 +368,4 @@ p = ggplot() +
        caption = paste0("Data available on NCEI-GCP (", typ, ") as of ", format(Sys.Date(), "%B %d, %Y") ) ) +
   scale_size_continuous(range = c(.5, 8))  # Adjust point size range
 p
-ggsave(filename = paste0(outDirR, "\\map_ONMS.jpg"), plot = p, width = 8, height = 6, dpi = 300)
+ggsave(filename = paste0(outDirR, "/map_ONMS.jpg"), plot = p, width = 8, height = 6, dpi = 300)

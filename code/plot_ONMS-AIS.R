@@ -9,11 +9,11 @@ rm(list=ls())
 #SITES ####
 ONMSsites = c("sb01","sb03","oc02", "cb11" )
 ## directories ####
-outDir   =  "F:\\CODE\\GitHub\\SoundscapesWebsite\\"
-outDirG  =  paste0(outDir, "content\\resources\\") #where save graphics
-outDirGe =  paste0(outDir, "content\\resources\\extra\\") #where extra save graphics
-outDirC  =  paste0(outDir,"context\\") #where to get context
-outDirP =   paste0(outDir,"products\\") #where to get context
+outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
+outDirG  =  paste0(outDir, "content/resources/") #where save graphics
+outDirGe =  paste0(outDir, "content/resources/extra/") #where extra save graphics
+outDirC  =  paste0(outDir,"context/") #where to get context
+outDirP =   paste0(outDir,"products/") #where to get context
 
 #INPUT PARAMS ####
 DC = Sys.Date()
@@ -27,7 +27,7 @@ fqShipN = "125 Hz"
 
 # CONTEXT ####
 #reads information for all sites
-metaFile = paste0(outDirG,"\\ONMSSound_IndicatorCategories.xlsx")
+metaFile = paste0(outDirG,"/ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
@@ -61,7 +61,7 @@ for (ss in 1:length(ONMSsites)) {
   stn = substr(site, start = 1, stop= 2)
   
   ## LOAD SOUND DATA ####
-  inFile = list.files( paste0(outDirP, stn, "\\"), pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs-season-spectrumlevel.*\\.Rda$"), full.names = T)
+  inFile = list.files( paste0(outDirP, stn, "/"), pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs-season-spectrumlevel.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
   st = as.Date( min(gps$UTC) )
