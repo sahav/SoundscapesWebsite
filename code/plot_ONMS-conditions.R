@@ -24,9 +24,11 @@ library(plotly)
 library(viridis)
 
 #SITES ####
-ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
+# ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
+ONMSsites = c("fgb01")
 ## directories ####
-outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
+# outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
+outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo 
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
@@ -49,7 +51,7 @@ removeShort = 360 #minium number of hours needed to included a year in the graph
 
 # CONTEXT ####
 #reads information for all sites
-metaFile = paste0(outDirG,"\\ONMSSound_IndicatorCategories.xlsx")
+metaFile = paste0(outDirG,"ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
@@ -82,7 +84,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   
   #renaming for NRS sites
   if (site == "cb11") {
-    outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" ) #products
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
     site1 = "NRS11"
     site3 = "cbnrs11"
     site  = "NRS11"
@@ -91,7 +93,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     site1 = site
     site3 = site
     site5 = site
-    outDirP = paste0( outDir,"products\\", substr(tolower(site), start = 1, stop =2),"\\" )#products
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" )#products
   }
   
   ## SITE PARAMETERS ####
@@ -301,7 +303,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     scale_fill_manual(values = c("low" = "blue",  "med" = "orange", "high" = "red") )
   l
   #save figure ####
-  ggsave(filename = paste0(outDirGe, "\plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
   #(2) EFFORT ALL DATA ####
   ## by month (days/ month-year) ####
@@ -341,7 +343,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   
   p1
   ##save figure ####
-  ggsave(filename = paste0(outDirGe, "\plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   
   ## by season (hours/ season in each year ####
   # season for HI sites includes December from the previous years- so make adjustment here,
@@ -380,7 +382,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     )
   p2
   ##save figure ####
-  ggsave(filename = paste0(outDirGe, "\plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   #(3) SEASONAL CONDITION PLOT ####
   caption_text = paste0(
@@ -455,7 +457,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ## save figure ####
-  ggsave(filename = paste0(outDirG, "\plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   #(4) ANNUAL COMPARISION plots ####
   # truncates data to peak season for biological sites- all plots after this are peak only!!!
@@ -501,7 +503,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
     
     p1
     ## re-save effort figure ####
-    ggsave(filename = paste0(outDirGe, "\plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+    ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
   } else {
     gpsAll = gps
     my_subtitle = "all data" 
@@ -595,7 +597,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "\plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   #(5) TIME SERIES- FOI ####
   # plot with error bars and median and hours above 75th percentile in title
@@ -796,7 +798,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
         plg2
         
-        ggsave(filename = paste0(outDirG, "\plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+        ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
       } else {
         # alternative methods for plg for Hawaii sites
         monthly_sequence = seq.Date(as.Date("2020-12-01"), as.Date("2021-06-01"), by = "month")
@@ -854,7 +856,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
         plg
         plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
         plg2
-        ggsave(filename = paste0(outDirG, "\plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+        ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
         
       }
     }
@@ -947,7 +949,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
       axis.text.y = element_text(size = 14, hjust = 1) )
   windD
-  ggsave(filename = paste0(outDirGe, "\plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
   
   x_scale = if (sidx == "biological") {
     scale_x_discrete(
@@ -986,11 +988,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 3
       axis.text.y   = element_text(size = 12, hjust = 1), 
       legend.position = "none")
   windB
-  ggsave(filename = paste0(outDirG, "\plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
   
   # SAVE UPDATED DATA ####
   # names(gps)
-  save(gps, file = paste0(outDirP, "\\data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
+  save(gps, file = paste0(outDirP, "/data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
 }
 
 
