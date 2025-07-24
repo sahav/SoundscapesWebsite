@@ -25,7 +25,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fgb01")
+ONMSsites = c("sb01")
 ## directories ####
 outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo 
