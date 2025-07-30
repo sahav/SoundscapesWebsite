@@ -23,7 +23,7 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "sb01" 
+site  = "hi01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -56,9 +56,9 @@ check gcp to see verify`)
 inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 4),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
-      "with", sum( duplicated(dysPy)), "duplicated days\n")
+      "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
 
 ## ONMS Sound FILES- NCEI-GCP ####
@@ -132,7 +132,7 @@ cData = NULL
 cDatah = NULL
 
 if (length(inFiles) > 0) { 
-  for (f in 1293:length(inFiles) ){ # 1245:1246 
+  for (f in 1: length(inFiles) ){ # 1245:1246 length(inFiles)
    
     cat("Processing", f, "of", length(inFiles),basename(inFiles[f]), "\n")
     
@@ -149,7 +149,10 @@ if (length(inFiles) > 0) {
     # combine data- check to make sure columns match
     tolData = tolData[, setdiff(names(tolData), "platform"), drop = FALSE]
     #remove_cols = setdiff(names(tolData), names(cData))
-    tolData = tolData[ , names(tolData) %in% names(cData) ]
+    if(f > 1) {
+     tolData = tolData[ , names(tolData) %in% names(cData) ] 
+    }
+    
     cData   = rbind(cData, tolData)
     
   } 
@@ -166,14 +169,18 @@ cDatah$site = site
 
 # #(ALT GET WIND) 
 # # # only if already ran previously but the SPL data were inaccurate!
-# inWind = "F:/ONMS/SS_Manta/data_sb01_HourlySPL-gfs_2025-06-24.Rda"
+# inWind = "F:/ONMS/SS_Manta/data_hi01_HourlySPL-gfs_2025-07-01.Rda"
 # load( inWind[1] ) # names(outData)
 # cols_to_keep = c("UTC",  "Latitude", "Longitude", "windU", "windV",
 #                   "precRate", "matchLong", "matchLat",
 #                   "matchTime", "windMag")
-# gps_subset = outData[, intersect(cols_to_keep, names(outData))]
+# if( exists("outData") ) {
+#   gps = outData
+#   rm(outData)
+# }
+# gps_subset = gps[, intersect(cols_to_keep, names(gps))]
 # # # names(gps_subset) # names(cDatah)
-# rm(outData)
+# rm(gps)
 # merged_data = merge(cDatah, gps_subset, by = "UTC", all.x = TRUE )
 # gps = merged_data
 # # # names(gps)
