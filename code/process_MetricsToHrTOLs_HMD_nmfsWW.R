@@ -1,0 +1,257 @@
+# COMPILE SOUNDSCAPE METRICS
+
+# assumes data are already downloaded from cloud, stored locally
+# assumes NCEI and NEFSC (e.g.NEFSC_SBNMS_201811_SB03_20181112.nc) data inputs
+
+# runs one site at a time 
+# checks for files already processed
+# adds wind estimate from PAMscapes for any new data (takes time!)
+
+# OUTPUTS: hourly TOLs values with wind speed and list of files processed
+
+# RUN this to make sure latest updates for PAMscapes
+# devtools::install_github('TaikiSan21/PAMscapes')
+
+library(PAMscapes)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+library(reshape)
+library(xlsx)
+library(openxlsx)
+
+# SET UP PARAMS ####
+rm(list=ls()) 
+DC = Sys.Date()
+site  = "nrs11" 
+site = tolower(site) 
+gcpF = "PMEL_CBNMS"
+prodName = "cb"
+
+# LOCAL DATA DIRECTORIES ####
+#dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+#dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/",gcpF,"/") #nmfs GCP HMD netCDFs
+
+# LOCAL CODE REPO DIRECTORIES ####
+#outDir =  "/Users/quca3108/SoundscapesWebsite/"
+#outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
+outDir =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" 
+outDirC = paste0( outDir,"content/resources/") #context
+outDirP = paste0( outDir,"products/", substr(tolower(prodName),start = 1, stop =2),"/" )#products
+outDirG = paste0( outDir,"report/" ) #graphics
+
+# ONMS Metadata ####
+metaFile = paste0(outDirC,"ONMSSound_IndicatorCategories.xlsx")
+lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
+colnames(lookup) = lookup[1, ]         # Set first row as column names
+lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
+lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
+siteInfo = lookup[lookup$`NCEI ID` == site,]
+siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
+
+cat("CHECK: Read in data for: ", siteInfo$`NCEI ID
+facilitates matching with metadata on gcp 
+check gcp to see verify`)
+
+# GET list of files to process ####
+## PyPAM soundscape FILES- NEFSC-GCP ####
+# e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
+#inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+#NRS11_20212023_20220831
+inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+
+tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
+if (length(tmp) != 0){
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 3),format = "%Y%m%d")
+  cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
+      "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
+}
+
+inFiles=inFilesPY
+
+#____________________SKIP for NRS______________________________________________#
+## ONMS Sound FILES- NCEI-GCP ####
+# e.g. ONMS_HI01_20231201_8021.1.48000_20231201_DAILY_MILLIDEC_MinRes.nc
+#inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names = T)
+#dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
+#cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),"with",sum( duplicated(dysON)), "duplicated days\n")
+
+## COMBINE FILE LISTS ####
+#check for duplicate days, remove MANTA
+#if (length(tmp) != 0){
+#  ixdR = which(dysON %in% dysPy)
+#  if ( length(ixdR) != 0 ){
+#    inFiles = c( inFilesPY, inFilesON[-ixdR] )
+#    ckFiles = as.data.frame(inFiles)
+#    dys = c(dysPy, dysON[-ixdR])
+#    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+#  }else{
+#    inFiles = c( inFilesPY, inFilesON )
+#    ckFiles = as.data.frame(inFiles)
+#    dys = c(dysPy, dysON[-ixdR])
+#    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+#  }
+#} else {
+#  inFiles = inFilesON
+#  dys = dysON
+#}
+#
+
+
+
+## CHECK FOR PROCESSED FILES #### 
+#updates list of files to process
+pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_", site), full.names = T, recursive = T)
+if ( length(pFile) > 0 ) {
+  load(pFile)
+  
+  # are there any new files to process?
+  inFilesN = inFiles[!basename(inFiles) %in% processedFiles]
+  
+  if ( length(inFilesN ) > 0 ) {
+    
+    # read in processed data to append results
+    inFileP = list.files((outDir), 
+                         pattern = paste0("data_", site, "_HourlySPL-gfs_\\d{4}-\\d{2}-\\d{2}\\.Rda$"), 
+                         full.names = T, recursive = T)
+    file_info = file.info(inFileP)
+    load( inFileP[which.max(file_info$ctime)] )
+    if( exists("outData") ) {
+      processedData = outData
+      rm(outData)
+    }
+    
+    cat( "Processed data for ", site, ": ", 
+         as.character( as.Date( min( processedData$UTC))) , " to ", 
+         as.character( as.Date( max( processedData$UTC)) ), 
+         " Found ", length(inFilesN), "new files to process\n")
+    
+    # these are the files that will be processed!
+    inFiles = inFilesN 
+    
+  } else {
+    stop("No new files to process... come back when you have more data")
+  }
+  
+} else {
+  cat("No processed files for ", site, " processing all new files")
+  processedData = NULL
+}
+
+# PROCESS ONMS Sound FILES ####
+cData = NULL  
+cDatah = NULL
+
+if (length(inFiles) > 0) { 
+  for (f in 1: length(inFiles) ){ # 1245:1246 length(inFiles)
+   
+    cat("Processing", f, "of", length(inFiles),basename(inFiles[f]), "\n")
+    
+    ncFile = inFiles[f]
+    hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+    tolData = createOctaveLevel(hmdData, type='tol')
+    names( tolData )
+    # add software column
+    if ( grepl("MinRes.nc", basename(inFiles[f]) ) ) {
+      tolData$software = "manta"
+    } else {  
+      tolData$software = "pypam" }
+    
+    # combine data- check to make sure columns match
+    tolData = tolData[, setdiff(names(tolData), "platform"), drop = FALSE]
+    #remove_cols = setdiff(names(tolData), names(cData))
+    if(f > 1) {
+     tolData = tolData[ , names(tolData) %in% names(cData) ] 
+    }
+    
+    cData   = rbind(cData, tolData)
+    
+  } 
+  
+  #bin to hourly median values
+  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
+}
+# the time binning seems to remove any "extra columns" so just the UTC and TOL bands for the output
+# names(cDatah)
+#ADD a few basic columns about the data
+cDatah$yr  = year(cDatah$UTC)
+cDatah$mth = month(cDatah$UTC)
+cDatah$site = site
+
+# #(ALT GET WIND) 
+# # # only if already ran previously but the SPL data were inaccurate!
+# inWind = "F:/ONMS/SS_Manta/data_hi01_HourlySPL-gfs_2025-07-01.Rda"
+# load( inWind[1] ) # names(outData)
+# cols_to_keep = c("UTC",  "Latitude", "Longitude", "windU", "windV",
+#                   "precRate", "matchLong", "matchLat",
+#                   "matchTime", "windMag")
+# if( exists("outData") ) {
+#   gps = outData
+#   rm(outData)
+# }
+# gps_subset = gps[, intersect(cols_to_keep, names(gps))]
+# # # names(gps_subset) # names(cDatah)
+# rm(gps)
+# merged_data = merge(cDatah, gps_subset, by = "UTC", all.x = TRUE )
+# gps = merged_data
+# # # names(gps)
+
+# GET WIND ####
+if ( length(cDatah) > 0 ) {
+
+  cat("ONMS data only ...") 
+  cat("This takes a bit ... maybe grab a coffee or go for walk") 
+  gps = matchGFS(cDatah)
+
+}
+
+# APPEND & SAVE NEW DATA FILES ####
+if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data
+  
+  #remove any no matching headings
+  data_mismatched = setdiff(colnames(gps), colnames(processedData))
+  gps_clean = gps[, !colnames(gps) %in% data_mismatched] #new data with matching headings
+
+  #re-order columns
+  # setdiff(colnames(gps_clean), colnames(processedData))
+  print(names(processedData))
+  col_order = colnames(processedData)
+  gps_clean1 = gps_clean[, col_order]
+  names( processedData)
+  names( gps_clean)
+  
+  # combine data
+  outData = rbind(processedData, gps_clean)
+  
+  #track days added
+  dys = length( unique( as.Date( outData$UTC) ) )
+  dysA = dys - length( unique( as.Date( gps_clean$UTC) ) )
+  
+  # summary of data processed
+  cat( "Output data for ", site, " has ", dys, "unique days: ", 
+       as.character( as.Date( min( outData$UTC))) , " to ", 
+       as.character( as.Date( max( outData$UTC)) ), "with ", dysA, " new days added")
+ 
+   # writes new file with appended data
+  save(outData, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
+  
+  # write out processed files
+  processedFiles = c(processedFiles, basename(inFiles) )
+  # writes over previous file
+  save(processedFiles, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPL.Rda") )
+  
+} else {  # save out all the newly processed data
+  # summary of data processed
+  dysA = length( unique( as.Date( gps$UTC) ) )
+  cat( "Output data for ", site, " has ", dysA, "unique days: ", 
+       as.character( as.Date( min( gps$UTC))) , " to ", 
+       as.character( as.Date( max( gps$UTC)) ))
+  # writes new file with data
+  outData = gps
+  save(outData, file = paste0(outDirP, "data_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
+  # write out processed files
+  processedFiles  = basename(inFiles)
+  save(processedFiles, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPL.Rda") )
+}
+
