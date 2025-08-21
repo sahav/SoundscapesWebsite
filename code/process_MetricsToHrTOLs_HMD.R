@@ -23,16 +23,19 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "hi01" 
+site  = "nrs11" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+#dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
+dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/PMEL_CBNMS/")
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
-outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
+#outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
+outDir =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" 
+
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
 outDirG = paste0( outDir,"report/" ) #graphics
