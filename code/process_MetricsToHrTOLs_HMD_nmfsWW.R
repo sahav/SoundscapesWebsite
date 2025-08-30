@@ -179,6 +179,9 @@ cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
 
+cDatah$Latitude = 37.88
+cDatah$Longitude = 123.43
+
 # #(ALT GET WIND) 
 # # # only if already ran previously but the SPL data were inaccurate!
 # inWind = "F:/ONMS/SS_Manta/data_hi01_HourlySPL-gfs_2025-07-01.Rda"
