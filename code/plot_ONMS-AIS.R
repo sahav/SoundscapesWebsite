@@ -7,9 +7,10 @@
 rm(list=ls()) 
 
 #SITES ####
-ONMSsites = "sb01" #c("sb01","sb03","oc02", "cb11" )
+ONMSsites = "cb11" #c("sb01","sb03","oc02", "cb11" )
 ## directories ####
-outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
+outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
 outDirG  =  paste0(outDir, "content/resources/") #where save graphics
 outDirGe =  paste0(outDir, "content/resources/extra/") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
@@ -17,7 +18,7 @@ outDirP =   paste0(outDir,"products/") #where to get context
 
 #INPUT PARAMS ####
 DC = Sys.Date()
-project = "ONMS"
+project = "NRS"
 AISUpp = 5 
 AISLow = 2
 windUpp = 22.6 #which wind model result to show on plot

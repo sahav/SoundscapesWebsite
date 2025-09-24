@@ -2,7 +2,8 @@
 rm(list=ls()) 
 
 ## directories ####
-outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
+outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
 outDirG  =  paste0(outDir, "content/resources/") #where save graphics
 outDirGe =  paste0(outDir, "content/resources/extra/") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
