@@ -25,7 +25,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("cb11")
+ONMSsites = c("ci05")
 ## directories ####
 outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
@@ -84,19 +84,21 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   site =  ONMSsites[uu]
   
   #renaming for NRS sites
-  if (site == "cb11") {
+  
+  
+  if  (site == "ci05") {
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
-    site1 = "NRS11"
-    site3 = "cbnrs11"
-    site  = "NRS11"
-    site5 = "cb11"
+    site1 = "NRS05"
+    site3 = "cinrs05"
+    site  = "NRS05"
+    site5 = "ci05"
   } else {
     site1 = site
     site3 = site
     site5 = site
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" )#products
   }
-  
+
   ## SITE PARAMETERS ####
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
