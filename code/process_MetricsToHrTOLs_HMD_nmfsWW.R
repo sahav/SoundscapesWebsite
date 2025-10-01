@@ -23,10 +23,10 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "nrs05" 
+site  = "nrs13" 
 site = tolower(site) 
-gcpF = "PMEL_CINMS"
-prodName = "ci"
+gcpF = "PMEL_CHNMS"
+prodName = "ch"
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
@@ -182,8 +182,8 @@ cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
 
-cDatah$Latitude = 37.89
-cDatah$Longitude = 119.55
+cDatah$Latitude = 35.31
+cDatah$Longitude = 121.59
 
 
 # #(ALT GET WIND) 
