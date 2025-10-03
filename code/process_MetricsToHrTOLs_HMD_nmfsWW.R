@@ -25,19 +25,20 @@ rm(list=ls())
 DC = Sys.Date()
 site  = "nrs11" 
 site = tolower(site) 
+gcpF = "PMEL_CBNMS"
+prodName = "cb"
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
 #dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/PMEL_CBNMS/")
+dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/",gcpF,"/") #nmfs GCP HMD netCDFs
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
 #outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
 outDir =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" 
-
 outDirC = paste0( outDir,"content/resources/") #context
-outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
+outDirP = paste0( outDir,"products/", substr(tolower(prodName),start = 1, stop =2),"/" )#products
 outDirG = paste0( outDir,"report/" ) #graphics
 
 # ONMS Metadata ####
@@ -56,40 +57,48 @@ check gcp to see verify`)
 # GET list of files to process ####
 ## PyPAM soundscape FILES- NEFSC-GCP ####
 # e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
-inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+#inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+#NRS11_20212023_20220831
+inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 4),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 3),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
       "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
 
+inFiles=inFilesPY
+
+#____________________SKIP for NRS______________________________________________#
 ## ONMS Sound FILES- NCEI-GCP ####
 # e.g. ONMS_HI01_20231201_8021.1.48000_20231201_DAILY_MILLIDEC_MinRes.nc
-inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names = T)
-dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
-cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),"with",
-    sum( duplicated(dysON)), "duplicated days\n")
+#inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names = T)
+#dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
+#cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),"with",sum( duplicated(dysON)), "duplicated days\n")
 
 ## COMBINE FILE LISTS ####
 #check for duplicate days, remove MANTA
-if (length(tmp) != 0){
-  ixdR = which(dysON %in% dysPy)
-  if ( length(ixdR) != 0 ){
-    inFiles = c( inFilesPY, inFilesON[-ixdR] )
-    ckFiles = as.data.frame(inFiles)
-    dys = c(dysPy, dysON[-ixdR])
-    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
-  }else{
-    inFiles = c( inFilesPY, inFilesON )
-    ckFiles = as.data.frame(inFiles)
-    dys = c(dysPy, dysON[-ixdR])
-    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
-  }
-} else {
-  inFiles = inFilesON
-  dys = dysON
-}
+#if (length(tmp) != 0){
+#  ixdR = which(dysON %in% dysPy)
+#  if ( length(ixdR) != 0 ){
+#    inFiles = c( inFilesPY, inFilesON[-ixdR] )
+#    ckFiles = as.data.frame(inFiles)
+#    dys = c(dysPy, dysON[-ixdR])
+#    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+#  }else{
+#    inFiles = c( inFilesPY, inFilesON )
+#    ckFiles = as.data.frame(inFiles)
+#    dys = c(dysPy, dysON[-ixdR])
+#    cat("Found ", length(inFiles), " files for ", site, "with", sum( duplicated(dys)), "duplicated days\n")
+#  }
+#} else {
+#  inFiles = inFilesON
+#  dys = dysON
+#}
+#
+
+
 
 ## CHECK FOR PROCESSED FILES #### 
 #updates list of files to process
@@ -169,6 +178,9 @@ if (length(inFiles) > 0) {
 cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
+
+cDatah$Latitude = 37.88
+cDatah$Longitude = 123.43
 
 # #(ALT GET WIND) 
 # # # only if already ran previously but the SPL data were inaccurate!
