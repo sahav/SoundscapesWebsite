@@ -10,31 +10,35 @@
 # OUTPUTS: hourly TOLs values with wind speed and list of files processed
 
 # RUN this to make sure latest updates for PAMscapes
-# devtools::install_github('TaikiSan21/PAMscapes')
+devtools::install_github('TaikiSan21/PAMscapes')
+
+#install.packages("rJava") make sure Java is installed for xlsx to work
 
 library(PAMscapes)
 library(lubridate)
 library(dplyr)
 library(ggplot2)
 library(reshape)
+library(rJava)
 library(xlsx)
 library(openxlsx)
+library(devtools)
+
 
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "nrs11" 
+site  = "fk01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-#dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/PMEL_CBNMS/")
+dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # NCEI GCP min HMD netCDF
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
 #outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
-outDir =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" 
+outDir =  "C:/Users/embe5980/SoundscapesWebsite/" 
 
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
