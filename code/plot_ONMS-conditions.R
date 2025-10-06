@@ -25,9 +25,10 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("cb11")
+ONMSsites = c("fk01")
+
 ## directories ####
-outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
+outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
@@ -48,7 +49,7 @@ windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
 removess = 0 # set to 1 if you want to truncate the time series
-removeShort = 360 #minium number of hours needed to included a year in the graphics 
+removeShort = 360 #minimum number of hours needed to included a year in the graphics 
 
 # CONTEXT ####
 #reads information for all sites
@@ -310,6 +311,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
+  
   #(2) EFFORT ALL DATA ####
   ## by month (days/ month-year) ####
   summary <- gps %>%
@@ -412,6 +414,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   colnames(mallData) = c("Quantile", "Season", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
+  subtitle_text <- if (sidx == "biological") "Data summarized for Peak season only" else NULL
   p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
@@ -441,9 +444,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     labs(
       caption  = caption_text,
-      if (sidx == "biological"){
-        subtitle = paste0( "Data summarized for Peak season only" ) 
-      } ,
+        subtitle = subtitle_text,
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
@@ -554,7 +555,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
-  
+
   p = ggplot() +
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
@@ -586,9 +587,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       caption  = caption_text,
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
-      if (sidx == "biological"){
-        subtitle = paste0( "Data summarized for Peak season only" ) 
-      }) +
+    subtitle = subtitle_text) +
     theme(legend.position = "right",
           plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
           axis.title.x = element_text(size = 14),           # X-axis label size
