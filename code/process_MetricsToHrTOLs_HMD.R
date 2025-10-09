@@ -28,7 +28,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk05" 
+site  = "fk07" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####

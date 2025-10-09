@@ -25,7 +25,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk01")
+ONMSsites = c("fk07")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -310,6 +310,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   l
   #save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
+  
   
   
   #(2) EFFORT ALL DATA ####
