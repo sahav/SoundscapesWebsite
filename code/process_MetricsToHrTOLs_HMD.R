@@ -28,7 +28,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk07" 
+site  = "fk05" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -191,6 +191,36 @@ cDatah$site = site
 # merged_data = merge(cDatah, gps_subset, by = "UTC", all.x = TRUE )
 # gps = merged_data
 # # # names(gps)
+
+
+#Too many unique days to process all at once. Need to break cDatah into smaller datasets
+#Split cDatah into chunks
+unique_days <- sort(unique(as.Date(cDatah$UTC)))
+
+# Step 2: Split those days into ~150-day chunks
+chunk_size_days <- 150
+day_chunks <- split(unique_days, ceiling(seq_along(unique_days) / chunk_size_days))
+
+# Step 3: Split the full dataset by matching on those date chunks
+data_chunks <- lapply(day_chunks, function(days) {
+  filter(cDatah, as.Date(UTC) %in% days)
+})
+
+# Check result
+length(data_chunks)             
+sapply(data_chunks, nrow)   
+
+
+#GET WIND WITH CHUNKS ####
+gps_chunks <- list()  # store wind-matched results
+
+for (i in seq_along(data_chunks)) {
+  cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
+  
+  gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+}
+
+
 
 # GET WIND ####
 if ( length(cDatah) > 0 ) {
