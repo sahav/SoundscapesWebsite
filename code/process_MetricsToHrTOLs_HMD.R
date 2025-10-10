@@ -10,31 +10,35 @@
 # OUTPUTS: hourly TOLs values with wind speed and list of files processed
 
 # RUN this to make sure latest updates for PAMscapes
-# devtools::install_github('TaikiSan21/PAMscapes')
+devtools::install_github('TaikiSan21/PAMscapes')
+
+#install.packages("rJava") make sure Java is installed for xlsx to work
 
 library(PAMscapes)
 library(lubridate)
 library(dplyr)
 library(ggplot2)
 library(reshape)
+library(rJava)
 library(xlsx)
 library(openxlsx)
+library(devtools)
+
 
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "nrs11" 
+site  = "fk05" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-#dirGCP = paste0( "F:/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-dirGCP = paste0( "W:/DETECTOR_OUTPUT/PYTHON_SOUNDSCAPE_PYPAM/PMEL_CBNMS/")
+dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # NCEI GCP min HMD netCDF
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
 #outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
-outDir =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" 
+outDir =  "C:/Users/embe5980/SoundscapesWebsite/" 
 
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
@@ -187,6 +191,45 @@ cDatah$site = site
 # merged_data = merge(cDatah, gps_subset, by = "UTC", all.x = TRUE )
 # gps = merged_data
 # # # names(gps)
+
+
+#Too many unique days to process all at once. Need to break cDatah into smaller datasets
+#Split cDatah into chunks
+unique_days <- sort(unique(as.Date(cDatah$UTC)))
+
+# Step 2: Split those days into ~150-day chunks
+chunk_size_days <- 100
+day_chunks <- split(unique_days, ceiling(seq_along(unique_days) / chunk_size_days))
+
+# Step 3: Split the full dataset by matching on those date chunks
+data_chunks <- lapply(day_chunks, function(days) {
+  filter(cDatah, as.Date(UTC) %in% days)
+})
+
+# Check result
+length(data_chunks)             
+sapply(data_chunks, nrow)   
+
+
+#GET WIND WITH CHUNKS ####
+gps_chunks <- list()  # store wind-matched results
+
+for (i in seq_along(data_chunks)) {
+  cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
+  
+  gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+}
+
+gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
+gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+
+
+gps <- dplyr::bind_rows(gps_chunks)
+
+
 
 # GET WIND ####
 if ( length(cDatah) > 0 ) {
