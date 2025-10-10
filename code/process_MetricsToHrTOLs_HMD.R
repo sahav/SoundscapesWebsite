@@ -198,7 +198,7 @@ cDatah$site = site
 unique_days <- sort(unique(as.Date(cDatah$UTC)))
 
 # Step 2: Split those days into ~150-day chunks
-chunk_size_days <- 150
+chunk_size_days <- 100
 day_chunks <- split(unique_days, ceiling(seq_along(unique_days) / chunk_size_days))
 
 # Step 3: Split the full dataset by matching on those date chunks
@@ -219,6 +219,15 @@ for (i in seq_along(data_chunks)) {
   
   gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
 }
+
+gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
+gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+
+
+gps <- dplyr::bind_rows(gps_chunks)
 
 
 

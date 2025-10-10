@@ -25,7 +25,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk07")
+ONMSsites = c("fk05")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -521,6 +521,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
+  
   
   ## re-calculate percentiles for all the data ####
   # all data - mALL 
