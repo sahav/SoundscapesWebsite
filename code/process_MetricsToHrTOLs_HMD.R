@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "gr01" 
+site  = "pm02" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -139,7 +139,7 @@ if ( length(pFile) > 0 ) {
   }
   
 } else {
-  cat("No processed files for ", site, " processing all new files")
+  cat("No processed files for", site, ", processing all new files")
   processedData = NULL
 }
 
@@ -241,8 +241,8 @@ gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
 gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
 gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
 gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
-gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
-gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
+#gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
+#gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
 #put chunks back together
 gps <- dplyr::bind_rows(gps_chunks)
