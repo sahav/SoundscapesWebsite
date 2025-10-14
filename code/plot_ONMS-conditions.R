@@ -26,7 +26,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("gr01")
+ONMSsites = c("pm02")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -77,6 +77,9 @@ TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
 windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.names = T)
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
+
+
+
 
 # PROCESS BY SITE #### 
 for (uu in 1:length(ONMSsites)) { # uu = 1
@@ -262,6 +265,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
                         probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
   
+  
+  
+  
   #(1) WIND category ####
   gps$wind_category = NA
   gps <- gps %>%
@@ -394,6 +400,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ##save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
+  
+  
   #(3) SEASONAL CONDITION PLOT ####
   caption_text = paste0(
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
@@ -468,6 +476,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ## save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
+  
+  
   
   #(4) ANNUAL COMPARISION plots ####
   # truncates data to peak season for biological sites- all plots after this are peak only!!!
