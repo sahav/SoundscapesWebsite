@@ -366,6 +366,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
   
+  
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
   p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
@@ -400,6 +401,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for all data")
   tol_columns = grep("TOL", colnames(gps))
+  
   seasonAll = NULL
   for (ii in 1: length(season_quantiles) ) {
     tmp = as.data.frame ( season_quantiles[ii] ) 
