@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "pm02" 
+site  = "hi04" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -121,9 +121,11 @@ if ( length(pFile) > 0 ) {
                          full.names = T, recursive = T)
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
+    #outData = gps    for some reason hi04 earlier outdata was saved as gps in products folder
     if( exists("outData") ) {
       processedData = outData
       rm(outData)
+      #rm(gps) fix for hi04
     }
     
     cat( "Processed data for ", site, ": ", 
@@ -237,15 +239,17 @@ gps_chunks <- list()  # store wind-matched results
 #can try for loop above but may crash if too many chunks
 gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
-gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+#gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+#gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
 #put chunks back together
 gps <- dplyr::bind_rows(gps_chunks)
+
+#save(gps, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPLWithNewData.Rda") )
 
 
 #SKIP IF YOU ALREADY GOT WIND USING CHUNKS

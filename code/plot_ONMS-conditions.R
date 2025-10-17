@@ -26,7 +26,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("pm02")
+ONMSsites = c("hi04")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -618,6 +618,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ### save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
+  
+  
+  
+  
   #(5) TIME SERIES- FOI ####
   # plot with error bars and median and hours above 75th percentile in title
   if ( nrow(FOIst) > 0 ) {
@@ -880,6 +884,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       }
     }
   }
+  
+  
+  
+  
   
   #(5) Wind Dominated in fqIn2 ####
   # select only data for fqIn2
