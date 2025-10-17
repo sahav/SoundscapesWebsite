@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "hi04" 
+site  = "hi03" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -121,11 +121,11 @@ if ( length(pFile) > 0 ) {
                          full.names = T, recursive = T)
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
-    #outData = gps    for some reason hi04 earlier outdata was saved as gps in products folder
+    outData = gps    #for some reason hi03 and 4 earlier outdata was saved as gps in products folder
     if( exists("outData") ) {
       processedData = outData
       rm(outData)
-      #rm(gps) fix for hi04
+      rm(gps) #fix for hi03 and 4
     }
     
     cat( "Processed data for ", site, ": ", 
