@@ -4,8 +4,6 @@
 # INPUTS: output of HrTOLs_ONMS.R, loads the most recent file; ONMS metadata; wind Model
 # works for each monitoring site
 
-rm(list=ls()) 
-
 # LIBRARIES ####
 #devtools::install_github('TaikiSan21/PAMscapes')
 
@@ -24,9 +22,12 @@ library(ggtext)
 library(plotly)
 library(viridis)
 
+
+rm(list=ls()) 
+
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk05")
+ONMSsites = c("fk07")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
