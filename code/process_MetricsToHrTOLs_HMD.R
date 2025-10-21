@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk07" 
+site  = "ci01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -179,6 +179,9 @@ if (length(inFiles) > 0) {
   
   #bin to hourly median values
   cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
+  
+  #had to use below line for CI01 because it wasnt keeping Lat/Long by default for some reason
+  #cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median"), extraCols = c("Latitude", "Longitude"))
 }
 # the time binning seems to remove any "extra columns" so just the UTC and TOL bands for the output
 # names(cDatah)
@@ -239,17 +242,16 @@ gps_chunks <- list()  # store wind-matched results
 #can try for loop above but may crash if too many chunks
 gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
-#gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-#gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
 #put chunks back together
 gps <- dplyr::bind_rows(gps_chunks)
 
-#save(gps, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPLWithNewData.Rda") )
 
 
 #SKIP IF YOU ALREADY GOT WIND USING CHUNKS
