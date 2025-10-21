@@ -4,8 +4,6 @@
 # INPUTS: output of HrTOLs_ONMS.R, loads the most recent file; ONMS metadata; wind Model
 # works for each monitoring site
 
-rm(list=ls()) 
-
 # LIBRARIES ####
 #devtools::install_github('TaikiSan21/PAMscapes')
 
@@ -17,15 +15,19 @@ library(ggplot2)
 library(tidyverse)
 library(openxlsx)
 library(reshape)
+
 library(gtable)
 library(grid)
 library(ggtext)
 library(plotly)
 library(viridis)
 
+
+rm(list=ls()) 
+
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk05")
+ONMSsites = c("fk07")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -76,6 +78,9 @@ TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
 windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.names = T)
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
+
+
+
 
 # PROCESS BY SITE #### 
 for (uu in 1:length(ONMSsites)) { # uu = 1
@@ -261,6 +266,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
                         probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
   
+  
+  
+  
   #(1) WIND category ####
   gps$wind_category = NA
   gps <- gps %>%
@@ -365,6 +373,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
   
+  
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
   p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
@@ -392,6 +401,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ##save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
+  
+  
   #(3) SEASONAL CONDITION PLOT ####
   caption_text = paste0(
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
@@ -399,6 +410,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for all data")
   tol_columns = grep("TOL", colnames(gps))
+  
   seasonAll = NULL
   for (ii in 1: length(season_quantiles) ) {
     tmp = as.data.frame ( season_quantiles[ii] ) 
@@ -465,6 +477,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ## save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
+  
+  
   
   #(4) ANNUAL COMPARISION plots ####
   # truncates data to peak season for biological sites- all plots after this are peak only!!!
@@ -604,6 +618,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   ### save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  
+  
+  
+  
   
   #(5) TIME SERIES- FOI ####
   # plot with error bars and median and hours above 75th percentile in title
@@ -867,6 +885,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       }
     }
   }
+  
+  
+  
+  
   
   #(5) Wind Dominated in fqIn2 ####
   # select only data for fqIn2

@@ -7,7 +7,7 @@
 # checks for files already processed
 # adds wind estimate from PAMscapes for any new data (takes time!)
 
-# OUTPUTS: hourly TOLs values with wind speed and list of files processed
+# OUTPUTS: hourly Third Octive Level values with wind speed and list of files processed
 
 # RUN this to make sure latest updates for PAMscapes
 devtools::install_github('TaikiSan21/PAMscapes')
@@ -25,10 +25,11 @@ library(openxlsx)
 library(devtools)
 
 
+
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk05" 
+site  = "fk07" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -44,6 +45,8 @@ outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
 outDirG = paste0( outDir,"report/" ) #graphics
 
+
+
 # ONMS Metadata ####
 metaFile = paste0(outDirC,"ONMSSound_IndicatorCategories.xlsx")
 lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #xlsx::read.xlsx(metaFile, sheetName = "Summary")
@@ -56,6 +59,8 @@ siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
 cat("CHECK: Read in data for: ", siteInfo$`NCEI ID
 facilitates matching with metadata on gcp 
 check gcp to see verify`)
+
+
 
 # GET list of files to process ####
 ## PyPAM soundscape FILES- NEFSC-GCP ####
@@ -74,6 +79,8 @@ inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names 
 dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
 cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),"with",
     sum( duplicated(dysON)), "duplicated days\n")
+
+
 
 ## COMBINE FILE LISTS ####
 #check for duplicate days, remove MANTA
@@ -95,6 +102,8 @@ if (length(tmp) != 0){
   dys = dysON
 }
 
+
+
 ## CHECK FOR PROCESSED FILES #### 
 #updates list of files to process
 pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_", site), full.names = T, recursive = T)
@@ -112,9 +121,11 @@ if ( length(pFile) > 0 ) {
                          full.names = T, recursive = T)
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
+    #outData = gps    #for some reason hi03,8, and 4 earlier outdata was saved as gps in products folder
     if( exists("outData") ) {
       processedData = outData
       rm(outData)
+      #rm(gps) #fix for hi03,8, and 4
     }
     
     cat( "Processed data for ", site, ": ", 
@@ -130,9 +141,11 @@ if ( length(pFile) > 0 ) {
   }
   
 } else {
-  cat("No processed files for ", site, " processing all new files")
+  cat("No processed files for", site, ", processing all new files")
   processedData = NULL
 }
+
+
 
 # PROCESS ONMS Sound FILES ####
 cData = NULL  
@@ -174,6 +187,8 @@ cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
 
+
+
 # #(ALT GET WIND) 
 # # # only if already ran previously but the SPL data were inaccurate!
 # inWind = "F:/ONMS/SS_Manta/data_hi01_HourlySPL-gfs_2025-07-01.Rda"
@@ -193,15 +208,16 @@ cDatah$site = site
 # # # names(gps)
 
 
+#GET WIND WITH CHUNKS ####
 #Too many unique days to process all at once. Need to break cDatah into smaller datasets
 #Split cDatah into chunks
 unique_days <- sort(unique(as.Date(cDatah$UTC)))
 
-# Step 2: Split those days into ~150-day chunks
+# Split those days into ~100-day chunks
 chunk_size_days <- 100
 day_chunks <- split(unique_days, ceiling(seq_along(unique_days) / chunk_size_days))
 
-# Step 3: Split the full dataset by matching on those date chunks
+# Split the full dataset by matching on those date chunks
 data_chunks <- lapply(day_chunks, function(days) {
   filter(cDatah, as.Date(UTC) %in% days)
 })
@@ -210,28 +226,35 @@ data_chunks <- lapply(day_chunks, function(days) {
 length(data_chunks)             
 sapply(data_chunks, nrow)   
 
-
-#GET WIND WITH CHUNKS ####
 gps_chunks <- list()  # store wind-matched results
 
-for (i in seq_along(data_chunks)) {
-  cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
+#for (i in seq_along(data_chunks)) {
+ # cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
   
-  gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
-}
+ # gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+#}
 
+#add/remove lines for the number of chunks data was broken into
+#run one line at a time, it will take a while
+#can try for loop above but may crash if too many chunks
+gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
-gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+#gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+#gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+#gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
+#gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
-
+#put chunks back together
 gps <- dplyr::bind_rows(gps_chunks)
 
+#save(gps, file = paste0(outDirP, "filesProcesed_", tolower(site), "_HourlySPLWithNewData.Rda") )
 
 
+#SKIP IF YOU ALREADY GOT WIND USING CHUNKS
 # GET WIND ####
+#when there arent too many days 
 if ( length(cDatah) > 0 ) {
 
   cat("ONMS data only ...") 
@@ -239,6 +262,8 @@ if ( length(cDatah) > 0 ) {
   gps = matchGFS(cDatah)
 
 }
+
+
 
 # APPEND & SAVE NEW DATA FILES ####
 if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data

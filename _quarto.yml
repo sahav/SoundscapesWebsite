@@ -61,7 +61,7 @@ website:
         text: Channel Islands
       - text: <br>
       - text: <b>Pacific Islands Region</b>
-      - href: content/pi.qmd
+      - href: content/pm.qmd
         text: Papahānaumokuākea
       - href: content/as.qmd
         text: American Samoa
