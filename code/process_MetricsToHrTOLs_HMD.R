@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "ci01" 
+site  = "ci04" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -231,10 +231,11 @@ sapply(data_chunks, nrow)
 
 gps_chunks <- list()  # store wind-matched results
 
+
 #for (i in seq_along(data_chunks)) {
  # cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
   
- # gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+  #gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
 #}
 
 #add/remove lines for the number of chunks data was broken into
@@ -245,7 +246,7 @@ gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
 gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
 gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
 gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+#gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 

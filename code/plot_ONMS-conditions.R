@@ -65,6 +65,7 @@ TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of int
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
 endSS = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "SanctSound") )
 endSS$endSS =  as.Date(endSS$endSS, origin = "1899-12-30")
+
 ## FREQUENCIES OF INTEREST ####
 FOI = as.data.frame ( openxlsx ::read.xlsx(metaFile, sheet = "Frequency of Interest") )
 FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
@@ -106,6 +107,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ## SITE PARAMETERS ####
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
+  
   ##frequency of interest ####
   if (substr(site, 1,3) == "fgb"){
     FOIs = FOI [ FOI$Sanctuary == substr(site5, 1,3), ]
@@ -114,6 +116,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   }
   ##frequency(s) to track
   FOIst = FOIs [ FOIs$`Track.this.FQ.as.indicator.for.sources?` == "Y", ] 
+  
   ##times of interest ####
   TOIs = TOI [ TOI$Site == (site1), ]
   TOIs <- TOIs %>%
