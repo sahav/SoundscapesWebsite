@@ -25,9 +25,9 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("nrs09")
+ONMSsites = c("sb09")
 ## directories ####
-outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
+outDir   = "~/GitHub/SoundscapesWebsite/" #"C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
