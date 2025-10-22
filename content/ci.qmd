@@ -118,9 +118,7 @@ display(HTML(gf.makeButtons(sites, "plot_***_AboveWind.jpg", "SourcePresent")))
 #| echo: false
 display(HTML(standardTextDict["sources of interest typical"]))
 display(HTML(gf.makeButtons(sites, "plot_***-63_status.jpg", "FOI")))
-```
-```{python}
-display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI")))
+display(HTML(gf.makeButtons(sites, "plot_***-125_status.jpg", "FOI2")))
 ```
 :::
 
