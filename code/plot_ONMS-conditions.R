@@ -5,7 +5,7 @@
 # works for each monitoring site
 
 # LIBRARIES ####
-#devtools::install_github('TaikiSan21/PAMscapes')
+devtools::install_github('TaikiSan21/PAMscapes')
 
 library(patchwork)
 library(PAMscapes)
@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("ci04")
+ONMSsites = c("sb01")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
