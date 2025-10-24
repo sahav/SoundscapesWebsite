@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("sb03")
+ONMSsites = c("pm02")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -460,7 +460,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     labs(
       caption  = caption_text,
-        subtitle = subtitle_text,
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
