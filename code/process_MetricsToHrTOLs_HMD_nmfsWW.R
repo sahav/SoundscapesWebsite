@@ -23,10 +23,10 @@ library(openxlsx)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "nrs11" 
+site  = "nrs09" 
 site = tolower(site) 
-gcpF = "PMEL_CBNMS"
-prodName = "cb"
+gcpF = "PMEL_SBNMS"
+prodName = "sb"
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
@@ -59,11 +59,14 @@ check gcp to see verify`)
 # e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
 #inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 #NRS11_20212023_20220831
-inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+#inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+#PMEL_CINMS_201410_NRS05_20141018.nc
+inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+
 
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 3),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
       "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
@@ -179,8 +182,9 @@ cDatah$yr  = year(cDatah$UTC)
 cDatah$mth = month(cDatah$UTC)
 cDatah$site = site
 
-cDatah$Latitude = 37.88
-cDatah$Longitude = 123.43
+cDatah$Latitude = 42.4
+cDatah$Longitude = -70.13
+
 
 # #(ALT GET WIND) 
 # # # only if already ran previously but the SPL data were inaccurate!
