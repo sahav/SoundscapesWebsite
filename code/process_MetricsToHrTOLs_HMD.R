@@ -267,6 +267,18 @@ if ( length(cDatah) > 0 ) {
 }
 
 
+#Fix for HI01
+#two lat and long columns in processedData
+processedDataF <- processedData %>% select(-Latitude.x, -Longitude.x)
+processedDataOld <- processedData
+processedData <- processedDataF %>%
+  rename(
+    Latitude = Latitude.y,
+    Longitude = Longitude.y
+  )
+
+
+
 
 # APPEND & SAVE NEW DATA FILES ####
 if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data

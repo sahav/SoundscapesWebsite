@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi08")
+ONMSsites = c("hi01")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -431,6 +431,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
   subtitle_text <- if (sidx == "biological") "Data summarized for Peak season only" else NULL
+  subtitle_textW <- if (sidx == "biological") "Data summarized for Early, Peak, and Late season only" else NULL
   p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
@@ -486,7 +487,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # truncates data to peak season for biological sites- all plots after this are peak only!!!
   if (sidx == "biological"){ #only keep peak
     gpsAll = gps
-    my_subtitle = "humpback season"
+    my_subtitle = "(humpback season)"
     gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
     unique( gps$mth )
     #redo effort plot so not confusing
@@ -506,6 +507,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         title = paste0( "monitoring effort by year ", my_subtitle) ,
         subtitle = paste0(toupper(site), " has ", udays, 
                           " unique days: ", as.character(st), " to ", as.character(ed)),
+                          #, "\n",  "Peak season has" ),
         x = "",
         y = "Days",
         fill = "Year"
@@ -862,7 +864,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
           labs(
             title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
             subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
-            caption  = "Typical conditions shown as gray area (25th and 75th percentiles of all the data)", 
+            caption  = paste0("Typical conditions shown as gray area (25th and 75th percentiles of all the data)"),
+                            #  , "\n", subtitle_textW), 
             x = "",
             y = substitute(
               paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
@@ -1002,6 +1005,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       title = paste0("How often sources of interest are likey present (vocalizing species or vessels)"),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
+                      #   , "\n", subtitle_textW),
       #caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
       x = "",
       y = paste0("% of hours above wind noise ", fqIn2name, "\n (calculated as % hours when measured sound levels are above predicted level based on wind speed)"),
