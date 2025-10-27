@@ -8,7 +8,7 @@ import os
 import ipywidgets as widgets
 from pythonFunctions import generalFunctions as gf
 
-sites = ["NRS05","CI01","CI04"]# "SIOB"
+sites = ["CI01","CI04","NRS05"]# "SIOB"
 
 # input table for standard text
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
