@@ -82,36 +82,36 @@ display(HTML(f'''
 <div id="button-group-Seasons">
     {gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")}
 </div>
-'''))
 
-colorScript = """
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+// Wait briefly to ensure the buttons exist in the DOM
+setTimeout(function() {{
     const container = document.querySelector('#button-group-Seasons');
     if (!container) return;
 
     const buttons = container.querySelectorAll('button');
 
-    // Override onclick to also update color
-    buttons.forEach(button => {
+    // Attach highlight behavior
+    buttons.forEach(button => {{
         const oldOnClick = button.getAttribute('onclick');
-        button.onclick = function() {
-            // Run the original image update
+        button.addEventListener('click', function(event) {{
+            // Run the original image update (if exists)
             if (oldOnClick) eval(oldOnClick);
 
             // Reset all buttons to white
             buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
             // Highlight the clicked one
             button.style.backgroundColor = '#ADD8E6';
-        };
-    });
+        }});
+    }});
 
-    // Highlight first button by default
+    // Highlight the first button by default
     if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
-});
+
+}}, 200);  // wait 200ms to ensure buttons are rendered
 </script>
-"""
-display(HTML(colorScript))
+'''))
+
 
 
 
