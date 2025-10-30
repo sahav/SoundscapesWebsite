@@ -75,7 +75,42 @@ display(HTML(standardTextDict["conditions overview"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
-display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
+
+#display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
+
+# Wrap the button group in a container div with a unique ID
+display(HTML(f'''
+<div id="button-group-Seasons">
+    {gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")}
+</div>
+'''))
+
+# Add color-changing script for this group only
+colorScript = """
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const container = document.querySelector('#button-group-Seasons');
+    if (!container) return;
+
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');  // reset all
+            button.style.backgroundColor = '#ADD8E6';  // highlight clicked
+        });
+    });
+
+    // Highlight the first button by default
+    if (buttons.length > 0) {
+        buttons[0].style.backgroundColor = '#ADD8E6';
+    }
+});
+</script>
+"""
+display(HTML(colorScript))
+
+
+
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
             <dialog id="infoModal">
@@ -101,7 +136,34 @@ display(HTML(infoHtml))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
-display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
+
+#display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
+
+display(HTML(f'''
+<div id="button-group-YearSPL">
+    {gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")}
+</div>
+'''))
+
+colorScript = """
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const container = document.querySelector('#button-group-YearSPL');
+    if (!container) return;
+
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
+            button.style.backgroundColor = '#ADD8E6';
+        });
+    });
+
+    if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
+});
+</script>
+"""
+display(HTML(colorScript))
 
 ```
 
