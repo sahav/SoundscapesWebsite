@@ -78,14 +78,12 @@ display(HTML(standardTextDict["Soundscape Overview"]))
 
 #display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
 
-# Wrap the button group in a container div with a unique ID
 display(HTML(f'''
 <div id="button-group-Seasons">
     {gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")}
 </div>
 '''))
 
-# Add color-changing script for this group only
 colorScript = """
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -93,17 +91,23 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!container) return;
 
     const buttons = container.querySelectorAll('button');
+
+    // Override onclick to also update color
     buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');  // reset all
-            button.style.backgroundColor = '#ADD8E6';  // highlight clicked
-        });
+        const oldOnClick = button.getAttribute('onclick');
+        button.onclick = function() {
+            // Run the original image update
+            if (oldOnClick) eval(oldOnClick);
+
+            // Reset all buttons to white
+            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
+            // Highlight the clicked one
+            button.style.backgroundColor = '#ADD8E6';
+        };
     });
 
-    // Highlight the first button by default
-    if (buttons.length > 0) {
-        buttons[0].style.backgroundColor = '#ADD8E6';
-    }
+    // Highlight first button by default
+    if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
 });
 </script>
 """
@@ -137,34 +141,7 @@ display(HTML(infoHtml))
 #| echo: false
 display(HTML(standardTextDict["What are the latest conditions in ocean sound?"]))
 
-#display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
-
-display(HTML(f'''
-<div id="button-group-YearSPL">
-    {gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")}
-</div>
-'''))
-
-colorScript = """
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    const container = document.querySelector('#button-group-YearSPL');
-    if (!container) return;
-
-    const buttons = container.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
-            button.style.backgroundColor = '#ADD8E6';
-        });
-    });
-
-    if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
-});
-</script>
-"""
-display(HTML(colorScript))
-
+display(HTML(gf.makeButtons(sites, "plot_***_YearSPL.jpg", "YearSPL")))
 ```
 
 ### How often are sources of interest likely present?
