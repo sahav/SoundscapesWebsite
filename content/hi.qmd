@@ -76,43 +76,41 @@ display(HTML(standardTextDict["conditions overview"]))
 #| echo: false
 display(HTML(standardTextDict["Soundscape Overview"]))
 
-#display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
+display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
 
-display(HTML(f'''
-<div id="button-group-Seasons">
-    {gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")}
-</div>
+#display(HTML(f'''
+#<div id="button-group-Seasons">
+#    {gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")}
+#</div>
 
-<script>
-// Wait briefly to ensure the buttons exist in the DOM
-setTimeout(function() {{
-    const container = document.querySelector('#button-group-Seasons');
-    if (!container) return;
+#<script>
+#// Wait briefly to ensure the buttons exist in the DOM
+#setTimeout(function() {{
+ #   const container = document.querySelector('#button-group-Seasons');
+  #  if (!container) return;
 
-    const buttons = container.querySelectorAll('button');
+   # const buttons = container.querySelectorAll('button');
 
-    // Attach highlight behavior
-    buttons.forEach(button => {{
-        const oldOnClick = button.getAttribute('onclick');
-        button.addEventListener('click', function(event) {{
-            // Run the original image update (if exists)
-            if (oldOnClick) eval(oldOnClick);
+    #// Attach highlight behavior
+    #buttons.forEach(button => {{
+     #   const oldOnClick = button.getAttribute('onclick');
+      #  button.addEventListener('click', function(event) {{
+       #     // Run the original image update (if exists)
+        #    if (oldOnClick) eval(oldOnClick);
 
-            // Reset all buttons to white
-            buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
-            // Highlight the clicked one
-            button.style.backgroundColor = '#ADD8E6';
-        }});
-    }});
+         #   // Reset all buttons to white
+           # buttons.forEach(btn => btn.style.backgroundColor = '#FFFFFF');
+          #  // Highlight the clicked one
+            #button.style.backgroundColor = '#ADD8E6';
+        #}});
+  #  }});
 
-    // Highlight the first button by default
-    if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
+   # // Highlight the first button by default
+  #  if (buttons.length > 0) buttons[0].style.backgroundColor = '#ADD8E6';
 
-}}, 200);  // wait 200ms to ensure buttons are rendered
-</script>
-'''))
-
-
+#}}, 200);  // wait 200ms to ensure buttons are rendered
+#</script>
+#'''))
 
 
 infoHtml = f'''
