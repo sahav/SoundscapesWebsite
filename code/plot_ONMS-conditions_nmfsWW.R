@@ -25,7 +25,7 @@ library(viridis)
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("sb09")
+ONMSsites = c("oc03")
 ## directories ####
 outDir   = "~/GitHub/SoundscapesWebsite/" #"C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
@@ -84,12 +84,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   site =  ONMSsites[uu]
   
   #renaming for NRS sites
-  if (site == "sb09") {
+  if (site == "oc03") {
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
-    site1 = "NRS09"
-    site3 = "sbnrs09"
-    site  = "NRS09"
-    site5 = "sb09"
+    site1 = "nrs03"
+    site3 = "ocnrs03"
+    site  = "NRS03"
+    site5 = "oc03"
   } else {
     site1 = site
     site3 = site
