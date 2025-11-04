@@ -424,15 +424,16 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasonAll = rbind(seasonAll,tmp)
   }
   tol_columns = grep("TOL", colnames(seasonAll))
+  
   ### format for plot ####
   mallData = melt(seasonAll, id.vars = c("Quantile","Season"), measure.vars = tol_columns)
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Season", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
-  subtitle_text <- if (sidx == "biological") "Data summarized for Peak season only" else NULL
-  subtitle_textW <- if (sidx == "biological") "Data summarized for Early, Peak, and Late season only" else NULL
-  p = ggplot() +
+ 
+ 
+   p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
@@ -484,11 +485,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   
   #(4) ANNUAL COMPARISION plots ####
-  # truncates data to peak season for biological sites- all plots after this are peak only!!!
-  if (sidx == "biological"){ #only keep peak
+  # truncates data to peak season for biological sites- all plots after this are peak season (early, peak, late) only!!!
+   subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
+  
+   if (sidx == "biological"){ #only keep peak
     gpsAll = gps
     my_subtitle = "(humpback season)"
     gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
+    #gps = gps[gps$Season %in% c("Peak"), ]
     unique( gps$mth )
     #redo effort plot so not confusing
     summary <- gps %>%
@@ -498,7 +502,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       ) %>%
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
+    
+    summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+    peakDays <- sum(summary$dy)
+    
     
     p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
       geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
@@ -506,8 +514,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       labs(
         title = paste0( "monitoring effort by year ", my_subtitle) ,
         subtitle = paste0(toupper(site), " has ", udays, 
-                          " unique days: ", as.character(st), " to ", as.character(ed)),
-                          #, "\n",  "Peak season has" ),
+                          " unique days: ", as.character(st), " to ", as.character(ed)
+                          , ", with ", peakDays, " unique days in humpback season"),
         x = "",
         y = "Days",
         fill = "Year"
@@ -605,6 +613,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
       caption  = caption_text,
+      color = "Year*",
+      fill = "Year*",
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
     subtitle = subtitle_text) +
@@ -865,7 +875,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
             title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
             subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
             caption  = paste0("Typical conditions shown as gray area (25th and 75th percentiles of all the data)"),
-                            #  , "\n", subtitle_textW), 
             x = "",
             y = substitute(
               paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
@@ -1005,7 +1014,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       title = paste0("How often sources of interest are likey present (vocalizing species or vessels)"),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
-                      #   , "\n", subtitle_textW),
       #caption = "Calculated as % hours when measured sound levels are above predicted level based on wind speed",
       x = "",
       y = paste0("% of hours above wind noise ", fqIn2name, "\n (calculated as % hours when measured sound levels are above predicted level based on wind speed)"),
