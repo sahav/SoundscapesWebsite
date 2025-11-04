@@ -90,7 +90,7 @@ def makeButtons(sites, generalFormat, identifier):
         
         initialColor = "#008CBA"
         if site == sites[0]:
-            initialColor = "#006C7A"
+            initialColor = "#BA2F00"
             
         buttons += f'<button id="{site}{identifier}button" onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: {initialColor};text-transform: uppercase;">{site}</button>'
         scripts += f"""
@@ -99,7 +99,7 @@ def makeButtons(sites, generalFormat, identifier):
                         var imgElement = document.getElementById('{identifier}');
                         imgElement.src = "{path}";
                         const thisButton = document.getElementById('{site}{identifier}button');
-                        thisButton.style.backgroundColor = '#006C7A';
+                        thisButton.style.backgroundColor = '#BA2F00';
                         {othersToLight}
                     }}
                     </script>
