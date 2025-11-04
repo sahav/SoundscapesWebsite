@@ -86,7 +86,7 @@ def makeButtons(sites, generalFormat, identifier):
         for s in sites:
             if s != site:
                 othersToLight += f"""const otherButton{s} = document.getElementById('{s}{identifier}button');
-                otherButton.style.backgroundColor = '#008CBA';"""
+                        otherButton{s}.style.backgroundColor = '#008CBA';"""
 
         buttons += f'<button id="{site}{identifier}button" onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;text-transform: uppercase;">{site}</button>'
         scripts += f"""
