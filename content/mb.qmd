@@ -77,6 +77,7 @@ display(HTML(standardTextDict["conditions overview"]))
 #| echo: true
 display(HTML(standardTextDict["Soundscape Overview"]))
 display(HTML(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons")))
+print(gf.makeButtons(sites, "plot_***_SeasonalSPL.jpg", "Seasons"))
 infoHtml = f'''
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal&#39;).showModal()">How was this calculated?</button>
             <dialog id="infoModal">
