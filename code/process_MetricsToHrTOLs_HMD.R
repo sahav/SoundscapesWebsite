@@ -29,7 +29,7 @@ library(devtools)
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "ci04" 
+site  = "pm01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -121,11 +121,11 @@ if ( length(pFile) > 0 ) {
                          full.names = T, recursive = T)
     file_info = file.info(inFileP)
     load( inFileP[which.max(file_info$ctime)] )
-    #outData = gps    #for some reason hi03,8, and 4 earlier outdata was saved as gps in products folder
+    #outData = gps    #for some reason hi03,8, and 4 AND pm01 earlier outdata was saved as gps in products folder
     if( exists("outData") ) {
       processedData = outData
       rm(outData)
-      #rm(gps) #fix for hi03,8, and 4
+      #rm(gps) #fix for hi03,8, and 4 AND pm01
     }
     
     cat( "Processed data for ", site, ": ", 
@@ -244,8 +244,8 @@ gps_chunks <- list()  # store wind-matched results
 gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
 gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
 #gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
