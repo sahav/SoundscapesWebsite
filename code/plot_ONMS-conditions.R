@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi01")
+ONMSsites = c("fk07")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -171,6 +171,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
+  # fk05 being weird w loading in most recent, ussed this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
   if( exists("outData") ) {
     gps = outData
     rm(outData)
@@ -390,6 +391,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
     seasont <- season[order(seasont$Season), ]
+    
+    #for fk07 that doesnt have winter 
+    #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
   } else if ( length(sidx) == 0) {
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
@@ -458,6 +462,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     mallData$Season <- factor(
       mallData$Season,
       levels = c("Winter", "Spring", "Summer", "Fall"))
+    
+    #no winter in fk0 so had to use this
+    mallData$Season <- factor(
+      mallData$Season,
+      levels = c("Spring", "Summer", "Fall"))
   }
     
    p = ggplot() +
