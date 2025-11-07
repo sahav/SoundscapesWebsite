@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk07")
+ONMSsites = c("fk06")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -382,7 +382,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
  
-  
+  ##reordering seasons in legend so they are chronological, not alphabetical
+  # may need to make adjustments if this site doesnt have data from all seasons
   if  ( sidx == "biological") {
     summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
     seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
@@ -453,6 +454,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
  
+  
+  ##reordering seasons in legend so they are chronological, not alphabetical
+  # may need to make adjustments if this site doesnt have data from all seasons
   if  ( sidx == "biological") {
     mallData$Season <- factor(
       mallData$Season,
@@ -463,12 +467,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       mallData$Season,
       levels = c("Winter", "Spring", "Summer", "Fall"))
     
-    #no winter in fk0 so had to use this
-    mallData$Season <- factor(
-      mallData$Season,
-      levels = c("Spring", "Summer", "Fall"))
+    #no winter in fk07 so had to use this
+    #mallData$Season <- factor(
+     # mallData$Season,
+      #levels = c("Spring", "Summer", "Fall"))
   }
     
+  
    p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
