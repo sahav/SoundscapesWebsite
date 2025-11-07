@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("pm02")
+ONMSsites = c("hi01")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -131,19 +131,19 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #put in alphabetical order so plots line up!!!
   if ( length(sidx) == 0 ) { # default
     season = data.frame(
-      Season = c("Fall", "Spring",  "Summer", "Winter"  ),
-      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
-      values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+      Season = c("Winter", "Spring", "Summer" , "Fall"),
+      Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
+      values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00") )
     sidx = "wssf"
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
     seasonShift = 0
   }else if  ( sidx == "biological") {
     season = data.frame(
-      Season = c("Early", "Late", "Peak", "Non"),
-      Months = c("12,1", "4,5", "2,3", "6,7,8,9,10,11") ,
-      values = c(  "#56B4E9", "#009E73", "#B3B3B3", "#CC79A7") )
+      Season = c("Early", "Peak", "Late", "Non"),
+      Months = c("12,1", "2,3", "4,5", "6,7,8,9,10,11") ,
+      values = c(  "#56B4E9", "#CC79A7", "#009E73", "#B3B3B3") )
     seasonLabel = "Early (Dec-Jan), Peak (Feb-Mar), Late (Apr-May), Non (Jun-Nov) "
-    seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
+   seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
@@ -153,9 +153,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasonShift = 0
   }else if ( sidx == "wssf") {
     season = data.frame(
-      Season = c("Fall", "Spring",  "Summer", "Winter"  ),
-      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
-      values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+      Season = c("Winter", "Spring", "Summer" , "Fall"),
+      Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
+      values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00"))
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
     seasonShift = 0
   }else if ( sidx == "southernHem") {
@@ -368,6 +368,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # season for HI sites includes December from the previous years- so make adjustment here,
   # if not HI this adds 0 so does nothing
   gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
+  #gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
+  #gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
   
   summary2 = gps %>%
     mutate(
@@ -376,9 +378,24 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     ) %>%
     count(year, Season)  # Count occurrences (hours) in each year-month
   
-  
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
+ 
+  
+  if  ( sidx == "biological") {
+    summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont <- season[order(seasont$Season), ]
+  } else if ( sidx == "wssf") {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+  } else if ( length(sidx) == 0) {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+  }
+  
   p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
     geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
     #coord_flip()+ 
@@ -432,7 +449,17 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
  
- 
+  if  ( sidx == "biological") {
+    mallData$Season <- factor(
+      mallData$Season,
+      levels = c("Early", "Peak", "Late", "Non")
+    )
+  }else if ( sidx == "wssf" | length(sidx) == 0) {
+    mallData$Season <- factor(
+      mallData$Season,
+      levels = c("Winter", "Spring", "Summer", "Fall"))
+  }
+    
    p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
@@ -487,6 +514,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #(4) ANNUAL COMPARISION plots ####
   # truncates data to peak season for biological sites- all plots after this are peak season (early, peak, late) only!!!
    subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
+   #subtitle_text <- NULL      for PM01 and 02 when making version of graph with October and November
   
    if (sidx == "biological"){ #only keep peak
     gpsAll = gps
@@ -613,8 +641,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
       caption  = caption_text,
-      color = "Year*",
-      fill = "Year*",
+      color = "Year",        #IF biological then change to Year*
+      fill = "Year",        #IF biological then change to Year*
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
     subtitle = subtitle_text) +
@@ -631,7 +659,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPLAllDatabutWrongYear.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   
   
