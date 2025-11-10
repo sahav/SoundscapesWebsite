@@ -81,13 +81,26 @@ def makeButtons(sites, generalFormat, identifier):
     for site in sites:
         path = f'{inputDir}/{generalFormat}'
         path = path.replace("***", site)
-
-        buttons += f'<button onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: #008CBA;text-transform: uppercase;">{site}</button>'
+        
+        othersToLight = ""
+        for s in sites:
+            if s != site:
+                othersToLight += f"""const otherButton{s} = document.getElementById('{s}{identifier}button');
+                        otherButton{s}.style.backgroundColor = '#008CBA';"""
+        
+        initialColor = "#008CBA"
+        if site == sites[0]:
+            initialColor = "#BA2F00"
+            
+        buttons += f'<button id="{site}{identifier}button" onclick="{site}{identifier}()" style="padding: 10px; color: white; margin: 4px 4px; background-color: {initialColor};text-transform: uppercase;">{site}</button>'
         scripts += f"""
                     <script>
                     function {site}{identifier}() {{
                         var imgElement = document.getElementById('{identifier}');
                         imgElement.src = "{path}";
+                        const thisButton = document.getElementById('{site}{identifier}button');
+                        thisButton.style.backgroundColor = '#BA2F00';
+                        {othersToLight}
                     }}
                     </script>
         """
