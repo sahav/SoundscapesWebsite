@@ -4,8 +4,6 @@
 # INPUTS: output of HrTOLs_ONMS.R, loads the most recent file; ONMS metadata; wind Model
 # works for each monitoring site
 
-rm(list=ls()) 
-
 # LIBRARIES ####
 #devtools::install_github('TaikiSan21/PAMscapes')
 
@@ -17,15 +15,20 @@ library(ggplot2)
 library(tidyverse)
 library(openxlsx)
 library(reshape)
+
 library(gtable)
 library(grid)
 library(ggtext)
 library(plotly)
 library(viridis)
 
+
+rm(list=ls()) 
+
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("oc03")
+ONMSsites = c("sb09")
+
 ## directories ####
 outDir   = "~/GitHub/SoundscapesWebsite/" #"C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
@@ -33,6 +36,7 @@ outDir   = "~/GitHub/SoundscapesWebsite/" #"C:/Users/pam_user/Documents/GitHub/S
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
+
 
 #PARAMETERS ####
 DC = Sys.Date()
@@ -48,7 +52,7 @@ windLow = 1 #which wind model result to show on plot
 windH = 10 #wind speeds categories
 windL = 5 #wind speeds categories
 removess = 0 # set to 1 if you want to truncate the time series
-removeShort = 360 #minium number of hours needed to included a year in the graphics 
+removeShort = 360 #minimum number of hours needed to included a year in the graphics 
 
 # CONTEXT ####
 #reads information for all sites
@@ -62,6 +66,7 @@ TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of int
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
 endSS = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "SanctSound") )
 endSS$endSS =  as.Date(endSS$endSS, origin = "1899-12-30")
+
 ## FREQUENCIES OF INTEREST ####
 FOI = as.data.frame ( openxlsx ::read.xlsx(metaFile, sheet = "Frequency of Interest") )
 FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
@@ -76,6 +81,9 @@ windFile = list.files(outDirC, pattern = paste0("WindModel_", project), full.nam
 file_info = file.info(windFile)
 load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 
+
+
+
 # PROCESS BY SITE #### 
 for (uu in 1:length(ONMSsites)) { # uu = 1
   
@@ -84,12 +92,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   site =  ONMSsites[uu]
   
   #renaming for NRS sites
-  if (site == "oc03") {
+  if (site == "sb09") {
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
-    site1 = "nrs03"
-    site3 = "ocnrs03"
-    site  = "NRS03"
-    site5 = "oc03"
+    site1 = "nrs09"
+    site3 = "sbnrs09"
+    site  = "NRS09"
+    site5 = "sb09"
   } else {
     site1 = site
     site3 = site
@@ -100,6 +108,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ## SITE PARAMETERS ####
   siteInfo = lookup[lookup$`NCEI ID` == tolower(site1),]
   siteInfo = siteInfo[!is.na(siteInfo$`NCEI ID`), ]
+  
   ##frequency of interest ####
   if (substr(site, 1,3) == "fgb"){
     FOIs = FOI [ FOI$Sanctuary == substr(site5, 1,3), ]
@@ -108,6 +117,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   }
   ##frequency(s) to track
   FOIst = FOIs [ FOIs$`Track.this.FQ.as.indicator.for.sources?` == "Y", ] 
+  
   ##times of interest ####
   TOIs = TOI [ TOI$Site == (site1), ]
   TOIs <- TOIs %>%
@@ -122,19 +132,19 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #put in alphabetical order so plots line up!!!
   if ( length(sidx) == 0 ) { # default
     season = data.frame(
-      Season = c("Fall", "Spring",  "Summer", "Winter"  ),
-      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ),
-      values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+      Season = c("Winter", "Spring", "Summer" , "Fall"),
+      Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
+      values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00") )
     sidx = "wssf"
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
     seasonShift = 0
   }else if  ( sidx == "biological") {
     season = data.frame(
-      Season = c("Early", "Late", "Peak", "Non"),
-      Months = c("12,1", "4,5", "2,3", "6,7,8,9,10,11") ,
-      values = c(  "#56B4E9", "#009E73", "#B3B3B3", "#CC79A7") )
+      Season = c("Early", "Peak", "Late", "Non"),
+      Months = c("12,1", "2,3", "4,5", "6,7,8,9,10,11") ,
+      values = c(  "#56B4E9", "#CC79A7", "#009E73", "#B3B3B3") )
     seasonLabel = "Early (Dec-Jan), Peak (Feb-Mar), Late (Apr-May), Non (Jun-Nov) "
-    seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
+   seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
@@ -144,9 +154,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasonShift = 0
   }else if ( sidx == "wssf") {
     season = data.frame(
-      Season = c("Fall", "Spring",  "Summer", "Winter"  ),
-      Months = c("10,11,12", "4,5,6","7,8,9", "1,2,3"   ) ,
-      values = c(   "#E69F00",  "#009E73", "#CC79A7", "#56B4E9") )
+      Season = c("Winter", "Spring", "Summer" , "Fall"),
+      Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
+      values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00"))
     seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
     seasonShift = 0
   }else if ( sidx == "southernHem") {
@@ -162,6 +172,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
+  # fk05 being weird w loading in most recent, ussed this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
   if( exists("outData") ) {
     gps = outData
     rm(outData)
@@ -260,6 +271,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
                         probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
   
+  
+  
+  
   #(1) WIND category ####
   gps$wind_category = NA
   gps <- gps %>%
@@ -310,6 +324,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
+  
+  
   #(2) EFFORT ALL DATA ####
   ## by month (days/ month-year) ####
   summary <- gps %>%
@@ -354,6 +370,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # season for HI sites includes December from the previous years- so make adjustment here,
   # if not HI this adds 0 so does nothing
   gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
+  #gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
+  #gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
   
   summary2 = gps %>%
     mutate(
@@ -364,6 +382,26 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   summary2$dy = round(summary2$n/ 24)
   seasont = season %>% filter(Season %in% unique(summary2$Season) )
+ 
+  ##reordering seasons in legend so they are chronological, not alphabetical
+  # may need to make adjustments if this site doesnt have data from all seasons
+  if  ( sidx == "biological") {
+    summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont <- season[order(seasont$Season), ]
+  } else if ( sidx == "wssf") {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+    
+    #for fk07 that doesnt have winter 
+    #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
+  } else if ( length(sidx) == 0) {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+  }
+  
   p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
     geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
     #coord_flip()+ 
@@ -389,6 +427,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ##save figure ####
   ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
+  
+  
   #(3) SEASONAL CONDITION PLOT ####
   caption_text = paste0(
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
@@ -396,6 +436,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for all data")
   tol_columns = grep("TOL", colnames(gps))
+  
   seasonAll = NULL
   for (ii in 1: length(season_quantiles) ) {
     tmp = as.data.frame ( season_quantiles[ii] ) 
@@ -406,13 +447,35 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasonAll = rbind(seasonAll,tmp)
   }
   tol_columns = grep("TOL", colnames(seasonAll))
+  
   ### format for plot ####
   mallData = melt(seasonAll, id.vars = c("Quantile","Season"), measure.vars = tol_columns)
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Season", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
-  p = ggplot() +
+ 
+  
+  ##reordering seasons in legend so they are chronological, not alphabetical
+  # may need to make adjustments if this site doesnt have data from all seasons
+  if  ( sidx == "biological") {
+    mallData$Season <- factor(
+      mallData$Season,
+      levels = c("Early", "Peak", "Late", "Non")
+    )
+  }else if ( sidx == "wssf" | length(sidx) == 0) {
+    mallData$Season <- factor(
+      mallData$Season,
+      levels = c("Winter", "Spring", "Summer", "Fall"))
+    
+    #no winter in fk07 so had to use this
+    #mallData$Season <- factor(
+     # mallData$Season,
+      #levels = c("Spring", "Summer", "Fall"))
+  }
+    
+  
+   p = ggplot() +
     # Add shaded area for 25%-75% range
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
@@ -441,9 +504,6 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     labs(
       caption  = caption_text,
-      if (sidx == "biological"){
-        subtitle = paste0( "Data summarized for Peak season only" ) 
-      } ,
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
@@ -464,12 +524,18 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ## save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
+  
+  
   #(4) ANNUAL COMPARISION plots ####
-  # truncates data to peak season for biological sites- all plots after this are peak only!!!
-  if (sidx == "biological"){ #only keep peak
+  # truncates data to peak season for biological sites- all plots after this are peak season (early, peak, late) only!!!
+   subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
+   #subtitle_text <- NULL      for PM01 and 02 when making version of graph with October and November
+  
+   if (sidx == "biological"){ #only keep peak
     gpsAll = gps
-    my_subtitle = "humpback season"
+    my_subtitle = "(humpback season)"
     gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
+    #gps = gps[gps$Season %in% c("Peak"), ]
     unique( gps$mth )
     #redo effort plot so not confusing
     summary <- gps %>%
@@ -479,7 +545,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       ) %>%
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
+    
+    summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+    peakDays <- sum(summary$dy)
+    
     
     p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
       geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
@@ -487,7 +557,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       labs(
         title = paste0( "monitoring effort by year ", my_subtitle) ,
         subtitle = paste0(toupper(site), " has ", udays, 
-                          " unique days: ", as.character(st), " to ", as.character(ed)),
+                          " unique days: ", as.character(st), " to ", as.character(ed)
+                          , ", with ", peakDays, " unique days in humpback season"),
         x = "",
         y = "Days",
         fill = "Year"
@@ -519,6 +590,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
+  
   
   ## re-calculate percentiles for all the data ####
   # all data - mALL 
@@ -554,7 +626,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
-  
+
   p = ggplot() +
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
@@ -584,11 +656,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
       caption  = caption_text,
+      color = "Year",        #IF biological then change to Year*
+      fill = "Year",        #IF biological then change to Year*
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
-      if (sidx == "biological"){
-        subtitle = paste0( "Data summarized for Peak season only" ) 
-      }) +
+    subtitle = subtitle_text) +
     theme(legend.position = "right",
           plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
           axis.title.x = element_text(size = 14),           # X-axis label size
@@ -603,6 +675,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   ### save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  
+  
+  
+  
   
   #(5) TIME SERIES- FOI ####
   # plot with error bars and median and hours above 75th percentile in title
@@ -841,7 +917,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
           labs(
             title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
             subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
-            caption  = "Typical conditions shown as gray area (25th and 75th percentiles of all the data)", 
+            caption  = paste0("Typical conditions shown as gray area (25th and 75th percentiles of all the data)"),
             x = "",
             y = substitute(
               paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
@@ -866,6 +942,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       }
     }
   }
+  
+  
+  
+  
   
   #(5) Wind Dominated in fqIn2 ####
   # select only data for fqIn2
@@ -999,6 +1079,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # names(gps)
   save(gps, file = paste0(outDirP, "/data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
 }
+
+
 
 
 
