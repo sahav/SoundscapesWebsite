@@ -7,9 +7,9 @@
 rm(list=ls()) 
 
 #SITES ####
-ONMSsites = "cb11" #c("sb01","sb03","oc02", "cb11" )
+ONMSsites = "oc02" #c("sb01","sb03","oc02", "cb11" )
 ## directories ####
-outDir   =  "C:/Users/pam_user/Documents/GitHub/SoundscapesWebsite/" # your local git repo 
+outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
 outDirG  =  paste0(outDir, "content/resources/") #where save graphics
 outDirGe =  paste0(outDir, "content/resources/extra/") #where extra save graphics
@@ -18,7 +18,7 @@ outDirP =   paste0(outDir,"products/") #where to get context
 
 #INPUT PARAMS ####
 DC = Sys.Date()
-project = "NRS"
+project = "ONMS"    #was NRS bt I changed to ONMS for oc02
 AISUpp = 5 
 AISLow = 2
 windUpp = 22.6 #which wind model result to show on plot
@@ -48,13 +48,13 @@ load( windFile[which.max(file_info$ctime)] ) #only load the most recent!
 ## LOAD AIS data ####
 load(paste0(outDirC, "Combine_ONMS_AIStransits_dataF.Rda") )
 
-for (ss in 1:length(ONMSsites)) {
+for (ss in 1:length(ONMSsites)) {   #ss = 1
 
   # LOOP THROUGH SITES ####
   site   = ONMSsites[ss] #"sb03" # "sb03" nrs11 mb02"
-  if (site == "cb11"){
-    site1  =  "NRS11" # cbnrs11 is weird..
-    site2  = "cbnrs11"
+  if (site == "oc03"){
+    site1  =  "NRS03" # cbnrs11 is weird..
+    site2  = "ocnrs03"
   } else {
     site1 = ONMSsites[ss]
     site2 = ONMSsites[ss]
@@ -386,6 +386,7 @@ for (ss in 1:length(ONMSsites)) {
   ## SAVE: table ####
   ggsave(paste0(outDirG, "table_", toupper(site), "_AIShist.jpg"), table_grob, width = 8, height = 5)
   
+  
   ## MONTHLY ABOVE AT 125 HZ ####
   # calculate - each month-year median level for each category
   gpsAIS$day = as.Date(gpsAIS$UTC)
@@ -406,15 +407,17 @@ for (ss in 1:length(ONMSsites)) {
   medians_diff = as.data.frame( medians_diff )
   medians_diff$yr = factor(medians_diff$yr, levels = rev(sort(unique(medians_diff$yr))))
   medians_diff$mth = factor(medians_diff$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10, 11,12)))
+  
   pais3 = ggplot(medians_diff, aes(x = factor(mth), y = as.numeric(difference), fill = factor( mth ) ) ) +
     geom_col(width = 1) +
     facet_wrap(~yr, ncol = 1) +
     coord_flip() +
     scale_fill_viridis_d(option = "D") +
     scale_x_discrete(
-      breaks = c("1", "3", "5", "7", "9", "11"),
-      labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
+      breaks = c("1", "4", "7", "10"),
+      labels = c("Jan", "Apr", "Jul", "Oct")
     ) +
+    scale_y_continuous(breaks = c(-1.25, 0.0, 1.25, 2.5, 3.75, 5.0, 6.25, 7.5)) +
     labs(
       title = paste0("How much do sound levels at ",fqShipN ," increase when ships are nearby?" ),
       subtitle  = paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"),
