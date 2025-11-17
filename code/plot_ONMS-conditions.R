@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk06")
+ONMSsites = c("cb11")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -60,6 +60,7 @@ lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
 lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
+
 ## TIMES OF INTEREST ####
 TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of interest") )
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
@@ -72,6 +73,7 @@ FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
 FOI$Sanctuary = tolower(FOI$Sanctuary)
 FOI = FOI[FOI$`Show.on.plot?` == "Y",]
 FOIp = FOI[FOI$`Track.this.FQ.as.indicator.for.sources?` == "Y",]
+
 ## TOL CONVERSION ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
@@ -91,9 +93,33 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   site =  ONMSsites[uu]
   
   #renaming for NRS sites
-  if (site == "cb11") {
+  if (site == "oc03") {
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
-    site1 = "NRS11"
+    site1 = "nrs03"
+    site3 = "ocnrs03"
+    site  = "NRS03"
+    site5 = "oc03"
+  } else if (site == "sb09"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs09"
+    site3 = "sbnrs09"
+    site  = "NRS09"
+    site5 = "sb09"
+  } else if (site == "ci05"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs05"
+    site3 = "cinrs05"
+    site  = "NRS05"
+    site5 = "ci05"
+  } else if (site == "ch13"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs13"
+    site3 = "chnrs13"
+    site  = "NRS13"
+    site5 = "ch13"
+  } else if (site == "cb11"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs11"
     site3 = "cbnrs11"
     site  = "NRS11"
     site5 = "cb11"
@@ -171,7 +197,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
-  # fk05 being weird w loading in most recent, ussed this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
+  # fk05 being weird w loading in most recent, used this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
+ 
   if( exists("outData") ) {
     gps = outData
     rm(outData)
@@ -334,7 +361,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     ) %>%
     count(year, month)  # Count occurrences (hours) in each year-month
   summary$dy = round(summary$n/ 24)
+  
+  
+  #removing Sept 2022 for PM01 summary <- summary[!(summary$year == 2022 & summary$month == "09"), ]
+  
   month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+  
+ 
+  
   
   p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
     geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
@@ -369,8 +403,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # season for HI sites includes December from the previous years- so make adjustment here,
   # if not HI this adds 0 so does nothing
   gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
-  #gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
-  #gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
+  #gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
+  #gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
   
   summary2 = gps %>%
     mutate(
@@ -453,6 +487,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   colnames(mallData) = c("Quantile", "Season", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
+  
+  #If upper limit of shaded FOI is greater than upper limit of data, scaale_x_log will remove shading
+  #adjust any upper limit that goes over upper limit of data
+  FOIs$FQend[FOIs$FQend > fqupper] <- fqupper
  
   
   ##reordering seasons in legend so they are chronological, not alphabetical
@@ -507,6 +545,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
     # Additional aesthetics
+     #scale_y_continuous(limits = c(39, NA)) +  # use to manually scale y minimum so vert line labels are visible
+     
     theme_minimal()+
     theme(legend.position = "right",
           plot.caption = ggtext::element_markdown(hjust = 0, size = 14),
@@ -530,11 +570,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
    subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
    #subtitle_text <- NULL      for PM01 and 02 when making version of graph with October and November
   
-   if (sidx == "biological"){ #only keep peak
+   if (sidx == "biological"){ #only keep humpback season
     gpsAll = gps
     my_subtitle = "(humpback season)"
-    gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
-    #gps = gps[gps$Season %in% c("Peak"), ]
+   #####  COMMENTING OUT BC trying PM01 w/ Oct and Nov
+    gps = gps[gps$Season %in% c("Early", "Peak","Late"), ] 
+    #gps = gps[gps$Season %in% c("Peak"), ] was trying just Peak humpaback for HIHWNMS sites
     unique( gps$mth )
     #redo effort plot so not confusing
     summary <- gps %>%
@@ -545,6 +586,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
     
+    #summary$month <- factor(summary$month, levels = c("09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07"))
+   #####for normal graphs 
     summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
     peakDays <- sum(summary$dy)
@@ -625,6 +668,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
+  
+  #removing Sept 2022 for PM01 mallData <- mallData[mallData$Year != 2022, ]
+  
 
   p = ggplot() +
     geom_ribbon(data = mallData %>% 
@@ -648,8 +694,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     # Add vertical lines at FQstart
     geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
     # Add labels at the bottom of each line
-    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
-    
+    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
+    #scale_y_continuous(limits = c(39, NA)) +  # use to manually scale y minimum so vert line labels are visible
+  
     # Additional aesthetics
     theme_minimal() +
     labs(
@@ -670,10 +717,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   p
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
-  pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
+  pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1)) #make height of last graph larger when legend gets cut off  b/c of too many data years. default is 1
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPLAllDatabutWrongYear.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
   
   
@@ -770,7 +817,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       # adjust for Hawaii year
       dailyFQ_complete$mth = month(dailyFQ_complete$Date)
       dailyFQ_complete$yr[dailyFQ_complete$mth == 12] = dailyFQ_complete$yr[dailyFQ_complete$mth == 12] + seasonShift
+      dailyFQ_complete$yr[dailyFQ_complete$mth == 11] = dailyFQ_complete$yr[dailyFQ_complete$mth == 11] + seasonShift
+      dailyFQ_complete$yr[dailyFQ_complete$mth == 10] = dailyFQ_complete$yr[dailyFQ_complete$mth == 10] + seasonShift
       
+      
+       
       # make labels for graphics (changed below for HI)
       monthly_sequence = seq.Date(as.Date("2021-01-01"), as.Date("2021-12-01"), by = "month")
       month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
@@ -781,6 +832,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       gpsFQ$mth = month(gpsFQ$UTC )
       #adjust for Hawaii year
       gpsFQ$yr[gpsFQ$mth == 12] = gpsFQ$yr[gpsFQ$mth == 12] + seasonShift
+      gpsFQ$yr[gpsFQ$mth == 11] = gpsFQ$yr[gpsFQ$mth == 11] + seasonShift
+      gpsFQ$yr[gpsFQ$mth == 10] = gpsFQ$yr[gpsFQ$mth == 10] + seasonShift
+      
+      #removing sept 2022 for PM01 Oct and Nov graph gpsFQ <- subset(gpsFQ, !(yr == 2022 & mth == 9))
+      
+      #gpsFQ %>% filter(yr == 2022) check to make sure no 2022 
+
       
       yrFQ = gpsFQ %>% group_by(yr) %>%
         summarise(
@@ -830,7 +888,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       
       ### plot: time series ####
       dailyFQ_complete$yr = factor(dailyFQ_complete$yr, levels = rev(sort(unique(dailyFQ_complete$yr))))
-      if (sidx != "biological") {
+     
+       if (sidx != "biological") {
         plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
           
           annotate("rect",
@@ -881,10 +940,16 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
       } else {
         # alternative methods for plg for Hawaii sites
+        #CHANGED to 10 instead of 12 and 8 instead of 6 for PM sites trial w oct and nov
         monthly_sequence = seq.Date(as.Date("2020-12-01"), as.Date("2021-06-01"), by = "month")
         month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
+        
+        #added -91, -60, 182, and 213 for PM adding Oct and Nov graphs
         days_of_year_for_months = c(-30, 1, 32, 60, 91, 121, 152)
-        # Adjust Julian so December days are negative (for clean continuous x-axis)
+       
+        
+         # Adjust Julian so December days are negative (for clean continuous x-axis)
+        #I changed to 274 from 335 to include oct and nov
         dailyFQ_modified = dailyFQ_complete %>%
           mutate(
             shifted_julian = ifelse(Julian >= 335, Julian - 365, Julian)
@@ -912,6 +977,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
           geom_line() +
           facet_wrap(~yr, ncol = 1)+
           scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq,
+                             #limits = c(-90,185)) +  FOR PM01 w/ Oct and Nov
                              limits = c(-40,150)) +
           labs(
             title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
@@ -952,20 +1018,27 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   gpsFQ = gps %>% select(all_of(cols_to_select))
   gpsFQ$Day = as.Date( gpsFQ$UTC )
   gpsFQ$mth = month(gpsFQ$UTC )
+  
+  #removeing sept 2022 for PM01   gpsFQ <- subset(gpsFQ, !(yr == 2022 & mth == 9))
+  
   # what wind speed category is the measured value closest to?
   wspeeds = unique( (windModel$windSpeed) )
   gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
+  
   # what is the SPL values for that windspeed?
   fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'500'
   wsIdx = match(gpsFQ$closest_windMag, windInfo$windSpeed)
   gpsFQ$WindModelfq = windInfo[wsIdx, fqIdx]
+  
   # what difference from the measured vs modeled?
   tol_col = grep("TOL", colnames(gpsFQ))
   gpsFQ$Exceed = gpsFQ[,tol_col] -  gpsFQ$WindModelfq 
+  
   # is the difference above or below 0?
   gpsFQ$Windthres = "unk"
   gpsFQ$Windthres[gpsFQ$Exceed <= ab2] = "below"
   gpsFQ$Windthres[gpsFQ$Exceed > ab2]  = "above"
+  
   # what are the all data thresholds for this frequency (not used)
   thresholds = mALL[mALL$FrequencyName == fqIn2,]
   threshold_mid =  thresholds$SoundLevel[thresholds$Quantile == "50%"]
@@ -997,10 +1070,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # CHECK: dayNE$percent_below + dayNE$percent_above
   
   dayNE = as.data.frame( dayNE )
+  
   #put most recent year at the top of the plot
   dayNE$yr  = factor(dayNE$yr,  levels = rev(sort(unique(dayNE$yr)))) 
   if (sidx == "biological") {
-    dayNE$mth = factor(dayNE$mth, levels = rev(c(12,1,2,3,4,5)))
+    dayNE$mth = factor(dayNE$mth, levels = rev(c(12,1,2,3,4,5))) #ADDED 10, 11, 6, and 7 for PM Oct aand Nov graph
   } else {
     #puts January at the top of the plot... maybe remove if confusing to go to previous year
     dayNE$mth = factor(dayNE$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10,11,12)))
@@ -1038,7 +1112,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   x_scale = if (sidx == "biological") {
     scale_x_discrete(
       breaks = c("12", "2", "4"),
-      labels = c("Dec", "Feb", "Apr")
+      labels = c("Dec", "Feb", "Apr") 
+      #breaks = c("10", "12", "2", "4", "6"),     #FOR PM01 to include Oct - Jul
+      #labels = c("Oct", "Dec", "Feb", "Apr", "Jun")   #FOR PM01 to include Oct - Jul
     )
   } else {
     scale_x_discrete(
