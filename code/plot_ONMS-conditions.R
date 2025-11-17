@@ -510,6 +510,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
      # mallData$Season,
       #levels = c("Spring", "Summer", "Fall"))
   }
+  
+  #if NRS, scale y min lower so that FOI labels are visible 
+  NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
     
   
    p = ggplot() +
@@ -545,7 +548,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
     # Additional aesthetics
-     #scale_y_continuous(limits = c(39, NA)) +  # use to manually scale y minimum so vert line labels are visible
+     scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
      
     theme_minimal()+
     theme(legend.position = "right",
@@ -671,6 +674,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   #removing Sept 2022 for PM01 mallData <- mallData[mallData$Year != 2022, ]
   
+  #if NRS, scale y min lower so that FOI labels are visible 
+  NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
 
   p = ggplot() +
     geom_ribbon(data = mallData %>% 
@@ -695,7 +700,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
     # Add labels at the bottom of each line
     geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
-    #scale_y_continuous(limits = c(39, NA)) +  # use to manually scale y minimum so vert line labels are visible
+    scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
   
     # Additional aesthetics
     theme_minimal() +
