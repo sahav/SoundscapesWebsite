@@ -7,7 +7,7 @@
 rm(list=ls()) 
 
 #SITES ####
-ONMSsites = "oc02" #c("sb01","sb03","oc02", "cb11" )
+ONMSsites = "sb03" #c("sb01","sb03","oc02", "cb11" )
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/"
