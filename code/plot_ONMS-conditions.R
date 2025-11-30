@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("cb11")
+ONMSsites = c("mb02")
 
 ## directories ####
 outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -297,7 +297,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
                         probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
   
-  
+# if (site == "sb03"){
+  # gpsB4fix <- gps
+  # gps <- gps %>% select(-"TOL_16")
+# } 
+ 
   
   
   #(1) WIND category ####
@@ -569,7 +573,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   
   #(4) ANNUAL COMPARISION plots ####
-  # truncates data to peak season for biological sites- all plots after this are peak season (early, peak, late) only!!!
+  # truncates data to peak season for biological sites (Pacific Island Region Sanctuaries) - all plots after this are peak season (early, peak, late) only!!!
    subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
    #subtitle_text <- NULL      for PM01 and 02 when making version of graph with October and November
   
@@ -676,19 +680,20 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   #if NRS, scale y min lower so that FOI labels are visible 
   NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
-
+ 
+  
   p = ggplot() +
+    #ribbon for year lines
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year),
                 alpha = 0.1) +  # Use alpha for transparency
-    
     #median TOL values- each year
     geom_line(data = mallData[mallData$Quantile == "50%",], aes(x = Frequency, y = SoundLevel, color = Year), linewidth = 2) +
     #median TOL values- all data
     geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
               linetype = "dotted") +
-    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = -Inf, ymax = Inf), 
+    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = -Inf, ymax = Inf),
               fill = "gray", alpha = 0.2) +  # Adjust alpha for transparency
     #wind model
     geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windUpp,], aes(x = variable, y = value), color = "black", linewidth = 1) +
@@ -697,11 +702,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     scale_color_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     scale_fill_manual(values =  rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     # Add vertical lines at FQstart
+    #, color = Label
     geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
     # Add labels at the bottom of each line
     geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
     scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
-  
     # Additional aesthetics
     theme_minimal() +
     labs(
@@ -720,12 +725,106 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
           legend.text = element_text(size = 12)
     ) 
   p
+  
+  
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1)) #make height of last graph larger when legend gets cut off  b/c of too many data years. default is 1
   
   ### save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  
+  
+  
+
+#INTERACTIVE PLOT
+#changes to make to ggplot above
+#still trying to figure out FOI vert lines and labels in plotly
+  #move geom_ribbon to after geom_lines
+  #make geom_rect y bounds: ymin = 35, ymax = 90
+  #add fill = Year to geom_line 
+  #add color = Year to geom_ribbon
+  #add ", text = paste("Year:", Year)" to each year geom_line in aes
+  #add "name = "Year", " to  scale_fill_manual and scale_color_manual
+  #then run code below
+  
+  
+  pInt = ggplot() +
+    #ribbon for year lines
+   #median TOL values- each year
+    geom_line(data = mallData[mallData$Quantile == "50%",], aes(x = Frequency, y = SoundLevel, color = Year,  fill = Year, text = paste("Year:", Year)), linewidth = 2) +
+    #median TOL values- all data
+    geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
+              linetype = "dotted") +
+    geom_ribbon(data = mallData %>% 
+                  pivot_wider(names_from = Quantile, values_from = SoundLevel),
+                aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year, color = Year),
+                alpha = 0.1) +  # Use alpha for transparency
+    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = 35, ymax = 90),
+              fill = "gray", alpha = 0.2) +  # Adjust alpha for transparency
+    #wind model
+    geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windUpp,], aes(x = variable, y = value), color = "black", linewidth = 1) +
+    geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windLow,], aes(x = variable, y = value), color = "black", linewidth = 1) +
+    scale_x_log10(labels = label_number(),limits = (c(10,fqupper))) +  # Log scale for x-axis
+    scale_color_manual(name = "Year", values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    scale_fill_manual(name = "Year", values =  rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    
+#commenting out to see if adding them after plotly is made works
+   # geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
+   # geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
+    scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
+    # Additional aesthetics
+    theme_minimal() +
+    labs(
+      #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
+      caption  = caption_text,
+      color = "Year",        #IF biological then change to Year*
+      fill = "Year",        #IF biological then change to Year*
+      x = "Frequency Hz",
+      y = "Sound Level (dB re 1 μPa/Hz)",
+      subtitle = subtitle_text) +
+    theme(legend.position = "right",
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
+          axis.title.x = element_text(size = 14),           # X-axis label size
+          axis.title.y = element_text(size = 14),           # Y-axis label size
+          axis.text = element_text(size = 14),
+          legend.text = element_text(size = 12)
+    ) 
+  pInt
+   
+  #make plot interactive 
+  interactive_plot <- ggplotly(pInt, tooltip = "text") 
+  
+  #remove hover info over grey shading 
+  interactive_plot$x$data[[14]]$hoverinfo <- "skip"
+  
+  
+  interactive_plot <-  interactive_plot %>% layout(
+    shapes = list(
+      list(
+        type = "line",
+        x0 = 100,
+        x1 = 100,
+        y0 = 35,
+        y1 = 90,
+        yref = "paper", # Reference to the plot's paper coordinates
+        line = list(color = "red", width = 15, dash = "dash")
+      )
+    )
+  )
+  
+  
+  interactive_plot 
+
+  
+#  interactive_plot$x$layout$xaxis$type
+# interactive_plot$x$data[[18]]$textangle <- 90  
+  
+#figure out which trace has the grey rectangles show "trace 13" when you hover
+ # for (i in seq_along(interactive_plot$x$data)) {
+  #  cat("TRACE", i, "\n")
+ #print(interactive_plot$x$data[[i]][c("name","fill","mode","hoverinfo")])
+  #}
   
   
   
@@ -1158,7 +1257,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # SAVE UPDATED DATA ####
   # names(gps)
   save(gps, file = paste0(outDirP, "/data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
-}
+
+  }
 
 
 
