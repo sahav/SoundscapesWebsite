@@ -140,6 +140,9 @@ display(HTML(gf.makeImage("MB01_FinalRosePlot.png", " Daily Fish Choruses")))
 #| echo: false
 display(HTML(standardTextDict["MARS-whales"]))
 display(HTML(gf.makeImage("MARS_BlueFinCI.jpg", "Seasonal blue and fin")))
+
+display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpg", "time series humpback")))
+display(HTML(gf.makeButtons(sites, "plot_***HumpbackWhaleDetections.jpg", "seasonal humpback")))
 ```
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
