@@ -9,6 +9,7 @@ import ipywidgets as widgets
 from pythonFunctions import generalFunctions as gf
 
 sites = ["MB01", "MB02"]
+humpbacksites = ["MB01", "MB02", "MB03]
 
 # input table for standard text
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
@@ -141,8 +142,8 @@ display(HTML(gf.makeImage("MB01_FinalRosePlot.png", " Daily Fish Choruses")))
 display(HTML(standardTextDict["MARS-whales"]))
 display(HTML(gf.makeImage("MARS_BlueFinCI.jpg", "Seasonal blue and fin")))
 
-display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpg", "time series humpback")))
-display(HTML(gf.makeButtons(sites, "plot_***HumpbackWhaleDetections.jpg", "seasonal humpback")))
+display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpeg", "time series humpback")))
+display(HTML(gf.makeButtons(humpbacksites, "plot_***HumpbackWhaleDetections.jpeg", "seasonal humpback")))
 ```
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
