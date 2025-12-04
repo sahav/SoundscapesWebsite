@@ -9,7 +9,7 @@ import ipywidgets as widgets
 from pythonFunctions import generalFunctions as gf
 
 sites = ["MB01", "MB02"]
-humpbacksites = ["MB01", "MB02", "MB03]
+humpbacksites = ["MB01", "MB02", "MB03"]
 
 # input table for standard text
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
