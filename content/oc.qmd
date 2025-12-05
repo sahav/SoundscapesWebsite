@@ -132,12 +132,12 @@ display(HTML(standardTextDict["Indicator description"]))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["large vessels interfer"]))
-display(HTML(gf.makeButtons(sites, "plot_OC02_AISMonthAbove.jpg", "SoundLevelVariance"))) 
+display(HTML(gf.makeImage("plot_OC02_AISMonthAbove.jpg", "SoundLevelVariance"))) 
 
 infoHtml3 = f'''
         <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).showModal()">Table of Results</button>
             <dialog id="infoModal3">
-                {gf.makeButtons(sites, "table_***_AISMonthAbove.jpg", "AISMonthlyTables")}
+                {gf.makeImage("table_OC02_AISMonthAbove.jpg", "AISMonthlyTables")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal3&#39;).close()">
                     Close
                 </button>
@@ -150,12 +150,12 @@ display(HTML(infoHtml3))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["level of traffic"]))
-display(HTML(gf.makeButtons(sites, "plot_***_AIShist.jpg", "Histogram")))
+display(HTML(gf.makeImage("plot_OC02_AIShist.jpg", "Histogram")))
 
 infoHtml4 = f'''
         <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).showModal()">Table of Results</button>
             <dialog id="infoModal4">
-                {gf.makeButtons(sites, "table_***_AIShist.jpg", "AISHistTables")}
+                {gf.makeImage("table_OC02_AIShist.jpg", "AISHistTables")}
                 <button style="background-color: #FFFFFF;" onclick="document.getElementById(&#39;infoModal4&#39;).close()">
                     Close
                 </button>
