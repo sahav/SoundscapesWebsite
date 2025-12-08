@@ -150,6 +150,6 @@ display(HTML(gf.makeButtons(humpbacksites, "plot_***HumpbackWhaleDetections.jpeg
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["whales"]))
+#display(HTML(standardTextDict["whales"]))
 ```
 :::

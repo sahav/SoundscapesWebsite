@@ -168,7 +168,7 @@ display(HTML(infoHtml4))
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["whales"]))
+#display(HTML(standardTextDict["whales"]))
 #display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
 ```
 :::
