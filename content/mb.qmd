@@ -142,6 +142,8 @@ display(HTML(gf.makeImage("MB01_FinalRosePlot.png", " Daily Fish Choruses")))
 display(HTML(standardTextDict["MARS-whales"]))
 display(HTML(gf.makeImage("MARS_BlueFinCI.jpg", "Seasonal blue and fin")))
 
+
+display(HTML(standardTextDict["humpback-whales"]))
 display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpeg", "time series humpback")))
 display(HTML(gf.makeButtons(humpbacksites, "plot_***HumpbackWhaleDetections.jpeg", "seasonal_humpback"))) 
 ```
