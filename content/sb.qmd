@@ -169,7 +169,7 @@ display(HTML(infoHtml4))
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["North Atlantic Right whales"]))
-#display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
+display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
 ```
 :::
 
