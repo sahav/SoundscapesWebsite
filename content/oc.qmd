@@ -169,7 +169,7 @@ display(HTML(infoHtml4))
 ```{python}
 #| echo: false
 #display(HTML(standardTextDict["whales"]))
-display(HTML("coming soon!"))
+display(HTML("Coming soon!"))
 
 #display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
 ```
