@@ -148,10 +148,12 @@ display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpeg", "time series hum
 display(HTML(standardTextDict["humpback-whales-boxplots"]))
 display(HTML(gf.makeButtons(humpbacksites, "plot_***HumpbackWhaleDetections.jpeg", "seasonal_humpback"))) 
 ```
-### Additional resources for cetacean acoustic detections:
+
 ```{python}
+#Additional resources for cetacean acoustic detections:
+
 #| echo: false
-display(HTML("Coming soon!"))
+#display(HTML("Coming soon!"))
 
 #display(HTML(standardTextDict["whales"]))
 ```
