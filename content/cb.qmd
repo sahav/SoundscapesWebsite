@@ -141,7 +141,7 @@ display(HTML(standardTextDict["large vessels interfer"]))
 #display(HTML(gf.makeButtons(sites, "plot_***_AISMonthAbove.jpg", "SoundLevelVariance"))) 
 # NEED TO ADD BUTTON: "See Table Results" table_***_AISMonthAbove.jpg
 ```
-#### How does the level of traffic change conditions?
+### How does the level of traffic change conditions?
 ```{python}
 #| echo: false
 display(HTML(standardTextDict["level of traffic"]))
@@ -152,7 +152,9 @@ display(HTML(standardTextDict["level of traffic"]))
 ### When do whales contribute to the soundscape, indicating their presence nearby?
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["whales"]))
+display(HTML("Coming soon!"))
+
+#display(HTML(standardTextDict["whales"]))
 #display(HTML(gf.embedMapViewer("https://apps-nefsc.fisheries.noaa.gov/pacm/#/narw")))
 ```
 :::
