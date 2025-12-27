@@ -27,12 +27,13 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("pm01")
+ONMSsites = c("sb09")
 
 ## directories ####
-outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
+outDir   = "~/GitHub/SoundscapesWebsite/" 
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
