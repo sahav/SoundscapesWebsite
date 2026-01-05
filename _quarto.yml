@@ -65,6 +65,8 @@ website:
         text: Papahānaumokuākea
       - href: content/as.qmd
         text: American Samoa
+      - href: content/pri.qmd
+        text: Pacific Islands Heritage
       - href: content/hi.qmd
         text: Hawaiian Islands Humpback Whale
 
@@ -81,5 +83,5 @@ format:
 filters:
   - include-files.lua
   - quarto
-
+  
   
