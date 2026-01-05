@@ -28,17 +28,20 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "ci04" 
+site  = "hi08" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
-dirGCP = paste0( "C:/Users/emma.beretta/Documents/ONMS/", site,"/") # NCEI GCP min HMD netCDF
+#dirGCP = paste0( "C:/Users/emma.beretta/Documents/ONMS/", site,"/") # for NOAA computer
+dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # for CIRES computer
+
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
 #outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
-outDir =  "C:/Users/emma.beretta/Documents/SoundscapesWebsite/" 
+#outDir =  "C:/Users/emma.beretta/Documents/SoundscapesWebsite/" #for NOAA computer
+outDir =  "C:/Users/embe5980/SoundscapesWebsite/" #for CIRES computer
 
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
