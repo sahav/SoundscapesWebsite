@@ -4,7 +4,6 @@
 # assumes NCEI and NEFSC (e.g.NEFSC_SBNMS_201811_SB03_20181112.nc) data inputs
 
 # runs one site at a time 
-# checks for files already processed
 # adds wind estimate from PAMscapes for any new data (takes time!)
 
 # OUTPUTS: hourly Hybrid millidecade values with wind speed and list of files processed
