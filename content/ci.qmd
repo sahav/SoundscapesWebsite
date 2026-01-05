@@ -63,7 +63,6 @@ display(HTML(standardTextDict["CINMS"]))
 #| echo: false
 display(HTML(htmlTable))
 
-
 display(HTML(gf.makeImage("CINMSSiteMap.jpg", "CI Site Map")))
 ```
 :::
