@@ -64,7 +64,7 @@ display(HTML(standardTextDict["CINMS"]))
 display(HTML(htmlTable))
 
 
-display(HTML(gf.makeImage("CINMSSiteMap.jpeg", "CI Site Map")))
+display(HTML(gf.makeImage("CINMSSiteMap.jpg", "CI Site Map")))
 ```
 :::
 
