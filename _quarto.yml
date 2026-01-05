@@ -1,10 +1,24 @@
 project: 
   type: website
+  render:
+    - content/index.qmd
+    - content/sb.qmd
+    - content/fgb.qmd
+    - content/gr.qmd
+    - content/fk.qmd
+    - content/oc.qmd
+    - content/cb.qmd
+    - content/mb.qmd
+    - content/ch.qmd
+    - content/ci.qmd
+    - content/pm.qmd
+    - content/as.qmd
+    - content/hi.qmd
 
 website: 
   page-navigation: true
   title: "NOAA quarto simple" 
-  site-url: "https://ci-cmg.github.io/SoundscapesWebsite" 
+  site-url: "https://ci-cmg.github.io/SoundscapesWebsite"
   repo-url: "https://github.com/CI-CMG/SoundscapesWebsite"
   repo-actions: [edit, source, issue]
   favicon: images/favicon.ico
@@ -81,5 +95,5 @@ format:
 filters:
   - include-files.lua
   - quarto
-
+  
   
