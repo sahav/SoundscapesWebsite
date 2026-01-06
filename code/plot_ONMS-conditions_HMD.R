@@ -27,11 +27,11 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("as01")
+ONMSsites = c("fgb01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
-outDir = "C:/Users/pam_user/Desktop/SoundscapesWebsite/" #for GCP workstation remote desktop
+outDir = "X:/Emma_Beretta/SoundscapesWebsite/" #for GCP workstation remote desktop
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
@@ -399,7 +399,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
     seasont <- season[order(seasont$Season), ]
     
-    #for fk07 that doesnt have winter 
+    #for fk07 and fgb01 that doesnt have winter 
     #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
   } else if ( length(sidx) == 0) {
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))

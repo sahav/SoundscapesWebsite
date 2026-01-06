@@ -233,12 +233,11 @@ sapply(data_chunks, nrow)
 
 gps_chunks <- list()  # store wind-matched results
 
-
-for (i in seq_along(data_chunks)[-1]) {
- cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
-
-gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
-}
+#loop but usually overwhelms R
+#for (i in seq_along(data_chunks)) {
+#cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
+#gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+#}
 
 #add/remove lines for the number of chunks data was broken into
 #run one line at a time, it will take a while
@@ -283,7 +282,6 @@ if ( length(cDatah) > 0 ) {
 
 
 # APPEND & SAVE NEW DATA FILES ####
-
 #SINCE HMD, we dont want to combine data with old TOL data  
 
 dysA = length( unique( as.Date( gps$UTC) ) )
