@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fgb01")
+ONMSsites = c("fk06")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -399,7 +399,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
     seasont <- season[order(seasont$Season), ]
     
-    #for fk07 and fgb01 that doesnt have winter 
+    #run only line below for fk06 fk07 and fgb01 that doesnt have winter 
     #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
   } else if ( length(sidx) == 0) {
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
