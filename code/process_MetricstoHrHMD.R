@@ -27,20 +27,23 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "hi08" 
+site  = "fgb01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
 #dirGCP = paste0( "/Users/quca3108/ONMS/", site,"/") # NCEI GCP min HMD netCDFs
 #dirGCP = paste0( "C:/Users/emma.beretta/Documents/ONMS/", site,"/") # for NOAA computer
-dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # for CIRES computer
+#dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # for CIRES computer
+dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP workstation
 
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
 #outDir =  "F:/CODE/GitHub/SoundscapesWebsite/" 
 #outDir =  "C:/Users/emma.beretta/Documents/SoundscapesWebsite/" #for NOAA computer
-outDir =  "C:/Users/embe5980/SoundscapesWebsite/" #for CIRES computer
+#outDir =  "C:/Users/embe5980/SoundscapesWebsite/" #for CIRES computer
+outDir =  "X:/Emma_Beretta/SoundscapesWebsite/" #for GCP workstation
+
 
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
@@ -243,8 +246,8 @@ gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
 gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
 gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
 #gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
