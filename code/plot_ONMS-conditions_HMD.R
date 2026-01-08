@@ -164,35 +164,35 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
       values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00") )
     sidx = "wssf"
-    seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonLabel = "Winter = Jan-Mar, Spring = Apr-Jun, Summer = Jul-Sep, Fall = Oct-Dec"
     seasonShift = 0
   }else if  ( sidx == "biological") {
     season = data.frame(
       Season = c("Early", "Peak", "Late", "Non"),
       Months = c("12,1", "2,3", "4,5", "6,7,8,9,10,11") ,
       values = c(  "#56B4E9", "#CC79A7", "#009E73", "#B3B3B3") )
-    seasonLabel = "Early (Dec-Jan), Peak (Feb-Mar), Late (Apr-May), Non (Jun-Nov) "
+    seasonLabel = "Early = Dec-Jan, Peak = Feb-Mar, Late = Apr-May, Non = Jun-Nov"
     seasonShift = 1 # this is the offset for HI sites- where the december is part of the next year
   }else if  ( sidx == "upwelling") {
     season = data.frame(
       Season = c("Post-Upwelling", "Upwelling", "Winter"),
       Months = c("7,8,9,10,11", "3,4,5,6", "12,1,2") ,
       values = c(  "#CC79A7",  "#009E73", "#56B4E9") )
-    seasonLabel = "Upwelling (Mar-Jun), Post-Upwelling (Jul-Nov), Winter (Dec-Feb)"
+    seasonLabel = "Upwelling = Mar-Jun, Post-Upwelling = Jul-Nov, Winter = Dec-Feb"
     seasonShift = 0
   }else if ( sidx == "wssf") {
     season = data.frame(
       Season = c("Winter", "Spring", "Summer" , "Fall"),
       Months = c("1,2,3" , "4,5,6",  "7,8,9", "10,11,12"),
       values = c( "#56B4E9", "#009E73",  "#CC79A7", "#E69F00"))
-    seasonLabel = "Winter (Jan-Mar), Spring (Apr-Jun), Summer (Jul-Sep), Fall (Oct-Dec)"
+    seasonLabel = "Winter = Jan-Mar, Spring = Apr-Jun, Summer = Jul-Sep, Fall = Oct-Dec"
     seasonShift = 0
   }else if ( sidx == "southernHem") {
     season = data.frame(
       Season = c( "Humpback", "Humpback peak", "Hurricane", "Tradewind" ),
       Months = c("6,7,8,9,10" , "8,9,10" ,"11,12,1,2,3,4",  "5,6,7,8,9,10") ,
       values = c(   "#56B4E9",  "#009E73", "#CC79A7", "#E69F00") )
-    seasonLabel = "Humpback (Jun-Oct), Humpback peak (Aug-Oct), Hurricane (Nov-Apr), Tradewind (May-Oct)"
+    seasonLabel = "Humpback = Jun-Oct, Humpback peak = Aug-Oct, Hurricane = Nov-Apr, Tradewind = May-Oct"
     seasonShift = 0
   }
   
@@ -325,7 +325,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   
   if(substr(site, 1, 2) == "pm" | substr(site, 1, 2) == "hi"){
-    legend_label = "*Humpback\n Year"
+    legend_label = "Humpback\nYear*"
   } else {
     legend_label = "Year"
   }
@@ -585,16 +585,17 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #if NRS, scale y min lower so that FOI labels are visible 
   NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
   
+  mallDataS = mallData
   
   p = ggplot() +
     # Add shaded area for 25%-75% range
-    geom_ribbon(data = mallData %>% 
+    geom_ribbon(data = mallDataS %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Season),
                 alpha = 0.2) +  # Use alpha for transparency
     
     # Median (50%) HMD values
-    geom_line(data = mallData[mallData$Quantile == "50%",], 
+    geom_line(data = mallDataS[mallDataS$Quantile == "50%",], 
               aes(x = Frequency, y = SoundLevel, color = Season), linewidth = 2) +
     geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
               linetype = "dotted")+ 
@@ -686,7 +687,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
                           , ", with ", peakDays, " unique days in humpback season"),
         x = "",
         y = "Days",
-        fill = "*Humpback\nYear"
+        fill = "Humpback\nYear*"
       ) +
       scale_x_discrete(labels = month.abb[ month_nums ]) +  # Show month names instead of numbers
       #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
@@ -717,14 +718,26 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     my_subtitle = "all data" 
   }
   
-  caption_text = paste0(
-    "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
-    "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
-    "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
-    "<b>Dotted sound level curve</b> is the median for ",my_subtitle, "<br>",
-    "<b>Solid sound level curves and shaded areas</b> are the annual medians and 25th-75th percentiles of ", my_subtitle, " data") # for ", my_subtitle)
+ 
   
   
+  if (my_subtitle == "(humpback season)"){
+    caption_text = paste0(
+      "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
+      "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
+      "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
+      "<b>Dotted sound level curve</b> is the median for humpback season<br>",
+      "<b>Solid sound level curves and shaded areas</b> are the annual medians and 25th-75th percentiles for humpback season") # for ", my_subtitle)
+    
+  } else {
+    caption_text = paste0(
+      "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
+      "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
+      "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
+      "<b>Dotted sound level curve</b> is the median for ",my_subtitle, "<br>",
+      "<b>Solid sound level curves and shaded areas</b> are the annual medians and 25th-75th percentiles for ", my_subtitle) # for ", my_subtitle)
+    
+  }
   
   
   ## re-calculate percentiles for all the data ####
@@ -820,7 +833,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ### save figure ####
   ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_HMDYearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
-  
+ 
   
   
   #INTERACTIVE PLOT
