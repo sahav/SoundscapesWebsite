@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi08")
+ONMSsites = c("fk06")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -402,13 +402,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
     seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
     seasont <- season[order(seasont$Season), ]
+  } else if (site == "fk06" | "fk07" | "fgb01"){
+    summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
+    
   } else if ( sidx == "wssf") {
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
     seasont <- season[order(seasont$Season), ]
     
-    #run only line below for fk06 fk07 and fgb01 that doesnt have winter 
-    #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
   } else if ( length(sidx) == 0) {
     summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
     seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
@@ -502,7 +503,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level curve</b> is the median for all data<br>",
-    "<b>Solid sound level curves and shaded areas</b> are the seasonal medians and 25th-75th percentiles of data")
+    "<b>Solid sound level curves and shaded areas</b> are the seasonal medians and 25th-75th percentiles for all data")
   
   
   # PERCENTILES for all the data ####
