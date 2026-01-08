@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi08")
+ONMSsites = c("fgb01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -402,7 +402,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
     seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
     seasont <- season[order(seasont$Season), ]
-  } else if (site == "fk06" | "fk07" | "fgb01"){
+  } else if (site %in% c("fk06", "fk07", "fgb01")){
     summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
     
   } else if ( sidx == "wssf") {
