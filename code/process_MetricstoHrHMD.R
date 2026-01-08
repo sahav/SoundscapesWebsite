@@ -27,7 +27,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk06" 
+site  = "hi08" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -79,7 +79,7 @@ if (length(tmp) != 0){
 # e.g. ONMS_HI01_20231201_8021.1.48000_20231201_DAILY_MILLIDEC_MinRes.nc
 inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names = T)
 dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
-cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),"with",
+cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),") with",
     sum( duplicated(dysON)), "duplicated days\n")
 
 
@@ -148,7 +148,86 @@ if (length(tmp) != 0){
 # }
 
 
+# PROCESS ONMS Sound FILES ####
 
+#PROCESS DATA WITH CHUNKS ####
+#Too many unique days to process all at once. Need to break cDatah into smaller datasets
+#Split cDatah into chunks
+
+#where we will store results
+cData_chunks <- list()  
+cDatah_chunks <- list()
+
+#get number of chunks
+# Split that list of days into ~100-day chunks
+chunk_size <- 100
+inFiles_chunks <- split(inFiles, ceiling(seq_along(inFiles) / chunk_size))
+x = 1
+cData = NULL  
+cDatah = NULL
+
+#process data by chunk (to avoid crashing R with too much data at once)
+#RERUN the for loop below for every chunk of 100 days
+#will automatically increase chunk number that you are on at end of loop, just need to restart it
+
+if (length(inFiles_chunks[[x]]) > 0) { 
+  for (f in 1: length(inFiles_chunks[[x]]) ){ # 1245:1246 length(inFiles)
+    
+    cat("Processing", f, "of", length(inFiles_chunks[[x]]), basename(inFiles_chunks[[x]][f]), "\n")
+    
+    ncFile = inFiles_chunks[[x]][f]
+    hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+    #tolData = createOctaveLevel(hmdData, type='tol')
+    names( hmdData )
+    # add software column
+    if ( grepl("MinRes.nc", basename(inFiles_chunks[[x]][f]) ) ) {
+      hmdData$software = "manta"
+    } else {  
+      hmdData$software = "pypam" }
+    
+    # combine data- check to make sure columns match
+    hmdData = hmdData[, setdiff(names(hmdData), "platform"), drop = FALSE]
+    #remove_cols = setdiff(names(tolData), names(cData))
+    if(f > 1) {
+      hmdData = hmdData[ , names(hmdData) %in% names(cData) ] 
+    }
+    
+    cData   = rbind(cData, hmdData)
+    
+  } 
+  
+  #bin to hourly median values
+  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
+  
+  #had to use below line for CI01 because it wasnt keeping Lat/Long by default for some reason
+  #cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median"), extraCols = c("Latitude", "Longitude"))
+  
+  #cData_chunks[[x]] <- cData
+  cDatah_chunks[[x]] <- cDatah
+  x = x+1
+  cData = NULL  
+  cDatah = NULL
+}
+
+#2.5 hours for 8 chunks
+#setdiff(names(cData_chunks[[3]]), names(cDatah_chunks[[3]]))  
+
+#rerun loop after every chunk of 100 completes
+
+#put chunks back together after you run for loop for total number of chunks
+cDatah <- dplyr::bind_rows(cDatah_chunks)
+
+
+#ADD a few basic columns about the data
+cDatah$yr  = year(cDatah$UTC)
+cDatah$mth = month(cDatah$UTC)
+cDatah$site = site
+
+
+
+#SKIP if completed w/ chunks
+
+#WITHOUT CHUNKS
 # PROCESS ONMS Sound FILES ####
 cData = NULL  
 cDatah = NULL
@@ -245,8 +324,8 @@ gps_chunks <- list()  # store wind-matched results
 gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
 gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
 gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-#gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-#gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
 #gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])

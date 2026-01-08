@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk06")
+ONMSsites = c("hi08")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -289,7 +289,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   # season for HI sites includes December from the previous years- so make adjustment here,
   # if not HI this adds 0 so does nothing
-  if ( sidx == "biological" & substr(site, 1, 2) == "pm") {
+  if ( substr(site, 1, 2) == "pm") {
     #shift october-december to the next year
     gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
     gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
@@ -309,15 +309,23 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     summary$month <- factor(summary$month, levels = c("10", "11", "12", "01", "02", "03", "04", "05", "06", "07"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
     peakDays <- sum(summary$dy)
+  } else if ( substr(site, 1, 2) == "hi") {
+    #shift december to the next year
+    gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
+    
+    summary$year[summary$month == 12] =  summary$year[summary$month == 12] + seasonShift
+ 
+    #order months to start with Dec for effort graph
+    summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05", "06", "07"))
+    month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+    peakDays <- sum(summary$dy)
   }
   
   month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
   
   
-  if(substr(site, 1, 2) == "pm"){
+  if(substr(site, 1, 2) == "pm" | substr(site, 1, 2) == "hi"){
     legend_label = "*Humpback\n Year"
-  } else if (substr(site, 1, 2) == "hi"){
-    legend_label = "*Year"
   } else {
     legend_label = "Year"
   }
@@ -413,9 +421,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     labs(
       title = "monitoring effort by season (all data)",
       subtitle  = paste0(toupper(site), " has ", udays, 
-                         " unique days: ", as.character(st), " to ", as.character(ed), "\n",
-                         seasonLabel),
-      x = "",      y = "Days",      fill = "Year"
+                         " unique days of data between ", as.character(st), " and ", as.character(ed)), #, "\n", seasonLabel),
+      x = "",      y = "Days",      fill = "Season"
     ) +
     scale_fill_manual(values = seasont$values) +
     theme_minimal() +
@@ -424,7 +431,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       axis.title.y = element_text(size = 14),
       axis.text.y = element_text(size = 14),
       axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
-      plot.subtitle = element_text(size = 14),
+      plot.subtitle = element_text(size = 12),
       legend.text = element_text(size = 12),
       legend.position = "right" 
     )
@@ -494,7 +501,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
-    "<b>Dotted sound level</b> curve is the median for all data")
+    "<b>Dotted sound level curve</b> is the median for all data<br>",
+    "<b>Solid sound level curves and shaded areas</b> are the seasonal medians and 25th-75th percentiles of data")
   
   
   # PERCENTILES for all the data ####
@@ -583,9 +591,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Season),
-                alpha = 0.1) +  # Use alpha for transparency
+                alpha = 0.2) +  # Use alpha for transparency
     
-    # Median (50%) TOL values
+    # Median (50%) HMD values
     geom_line(data = mallData[mallData$Quantile == "50%",], 
               aes(x = Frequency, y = SoundLevel, color = Season), linewidth = 2) +
     geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
@@ -606,16 +614,17 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     # Add labels at the bottom of each line
   #  geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
      labs(
-      caption  = caption_text,
+        subtitle = seasonLabel,
+       caption  = caption_text,
       x = "Frequency Hz",
-      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
+      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa"^2, "/Hz)" ) ) #dB re 1 uPa^2/Hz
     ) +
     # Additional aesthetics
     scale_y_continuous(limits = c(30, NA)) +  # use to manually scale y minimum so vert line labels are visible
     
     theme_minimal()+
     theme(legend.position = "right",
-          plot.caption = ggtext::element_markdown(hjust = 0, size = 14),
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
           axis.title.x = element_text(size = 14),           
           axis.title.y = element_text(size = 14), 
           legend.text = element_text(size = 12),
@@ -634,16 +643,18 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #(4) ANNUAL COMPARISION plots ####
   # truncates data to peak season for biological sites (Pacific Island Region Sanctuaries) - all plots after this are peak season (early, peak, late) only!!!
   subtitle_text <- if (sidx == "biological" & substr(site, 1, 2) == "hi"){
-    "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." 
+    #"*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." 
+    "*Humpback Year includes data from Dec of previous year through May of the given year. Humpback season excludes data from\n the Non season (Jun-Nov)."
   } else if (sidx == "biological" & substr(site, 1, 2) == "pm"){
-    "*Humpback Year includes data from Oct - Dec of previous year through Jul of the given year"
+    "*Humpback Year includes data from Oct - Dec of previous year through Jul of the given year."
   } else NULL
  
   
-  if (sidx == "biological" & substr(site, 1, 2) == "hi"){ #only keep humpback season
+  if (substr(site, 1, 2) == "hi"){ #only keep humpback season
     gpsAll = gps
     my_subtitle = "(humpback season)"
     #####  COMMENTING OUT BC trying PM01 w/ Oct and Nov
+    gps = gpsold 
     gps = gps[gps$Season %in% c("Early", "Peak","Late"), ] 
     #gps = gps[gps$Season %in% c("Peak"), ] was trying just Peak humpaback for HIHWNMS sites
     unique( gps$mth )
@@ -655,6 +666,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       ) %>%
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
+    
+    summary$year[summary$month == 12] =  summary$year[summary$month == 12] + seasonShift
     
     #summary$month <- factor(summary$month, levels = c("09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07"))
     #####for normal graphs 
@@ -673,7 +686,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
                           , ", with ", peakDays, " unique days in humpback season"),
         x = "",
         y = "Days",
-        fill = "Year"
+        fill = "*Humpback\nYear"
       ) +
       scale_x_discrete(labels = month.abb[ month_nums ]) +  # Show month names instead of numbers
       #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
@@ -684,14 +697,21 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         axis.title.y = element_text(size = 14),
         axis.text.y = element_text(size = 14),
         axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
-        plot.subtitle = element_text(size = 14),
+        plot.subtitle = element_text(size = 12),
         legend.text = element_text(size = 12),
         legend.position = "right" 
-      )
+      )+
+      #adding marker for cutoff threshold (months need more than 23 days of data to be kept in line graph)
+      geom_hline(yintercept = 23,    
+                 linetype = "dashed",
+                 color = "red",
+                 size = .5)
     
     p1
     ## re-save effort figure ####
-    ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+    ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_HMDEffort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+  
+    gps = gpsAll
   } else {
     gpsAll = gps
     my_subtitle = "all data" 
@@ -701,7 +721,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>",toupper(site) , " </b> (", siteInfo$`Oceanographic category`, ")<br>",
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
-    "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
+    "<b>Dotted sound level curve</b> is the median for ",my_subtitle, "<br>",
+    "<b>Solid sound level curves and shaded areas</b> are the annual medians and 25th-75th percentiles of ", my_subtitle, " data") # for ", my_subtitle)
   
   
   
@@ -780,7 +801,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       color = legend_label,        #IF biological then change to Year*
       fill = legend_label,        #IF biological then change to Year*
       x = "Frequency Hz",
-      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
+      y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa"^2, "/Hz)" ) ),
       subtitle = subtitle_text) +
     theme(legend.position = "right",
           plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
