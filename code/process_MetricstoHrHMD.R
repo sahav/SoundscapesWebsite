@@ -27,7 +27,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk01" 
+site  = "fk05" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -229,7 +229,6 @@ cDatah$site = site
 
 #WITHOUT CHUNKS
 # PROCESS ONMS Sound FILES ####
-cData = NULL  
 cDatah = NULL
 
 if (length(inFiles) > 0) { 
@@ -334,7 +333,7 @@ gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
 gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
 gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
 gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
-#gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
+gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
 #put chunks back together
