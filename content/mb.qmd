@@ -9,6 +9,7 @@ import ipywidgets as widgets
 from pythonFunctions import generalFunctions as gf
 
 sites = ["MB01", "MB02"]
+humpbacksites = ["MB01", "MB02", "MB03"]
 
 # input table for standard text
 inputDir = os.path.normpath(os.path.join(os.getcwd(), "resources"))
@@ -140,10 +141,20 @@ display(HTML(gf.makeImage("MB01_FinalRosePlot.png", " Daily Fish Choruses")))
 #| echo: false
 display(HTML(standardTextDict["MARS-whales"]))
 display(HTML(gf.makeImage("MARS_BlueFinCI.jpg", "Seasonal blue and fin")))
+
+display(HTML(standardTextDict["humpback-whales"]))
+display(HTML(gf.makeImage("MBNMS_HumpbackWhaleDetections.jpeg", "time series humpback")))
+
+display(HTML(standardTextDict["humpback-whales-boxplots"]))
+display(HTML(gf.makeButtons(humpbacksites, "plot_***HumpbackWhaleDetections.jpeg", "seasonal_humpback"))) 
 ```
-### When do whales contribute to the soundscape, indicating their presence nearby?
+
 ```{python}
 #| echo: false
-display(HTML(standardTextDict["whales"]))
+
+#Additional resources for cetacean acoustic detections:
+#display(HTML("Coming soon!"))
+
+#display(HTML(standardTextDict["whales"]))
 ```
 :::

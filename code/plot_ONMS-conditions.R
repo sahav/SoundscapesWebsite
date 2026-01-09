@@ -5,7 +5,7 @@
 # works for each monitoring site
 
 # LIBRARIES ####
-devtools::install_github('TaikiSan21/PAMscapes')
+#devtools::install_github('TaikiSan21/PAMscapes')
 
 library(patchwork)
 library(PAMscapes)
@@ -27,12 +27,13 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk06")
+ONMSsites = c("sb09")
 
 ## directories ####
-outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
+#outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
+outDir   = "~/GitHub/SoundscapesWebsite/" 
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
 outDirC  =  paste0(outDir,"context/") #where to get context
@@ -60,6 +61,7 @@ lookup = as.data.frame ( openxlsx :: read.xlsx(metaFile, sheet  = "Summary") ) #
 colnames(lookup) = lookup[1, ]         # Set first row as column names
 lookup = as.data.frame( lookup[-1, ] ) # Remove the first row
 lookup = as.data.frame( lookup[!apply(lookup, 1, function(row) all(is.na(row))), ] )
+
 ## TIMES OF INTEREST ####
 TOI = as.data.frame (openxlsx :: read.xlsx(metaFile, sheet = "Time period of interest") )
 TOI = TOI[!apply(TOI, 1, function(row) all(is.na(row))), ]
@@ -72,6 +74,7 @@ FOI = FOI[!apply(FOI, 1, function(row) all(is.na(row))), ]
 FOI$Sanctuary = tolower(FOI$Sanctuary)
 FOI = FOI[FOI$`Show.on.plot?` == "Y",]
 FOIp = FOI[FOI$`Track.this.FQ.as.indicator.for.sources?` == "Y",]
+
 ## TOL CONVERSION ####
 TOL_convert = read.csv(paste0(outDirC,"TOLconvert.csv"))
 TOL_convert$Nominal = paste0("TOL_",TOL_convert$Center)
@@ -91,9 +94,33 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   site =  ONMSsites[uu]
   
   #renaming for NRS sites
-  if (site == "cb11") {
+  if (site == "oc03") {
     outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
-    site1 = "NRS11"
+    site1 = "nrs03"
+    site3 = "ocnrs03"
+    site  = "NRS03"
+    site5 = "oc03"
+  } else if (site == "sb09"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs09"
+    site3 = "sbnrs09"
+    site  = "NRS09"
+    site5 = "sb09"
+  } else if (site == "ci05"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs05"
+    site3 = "cinrs05"
+    site  = "NRS05"
+    site5 = "ci05"
+  } else if (site == "ch13"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs13"
+    site3 = "chnrs13"
+    site  = "NRS13"
+    site5 = "ch13"
+  } else if (site == "cb11"){
+    outDirP = paste0( outDir,"products/", substr(tolower(site), start = 1, stop =2),"/" ) #products
+    site1 = "nrs11"
     site3 = "cbnrs11"
     site  = "NRS11"
     site5 = "cb11"
@@ -171,7 +198,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   inFile = list.files(outDirP, pattern = paste0("data_", tolower(site1), "_HourlySPL-gfs_.*\\.Rda$"), full.names = T)
   file_info = file.info(inFile) 
   load( inFile[which.max(file_info$ctime)] ) #only load the most recent!
-  # fk05 being weird w loading in most recent, ussed this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
+  # fk05 being weird w loading in most recent, used this load("C:/Users/embe5980/SoundscapesWebsite/products/fk/data_fk05_HourlySPL-gfs_2025-10-17.Rda")
+ 
   if( exists("outData") ) {
     gps = outData
     rm(outData)
@@ -233,47 +261,177 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ed = as.Date( max(gps$UTC) )
   udays = length( unique(as.Date(gps$UTC)) )
   
+
   # CHECK: DATA SUMMARY ####
   cat(site, "Context Summary:\n", siteInfo$`Oceanographic category`,  "; season-",  unique(gps$Season), 
       "; times of interest-", nrow(TOIs), 
       "; frequencies of interest- ", nrow(FOIst), "\n",
       "Input Data - ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
   
-  # PERCENTILES for all the data ####
-  # all data - NOTE recalculated below if only plotting peak
-  tol_columns = grep("TOL", colnames(gps))
-  all_quantiles = apply(gps[, tol_columns, drop = FALSE], 2, quantile, 
-                        probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
-  # this re-formats the quantiles for plotting
-  All = as.data.frame( all_quantiles )
-  All$Quantile = rownames(All)
-  All$Year = "all"
-  tol_columns = grep("TOL", colnames(All))
-  mALL = melt(All, id.vars = c("Quantile","Year"), measure.vars = tol_columns)
-  mALL$variable = as.numeric( as.character( gsub("TOL_", "", mALL$variable )))
-  colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
-  # by season
-  tol_columns = grep("TOL", colnames(gps))
-  season_split = split(gps, gps$Season)
-  season_quantiles = lapply(season_split, function(season_data) {
-    apply(season_data[, tol_columns, drop = FALSE], 2, quantile, 
-          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
-  # by year -- recalculated below if only plotting peak
-  yr_split = split(gps, gps$yr) # Calculate quantiles for each year
-  year_quantiles = lapply(yr_split, function(season_data) {
-    apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  
-          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
-  # by year 1 
-  yr1 = min( gps$yr )
-  tol_columns = grep("TOL", colnames(gps))
-  yr1.df = gps[ gps$yr == yr1,]
-  yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
-                        probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
+  
+  
+  #(1) EFFORT ALL DATA ####
+  ## by month (days/ month-year) ####
+  ## by season (hours/ season in each year) ####
+  
+  summary <- gps %>%
+    mutate(
+      year  = year(UTC),  # Extract Year
+      month = format(UTC, "%m")  # Extract Month (numeric format)
+    ) %>%
+    count(year, month)  # Count occurrences (hours) in each year-month
+  summary$dy = round(summary$n/ 24)
+  
+  
+  # season for HI sites includes December from the previous years- so make adjustment here,
+  # if not HI this adds 0 so does nothing
+  if ( sidx == "biological" & substr(site, 1, 2) == "pm") {
+    #shift october-december to the next year
+    gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
+    gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
+    gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
+  
+    summary$year[summary$month == 12] =  summary$year[summary$month == 12] + seasonShift
+    summary$year[summary$month == 11] =  summary$year[summary$month == 11] + seasonShift   #for PM sites, Eden wants to see with October and November counted as next year
+    summary$year[summary$month == 10] =  summary$year[summary$month == 10] + seasonShift  #for PM sites, Eden wants to see with October and November counted as next year
+    
+    #removing Sept 2022 for PM01, we only want Oct-Jul, usually no data recorded in Sept
+    summary <- summary[!(summary$year == 2022 & summary$month == "09"), ]
+    
+    #removing Sept 2022 for PM01, we only want Oct-Jul, usually no data recorded in Sept
+    gps <- gps[!(gps$yr == 2022 & gps$mth == 9), ]
+    
+    #order months to start with Oct for effort graph
+    summary$month <- factor(summary$month, levels = c("10", "11", "12", "01", "02", "03", "04", "05", "06", "07"))
+    month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+    peakDays <- sum(summary$dy)
+  }
+  
+  month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
+
+  
+  if(substr(site, 1, 2) == "pm"){
+    legend_label = "*Humpback\n Year"
+  } else if (substr(site, 1, 2) == "hi"){
+    legend_label = "*Year"
+  } else {
+    legend_label = "Year"
+  }
+  
+  if(substr(site, 1, 2) == "pm"){
+    effort_title = "monitoring effort by humpback year (all data)"
+  } else {
+    effort_title = "monitoring effort by year (all data)"
+  }
+  
+  
+  p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
+    geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
+    #coord_flip() +
+    labs(
+      title = effort_title,
+      subtitle = paste0(toupper(site), " has ", udays, 
+                        " unique days: ", as.character(st), " to ", as.character(ed)),
+      x = "",
+      y = "Days",
+      fill = legend_label
+    ) +
+    scale_x_discrete(labels = month.abb[month_nums]) +  # Show month names instead of numbers
+    #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
+    scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      axis.title.y = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
+      plot.subtitle = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.position = "right" 
+    ) +
+    #adding marker for cutoff threshold (months need more than 23 days of data to be kept in line graph)
+    geom_hline(yintercept = 23,    
+               linetype = "dashed",
+               color = "red",
+               size = .5)
+  
+  p1
+  ##save figure ####
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortwOctNov.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
+  
+  
+  #remove any months that have less than 23 days of data (552 hours) from gps
+  #for PM01: 03/20, 04/20, 06/20, 07/21, 07/23, 06/24
+  
+  summary$month = as.character(summary$month)
+  summary$month = as.numeric(summary$month)
+  summaryX = summary %>% filter(n < 552) %>% select(year, month)
+  
+  gpsnew = anti_join(gps, summaryX, by = c("yr" = "year",
+                                           "mth" = "month"))
+  gpsold = gps
+  gps = gpsnew
+    
+  
+  summary2 = gps %>%
+    mutate(
+      year  = yr,  # Extract Year
+      month = mth  # Extract Month (numeric format)
+    ) %>%
+    count(year, Season)  # Count occurrences (hours) in each year-month
+  
+  summary2$dy = round(summary2$n/ 24)
+  seasont = season %>% filter(Season %in% unique(summary2$Season) )
+ 
+  
+  ##reordering seasons in legend so they are chronological, not alphabetical
+  # may need to make adjustments if this site doesnt have data from all seasons
+  if  ( sidx == "biological") {
+    summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
+    seasont <- season[order(seasont$Season), ]
+  } else if ( sidx == "wssf") {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+    
+    #for fk07 that doesnt have winter 
+    #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
+  } else if ( length(sidx) == 0) {
+    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
+    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
+    seasont <- season[order(seasont$Season), ]
+  }
+  
+  p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
+    geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
+    #coord_flip()+ 
+    labs(
+      title = "monitoring effort by season (all data)",
+      subtitle  = paste0(toupper(site), " has ", udays, 
+                         " unique days: ", as.character(st), " to ", as.character(ed), "\n",
+                         seasonLabel),
+      x = "",      y = "Days",      fill = "Year"
+    ) +
+    scale_fill_manual(values = seasont$values) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold", hjust = 0),
+      axis.title.y = element_text(size = 14),
+      axis.text.y = element_text(size = 14),
+      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
+      plot.subtitle = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      legend.position = "right" 
+    )
+  p2
+  ##save figure ####
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeasonwOctNovnoX.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   
   
-  
-  #(1) WIND category ####
+
+  #(2) WIND category ####
   gps$wind_category = NA
   gps <- gps %>%
     mutate(wind_category = case_when(
@@ -321,110 +479,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     scale_fill_manual(values = c("low" = "blue",  "med" = "orange", "high" = "red") )
   l
   #save figure ####
-  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeed.jpg"), plot = l , width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_windSpeedwOctNovnoX.jpg"), plot = l , width = 10, height = 12, dpi = 300)
   
-  
-  
-  #(2) EFFORT ALL DATA ####
-  ## by month (days/ month-year) ####
-  summary <- gps %>%
-    mutate(
-      year  = year(UTC),  # Extract Year
-      month = format(UTC, "%m")  # Extract Month (numeric format)
-    ) %>%
-    count(year, month)  # Count occurrences (hours) in each year-month
-  summary$dy = round(summary$n/ 24)
-  month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
-  
-  p1 = ggplot(summary, aes(x = month, y = dy, fill = as.factor(year))) +
-    geom_col(position = "dodge", width = .4) +  # Use dodge to separate bars for each year within the same month
-    #coord_flip() +
-    labs(
-      title = "monitoring effort by year (all data)",
-      subtitle = paste0(toupper(site), " has ", udays, 
-                        " unique days: ", as.character(st), " to ", as.character(ed)),
-      x = "",
-      y = "Days",
-      fill = "Year"
-    ) +
-    scale_x_discrete(labels = month.abb[month_nums]) +  # Show month names instead of numbers
-    #scale_fill_manual(values = rev(gray.colors(length(unique(summary$year))))) +  # Create grayscale colors
-    scale_fill_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
-    theme_minimal() +
-    theme(
-      plot.title = element_text(size = 16, face = "bold", hjust = 0),
-      axis.title.y = element_text(size = 14),
-      axis.text.y = element_text(size = 14),
-      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
-      plot.subtitle = element_text(size = 14),
-      legend.text = element_text(size = 12),
-      legend.position = "right" 
-    )
-  
-  p1
-  ##save figure ####
-  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_Effort.jpg"), plot = p1, width = 10, height = 4, dpi = 300)
-  
-  ## by season (hours/ season in each year ####
-  # season for HI sites includes December from the previous years- so make adjustment here,
-  # if not HI this adds 0 so does nothing
-  gps$yr[gps$mth == 12] = gps$yr[gps$mth == 12] + seasonShift
-  #gps$yr[gps$mth == 11] = gps$yr[gps$mth == 11] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
-  #gps$yr[gps$mth == 10] = gps$yr[gps$mth == 10] + seasonShift   #for PM sites, Eden wantss to ssee with October and November counted as next year
-  
-  summary2 = gps %>%
-    mutate(
-      year  = yr,  # Extract Year
-      month = mth  # Extract Month (numeric format)
-    ) %>%
-    count(year, Season)  # Count occurrences (hours) in each year-month
-  
-  summary2$dy = round(summary2$n/ 24)
-  seasont = season %>% filter(Season %in% unique(summary2$Season) )
- 
-  ##reordering seasons in legend so they are chronological, not alphabetical
-  # may need to make adjustments if this site doesnt have data from all seasons
-  if  ( sidx == "biological") {
-    summary2$Season <- factor(summary2$Season, levels = c("Early", "Peak", "Late", "Non"))
-    seasont$Season <- factor(seasont$Season, levels = c("Early", "Peak", "Late", "Non"))
-    seasont <- season[order(seasont$Season), ]
-  } else if ( sidx == "wssf") {
-    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
-    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
-    seasont <- season[order(seasont$Season), ]
-    
-    #for fk07 that doesnt have winter 
-    #summary2$Season <- factor(summary2$Season, levels = c("Spring", "Summer", "Fall"))
-  } else if ( length(sidx) == 0) {
-    summary2$Season <- factor(summary2$Season, levels = c("Winter", "Spring", "Summer", "Fall"))
-    seasont$Season <- factor(seasont$Season, levels =  c("Winter", "Spring", "Summer", "Fall"))
-    seasont <- season[order(seasont$Season), ]
-  }
-  
-  p2 = ggplot(summary2, aes(x = as.character(year), y = dy, fill = as.factor(Season))) +
-    geom_col(position = "dodge", width = .3) +  # Use dodge to separate bars for each year within the same month
-    #coord_flip()+ 
-    labs(
-      title = "monitoring effort by season (all data)",
-      subtitle  = paste0(toupper(site), " has ", udays, 
-                         " unique days: ", as.character(st), " to ", as.character(ed), "\n",
-                         seasonLabel),
-      x = "",      y = "Days",      fill = "Year"
-    ) +
-    scale_fill_manual(values = seasont$values) +
-    theme_minimal() +
-    theme(
-      plot.title = element_text(size = 16, face = "bold", hjust = 0),
-      axis.title.y = element_text(size = 14),
-      axis.text.y = element_text(size = 14),
-      axis.text.x = element_text(size = 14, hjust = 1, angle = 30),  
-      plot.subtitle = element_text(size = 14),
-      legend.text = element_text(size = 12),
-      legend.position = "right" 
-    )
-  p2
-  ##save figure ####
-  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_EffortSeason.jpg"), plot = p2, width = 10, height = 4, dpi = 300)
   
   
   
@@ -434,6 +490,41 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Vertical lines/shaded area</b> indicate frequencies for sounds of interest in this soundscape<br>",
     "<b>Black lines</b> are modeled wind noise at this depth [", windLow, " m/s & ", windUpp, " m/s]<br>",
     "<b>Dotted sound level</b> curve is the median for all data")
+  
+  
+  # PERCENTILES for all the data ####
+  # all data - NOTE recalculated below if only plotting peak
+  tol_columns = grep("TOL", colnames(gps))
+  all_quantiles = apply(gps[, tol_columns, drop = FALSE], 2, quantile, 
+                        probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
+  # this re-formats the quantiles for plotting
+  All = as.data.frame( all_quantiles )
+  All$Quantile = rownames(All)
+  All$Year = "all"
+  tol_columns = grep("TOL", colnames(All))
+  mALL = melt(All, id.vars = c("Quantile","Year"), measure.vars = tol_columns)
+  mALL$variable = as.numeric( as.character( gsub("TOL_", "", mALL$variable )))
+  colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
+  # by season
+  tol_columns = grep("TOL", colnames(gps))
+  season_split = split(gps, gps$Season)
+  season_quantiles = lapply(season_split, function(season_data) {
+    apply(season_data[, tol_columns, drop = FALSE], 2, quantile, 
+          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
+  # by year -- recalculated below if only plotting peak
+  yr_split = split(gps, gps$yr) # Calculate quantiles for each year
+  year_quantiles = lapply(yr_split, function(season_data) {
+    apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  
+          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
+  # by year 1 
+  yr1 = min( gps$yr )
+  tol_columns = grep("TOL", colnames(gps))
+  yr1.df = gps[ gps$yr == yr1,]
+  yr1_quantiles = apply(yr1.df[, tol_columns, drop = FALSE], 2, quantile, 
+                        probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
+  
+  
+  
   tol_columns = grep("TOL", colnames(gps))
   
   seasonAll = NULL
@@ -453,6 +544,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   colnames(mallData) = c("Quantile", "Season", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
   seasont = season %>% filter(Season %in% unique(mallData$Season) )
+  
+  #If upper limit of shaded FOI is greater than upper limit of data, scaale_x_log will remove shading
+  #adjust any upper limit that goes over upper limit of data
+  FOIs$FQend[FOIs$FQend > fqupper] <- fqupper
  
   
   ##reordering seasons in legend so they are chronological, not alphabetical
@@ -472,6 +567,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
      # mallData$Season,
       #levels = c("Spring", "Summer", "Fall"))
   }
+  
+  #if NRS, scale y min lower so that FOI labels are visible 
+  NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
     
   
    p = ggplot() +
@@ -507,6 +605,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) )
     ) + 
     # Additional aesthetics
+     scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
+     
     theme_minimal()+
     theme(legend.position = "right",
           plot.caption = ggtext::element_markdown(hjust = 0, size = 14),
@@ -521,20 +621,24 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
   arranged_plot = grid.arrange(p, separator, p2, heights =c(4, 0.1, 1))
   ## save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPL.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_SeasonalSPLwOctNovnoX.jpg"), plot = arranged_plot, width = 10, height = 12, dpi = 300)
   
   
   
   #(4) ANNUAL COMPARISION plots ####
-  # truncates data to peak season for biological sites- all plots after this are peak season (early, peak, late) only!!!
-   subtitle_text <- if (sidx == "biological") "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." else NULL
-   #subtitle_text <- NULL      for PM01 and 02 when making version of graph with October and November
-  
-   if (sidx == "biological"){ #only keep peak
+  # truncates data to peak season for biological sites (Pacific Island Region Sanctuaries) - all plots after this are peak season (early, peak, late) only!!!
+  subtitle_text <- if (sidx == "biological" & substr(site, 1, 2) == "hi"){
+    "*Each line represents that year's humpback season which includes Early (Dec of previous year-Jan), Peak (Feb-Mar), \nand Late (Apr-May) seasons." 
+  } else if (sidx == "biological" & substr(site, 1, 2) == "pm"){
+    "*Humpback Year includes data from Oct - Dec of previous year through Jul of the given year"
+  } else NULL
+   
+   if (sidx == "biological" & substr(site, 1, 2) == "hi"){ #only keep humpback season
     gpsAll = gps
     my_subtitle = "(humpback season)"
-    gps = gps[gps$Season %in% c("Early", "Peak","Late"), ]
-    #gps = gps[gps$Season %in% c("Peak"), ]
+   #####  COMMENTING OUT BC trying PM01 w/ Oct and Nov
+    gps = gps[gps$Season %in% c("Early", "Peak","Late"), ] 
+    #gps = gps[gps$Season %in% c("Peak"), ] was trying just Peak humpaback for HIHWNMS sites
     unique( gps$mth )
     #redo effort plot so not confusing
     summary <- gps %>%
@@ -545,6 +649,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       count(year, month)  # Count occurrences (hours) in each year-month
     summary$dy = round(summary$n/ 24)
     
+    #summary$month <- factor(summary$month, levels = c("09", "10", "11", "12", "01", "02", "03", "04", "05", "06", "07"))
+   #####for normal graphs 
     summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
     peakDays <- sum(summary$dy)
@@ -591,6 +697,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     "<b>Dotted sound level</b> curve is the median for ",my_subtitle   )
   
   
+  
+  
   ## re-calculate percentiles for all the data ####
   # all data - mALL 
   tol_columns = grep("TOL", colnames(gps))
@@ -599,12 +707,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   All = as.data.frame( all_quantiles )
   All$Quantile = rownames(All)
   All$Year = "all"
+  
   tol_columns = grep("TOL", colnames(All))
   mALL = melt(All, id.vars = c("Quantile","Year"), measure.vars = tol_columns)
   mALL$variable = as.numeric( as.character( gsub("TOL_", "", mALL$variable )))
   colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
   # by year- mallData 
   tol_columns = grep("TOL", colnames(gps))
+  
   yr_split = split(gps, gps$yr) # Calculate quantiles for each year
   year_quantiles = lapply(yr_split, function(season_data) {
     apply(season_data[, tol_columns, drop = FALSE], 2, quantile,  
@@ -625,19 +735,23 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   mallData$variable = as.numeric( as.character( gsub("TOL_", "", mallData$variable )))
   colnames(mallData) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
   fqupper = max(as.numeric( as.character( mallData$Frequency) ))
-
+  
+  #if NRS, scale y min lower so that FOI labels are visible 
+  NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
+  
+  
   p = ggplot() +
+    #ribbon for year lines
     geom_ribbon(data = mallData %>% 
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year),
                 alpha = 0.1) +  # Use alpha for transparency
-    
     #median TOL values- each year
     geom_line(data = mallData[mallData$Quantile == "50%",], aes(x = Frequency, y = SoundLevel, color = Year), linewidth = 2) +
     #median TOL values- all data
     geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
               linetype = "dotted") +
-    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = -Inf, ymax = Inf), 
+    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = -Inf, ymax = Inf),
               fill = "gray", alpha = 0.2) +  # Adjust alpha for transparency
     #wind model
     geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windUpp,], aes(x = variable, y = value), color = "black", linewidth = 1) +
@@ -646,17 +760,18 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     scale_color_manual(values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     scale_fill_manual(values =  rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
     # Add vertical lines at FQstart
+    #, color = Label
     geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
     # Add labels at the bottom of each line
-    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label), angle = 90, vjust = 1, hjust = 0.5, size = 4) +
-    
+    geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
+    scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
     # Additional aesthetics
     theme_minimal() +
     labs(
       #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
       caption  = caption_text,
-      color = "Year",        #IF biological then change to Year*
-      fill = "Year",        #IF biological then change to Year*
+      color = legend_label,        #IF biological then change to Year*
+      fill = legend_label,        #IF biological then change to Year*
       x = "Frequency Hz",
       y = expression(paste("Sound Levels (dB re 1 ", mu, " Pa/Hz)" ) ),
     subtitle = subtitle_text) +
@@ -668,12 +783,106 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
           legend.text = element_text(size = 12)
     ) 
   p
+  
+  
   separator <- grid.rect(gp = gpar(fill = "black"), height = unit(2, "pt"), width = unit(1, "npc"))
   # arranged_plot = grid.arrange(p, separator, l, heights =c(4, 0.05, 0.8))
-  pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1))
+  pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1)) #make height of last graph larger when legend gets cut off  b/c of too many data years. default is 1
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPLAllDatabutWrongYear.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_YearSPLwOctNovnoX.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  
+  
+  
+
+#INTERACTIVE PLOT
+#changes to make to ggplot above
+#still trying to figure out FOI vert lines and labels in plotly
+  #move geom_ribbon to after geom_lines
+  #make geom_rect y bounds: ymin = 35, ymax = 90
+  #add fill = Year to geom_line 
+  #add color = Year to geom_ribbon
+  #add ", text = paste("Year:", Year)" to each year geom_line in aes
+  #add "name = "Year", " to  scale_fill_manual and scale_color_manual
+  #then run code below
+  
+  
+  pInt = ggplot() +
+    #ribbon for year lines
+   #median TOL values- each year
+    geom_line(data = mallData[mallData$Quantile == "50%",], aes(x = Frequency, y = SoundLevel, color = Year,  fill = Year, text = paste("Year:", Year)), linewidth = 2) +
+    #median TOL values- all data
+    geom_line(data = mALL[mALL$Quantile == "50%",], aes(x = Frequency, y = SoundLevel), color = "black", linewidth = 1,
+              linetype = "dotted") +
+    geom_ribbon(data = mallData %>% 
+                  pivot_wider(names_from = Quantile, values_from = SoundLevel),
+                aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year, color = Year),
+                alpha = 0.1) +  # Use alpha for transparency
+    geom_rect(data = FOIs, aes(xmin = FQstart, xmax = FQend, ymin = 35, ymax = 90),
+              fill = "gray", alpha = 0.2) +  # Adjust alpha for transparency
+    #wind model
+    geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windUpp,], aes(x = variable, y = value), color = "black", linewidth = 1) +
+    geom_line(data = mwindInfo[as.character(mwindInfo$windSpeed) == windLow,], aes(x = variable, y = value), color = "black", linewidth = 1) +
+    scale_x_log10(labels = label_number(),limits = (c(10,fqupper))) +  # Log scale for x-axis
+    scale_color_manual(name = "Year", values = rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    scale_fill_manual(name = "Year", values =  rev(colorRampPalette(c("darkblue", "lightblue"))(length(unique(summary$year))))) +
+    
+#commenting out to see if adding them after plotly is made works
+   # geom_vline(data = FOIs, aes(xintercept = FQstart, color = Label), linetype = "dashed", color = "black",linewidth = .5) +
+   # geom_text(data = FOIs, aes(x = FQstart, y = 40, label = Label),  angle = 90, vjust = 1, hjust = 0.5, size = 4) +
+    scale_y_continuous(limits = c(NRSLabelShift, NA)) +  # use to manually scale y minimum so vert line labels are visible
+    # Additional aesthetics
+    theme_minimal() +
+    labs(
+      #title = paste0(toupper(site), "(",siteInfo$`Oceanographic category`, ")"), 
+      caption  = caption_text,
+      color = "Year",        #IF biological then change to Year*
+      fill = "Year",        #IF biological then change to Year*
+      x = "Frequency Hz",
+      y = "Sound Level (dB re 1 μPa/Hz)",
+      subtitle = subtitle_text) +
+    theme(legend.position = "right",
+          plot.caption = ggtext::element_markdown(hjust = 0, size = 12),
+          axis.title.x = element_text(size = 14),           # X-axis label size
+          axis.title.y = element_text(size = 14),           # Y-axis label size
+          axis.text = element_text(size = 14),
+          legend.text = element_text(size = 12)
+    ) 
+  pInt
+   
+  #make plot interactive 
+  interactive_plot <- ggplotly(pInt, tooltip = "text") 
+  
+  #remove hover info over grey shading 
+  interactive_plot$x$data[[14]]$hoverinfo <- "skip"
+  
+  
+  interactive_plot <-  interactive_plot %>% layout(
+    shapes = list(
+      list(
+        type = "line",
+        x0 = 100,
+        x1 = 100,
+        y0 = 35,
+        y1 = 90,
+        yref = "paper", # Reference to the plot's paper coordinates
+        line = list(color = "red", width = 15, dash = "dash")
+      )
+    )
+  )
+  
+  
+  interactive_plot 
+
+  
+#  interactive_plot$x$layout$xaxis$type
+# interactive_plot$x$data[[18]]$textangle <- 90  
+  
+#figure out which trace has the grey rectangles show "trace 13" when you hover
+ # for (i in seq_along(interactive_plot$x$data)) {
+  #  cat("TRACE", i, "\n")
+ #print(interactive_plot$x$data[[i]][c("name","fill","mode","hoverinfo")])
+  #}
   
   
   
@@ -770,7 +979,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       # adjust for Hawaii year
       dailyFQ_complete$mth = month(dailyFQ_complete$Date)
       dailyFQ_complete$yr[dailyFQ_complete$mth == 12] = dailyFQ_complete$yr[dailyFQ_complete$mth == 12] + seasonShift
+     
+      if(substring(site, 1, 2) == "pm") {
+        dailyFQ_complete$yr[dailyFQ_complete$mth == 11] = dailyFQ_complete$yr[dailyFQ_complete$mth == 11] + seasonShift
+        dailyFQ_complete$yr[dailyFQ_complete$mth == 10] = dailyFQ_complete$yr[dailyFQ_complete$mth == 10] + seasonShift
+      }
       
+       
       # make labels for graphics (changed below for HI)
       monthly_sequence = seq.Date(as.Date("2021-01-01"), as.Date("2021-12-01"), by = "month")
       month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
@@ -781,6 +996,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       gpsFQ$mth = month(gpsFQ$UTC )
       #adjust for Hawaii year
       gpsFQ$yr[gpsFQ$mth == 12] = gpsFQ$yr[gpsFQ$mth == 12] + seasonShift
+      
+      if(substring(site, 1, 2) == "pm") {
+      gpsFQ$yr[gpsFQ$mth == 11] = gpsFQ$yr[gpsFQ$mth == 11] + seasonShift
+      gpsFQ$yr[gpsFQ$mth == 10] = gpsFQ$yr[gpsFQ$mth == 10] + seasonShift
+      }
+      
       
       yrFQ = gpsFQ %>% group_by(yr) %>%
         summarise(
@@ -830,7 +1051,8 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       
       ### plot: time series ####
       dailyFQ_complete$yr = factor(dailyFQ_complete$yr, levels = rev(sort(unique(dailyFQ_complete$yr))))
-      if (sidx != "biological") {
+     
+       if (sidx != "biological") {
         plg =  ggplot(dailyFQ_complete, aes(x = Julian, y = TOL_50, group = yr) ) +
           
           annotate("rect",
@@ -879,12 +1101,15 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         plg2
         
         ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
-      } else {
+      } else if (substring(site, 1, 2) == "hi") {
         # alternative methods for plg for Hawaii sites
         monthly_sequence = seq.Date(as.Date("2020-12-01"), as.Date("2021-06-01"), by = "month")
         month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
+        
         days_of_year_for_months = c(-30, 1, 32, 60, 91, 121, 152)
-        # Adjust Julian so December days are negative (for clean continuous x-axis)
+       
+        
+         # Adjust Julian so December days are negative (for clean continuous x-axis)
         dailyFQ_modified = dailyFQ_complete %>%
           mutate(
             shifted_julian = ifelse(Julian >= 335, Julian - 365, Julian)
@@ -938,6 +1163,71 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
         plg2
         ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_status.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
         
+      } else if (substring(site, 1, 2) == "pm") {
+        # alternative methods for plg for Papahanamokuakea sites
+        #CHANGED to 10 instead of 12 and 8 instead of 6 for PM sites trial w oct and nov
+        monthly_sequence = seq.Date(as.Date("2020-10-01"), as.Date("2021-08-01"), by = "month")
+        month_names_seq  = format(monthly_sequence, "%b")  # Extracts full month names
+        
+        #added -91, -60, 182, and 213 for PM adding Oct and Nov graphs
+        days_of_year_for_months = c(-91, -60, -30, 1, 32, 60, 91, 121, 152, 182, 213)
+        
+        
+        # Adjust Julian so December days are negative (for clean continuous x-axis)
+        #I changed to 274 from 335 to include oct and nov
+        dailyFQ_modified = dailyFQ_complete %>%
+          mutate(
+            shifted_julian = ifelse(Julian >= 274, Julian - 365, Julian)
+          )
+        
+        plg = ggplot(dailyFQ_modified, aes(x = shifted_julian, y = TOL_50, group = yr)) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q25, ymax = q75,
+                   fill = "#CCCCCC", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q75, ymax = q99 ,
+                   fill = "lightcoral", alpha = 0.2) +
+          annotate("rect",
+                   xmin = -Inf, xmax = Inf,
+                   ymin = q01, ymax = q25,
+                   fill = "lightblue", alpha = 0.2) +
+          ylim(q01, q99) +
+          
+          geom_hline(aes(yintercept = q50),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q75),linetype = "dashed", color = "gray",linewidth = .2) +
+          geom_hline(aes(yintercept = q25),linetype = "dashed", color = "gray",linewidth = .2) +
+          
+          geom_line() +
+          facet_wrap(~yr, ncol = 1)+
+          scale_x_continuous(breaks = days_of_year_for_months, labels = month_names_seq,
+                             limits = c(-90,185)) +  #FOR PM01 w/ Oct and Nov
+          labs(
+            title    = paste0("Are sound levels within \ntypical conditions for ", ft, "Hz?" ) , 
+            subtitle =  paste0(toupper(site), " (",siteInfo$`Oceanographic category`, ")"), #toupper(site),
+            caption  = paste0("Typical conditions shown as gray area (25th and 75th percentiles of all the data)"),
+            x = "",
+            y = substitute(
+              paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at ", f, " Hz)"),
+              list(f = ft) )
+            # expression(paste("Daily Median Sound Levels (dB re 1 ", mu, " Pa/Hz at,", fqInN, "Hz)" ) )
+          ) +
+          theme_minimal() +
+          theme(legend.position = "none",
+                plot.title = element_text(size = 16, face = "bold", hjust = 0),
+                axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
+                axis.text.y = element_text(size = 14, hjust = 1),
+                strip.text = element_text(hjust = 0, size = 12),
+                plot.caption = element_text(size = 12, hjust = 0),
+                plot.subtitle = element_text(size = 12))
+        
+        ## save: plot 125 Hz time series with thresholds ####
+        plg
+        plg2 = plg + pthrs + plot_layout(ncol = 2, widths = c(2, 1))  #plg = grid.arrange(plg, pthrs, nrow = 1, widths = c(2, 1))
+        plg2
+        ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "-", ft, "_statuswOctNovnoX.jpg"), plot = plg2, width = 10, height = 12, dpi = 300)
+        
       }
     }
   }
@@ -952,20 +1242,25 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   gpsFQ = gps %>% select(all_of(cols_to_select))
   gpsFQ$Day = as.Date( gpsFQ$UTC )
   gpsFQ$mth = month(gpsFQ$UTC )
+  
   # what wind speed category is the measured value closest to?
   wspeeds = unique( (windModel$windSpeed) )
   gpsFQ$closest_windMag = wspeeds[pmax(1, findInterval(gpsFQ$windMag, wspeeds)+1)]
+  
   # what is the SPL values for that windspeed?
   fqIdx = which( colnames( windInfo) == substr( fqIn2, 5,8)) #'500'
   wsIdx = match(gpsFQ$closest_windMag, windInfo$windSpeed)
   gpsFQ$WindModelfq = windInfo[wsIdx, fqIdx]
+  
   # what difference from the measured vs modeled?
   tol_col = grep("TOL", colnames(gpsFQ))
   gpsFQ$Exceed = gpsFQ[,tol_col] -  gpsFQ$WindModelfq 
+  
   # is the difference above or below 0?
   gpsFQ$Windthres = "unk"
   gpsFQ$Windthres[gpsFQ$Exceed <= ab2] = "below"
   gpsFQ$Windthres[gpsFQ$Exceed > ab2]  = "above"
+  
   # what are the all data thresholds for this frequency (not used)
   thresholds = mALL[mALL$FrequencyName == fqIn2,]
   threshold_mid =  thresholds$SoundLevel[thresholds$Quantile == "50%"]
@@ -997,11 +1292,15 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   # CHECK: dayNE$percent_below + dayNE$percent_above
   
   dayNE = as.data.frame( dayNE )
+  
   #put most recent year at the top of the plot
   dayNE$yr  = factor(dayNE$yr,  levels = rev(sort(unique(dayNE$yr)))) 
-  if (sidx == "biological") {
-    dayNE$mth = factor(dayNE$mth, levels = rev(c(12,1,2,3,4,5)))
-  } else {
+  
+  if (sidx == "biological" & substring(site, 1, 2) == "hi") {
+    dayNE$mth = factor(dayNE$mth, levels = rev(c(12,1,2,3,4,5))) 
+  }else if (sidx == "biological" & substring(site, 1, 2) == "pm") {
+    dayNE$mth = factor(dayNE$mth, levels = rev(c(10,11,12,1,2,3,4,5,6,7))) #ADDED 10, 11, 6, and 7 for PM Oct aand Nov graph
+  }else {
     #puts January at the top of the plot... maybe remove if confusing to go to previous year
     dayNE$mth = factor(dayNE$mth, levels = rev(c(1,2,3,4,5,6,7,8,9,10,11,12)))
   }
@@ -1033,14 +1332,19 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       axis.text.x = element_text(size = 14, hjust = 1, angle = 30),
       axis.text.y = element_text(size = 14, hjust = 1) )
   windD
-  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_WindDominated.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirGe, "/plot_", toupper(site), "_WindDominatedwOctNovnoX.jpg"), plot = windD, width = 10, height = 12, dpi = 300)
   
-  x_scale = if (sidx == "biological") {
+  x_scale = if (sidx == "biological" & substring(site, 1, 2) == "hi" ) {
     scale_x_discrete(
       breaks = c("12", "2", "4"),
-      labels = c("Dec", "Feb", "Apr")
+      labels = c("Dec", "Feb", "Apr") 
     )
-  } else {
+  } else if (sidx == "biological" & substring(site, 1, 2) == "pm" ){
+   scale_x_discrete(
+     breaks = c("10", "12", "2", "4", "6"),
+    labels = c("Oct", "Dec", "Feb", "Apr", "Jun")
+   )
+  }else {
     scale_x_discrete(
       breaks = c("1", "3", "5", "7", "9", "11"),
       labels = c("Jan", "Mar", "May", "Jul", "Sep", "Nov")
@@ -1072,12 +1376,13 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       axis.text.y   = element_text(size = 12, hjust = 1), 
       legend.position = "none")
   windB
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_AboveWind.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_AboveWindwOctNovnoX.jpg"), plot = windB, width = 10, height = 12, dpi = 300)
   
   # SAVE UPDATED DATA ####
   # names(gps)
   save(gps, file = paste0(outDirP, "/data_", tolower(site), "_HourlySPL-gfs-season-spectrumlevel_", DC, ".Rda") )
-}
+
+  }
 
 
 
