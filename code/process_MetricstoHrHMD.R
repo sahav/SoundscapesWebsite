@@ -27,7 +27,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "hi08" 
+site  = "fk01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -239,8 +239,10 @@ if (length(inFiles) > 0) {
     
     ncFile = inFiles[f]
     hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+    
     #tolData = createOctaveLevel(hmdData, type='tol')
-    names( hmdData )
+    #names( hmdData )
+    
     # add software column
     if ( grepl("MinRes.nc", basename(inFiles[f]) ) ) {
       hmdData$software = "manta"
@@ -249,17 +251,22 @@ if (length(inFiles) > 0) {
     
     # combine data- check to make sure columns match
     hmdData = hmdData[, setdiff(names(hmdData), "platform"), drop = FALSE]
+    
     #remove_cols = setdiff(names(tolData), names(cData))
-    if(f > 1) {
-      hmdData = hmdData[ , names(hmdData) %in% names(cData) ] 
+    # if(f > 1) {
+    #   hmdData = hmdData[ , names(hmdData) %in% names(cData) ] 
+    # }
+    
+    #bin to hourly median values
+    cDatah_day = binSoundscapeData(hmdData, bin = "1hour", method = c("median") )
+    
+    if (is.null(cDatah)) {
+      cDatah = cDatah_day
+    } else {
+      cDatah = rbind(cDatah, cDatah_day)
     }
     
-    cData   = rbind(cData, hmdData)
-    
   } 
-  
-  #bin to hourly median values
-  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
   
   #had to use below line for CI01 because it wasnt keeping Lat/Long by default for some reason
   #cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median"), extraCols = c("Latitude", "Longitude"))
@@ -326,7 +333,7 @@ gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
 gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
 gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
 gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-#gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
 #gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
