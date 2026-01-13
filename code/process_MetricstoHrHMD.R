@@ -27,7 +27,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "fk05" 
+site  = "sb01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -36,6 +36,9 @@ site = tolower(site)
 #dirGCP = paste0( "C:/Users/embe5980/ONMS/", site,"/") # for CIRES computer
 dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP workstation
 
+#SANCTSOUND DATA DIRECTORY
+#for what sanctsound data is in different location than ONMS data: grnms and sbnms
+dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB01") # for GCP workstation
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
@@ -67,10 +70,10 @@ cat("CHECK: Read in data for: ",
 # GET list of files to process ####
 ## PyPAM soundscape FILES- NEFSC-GCP ####
 # e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
-inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+inFilesPY = list.files(dirGCPSS, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 4),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
       "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
@@ -150,80 +153,82 @@ if (length(tmp) != 0){
 
 # PROCESS ONMS Sound FILES ####
 
-#PROCESS DATA WITH CHUNKS ####
-#Too many unique days to process all at once. Need to break cDatah into smaller datasets
-#Split cDatah into chunks
+# #PROCESS DATA WITH CHUNKS ####
+# #Too many unique days to process all at once. Need to break cDatah into smaller datasets
+# #Split cDatah into chunks
+# 
+# #where we will store results
+# cData_chunks <- list()  
+# cDatah_chunks <- list()
+# 
+# #get number of chunks
+# # Split that list of days into ~100-day chunks
+# chunk_size <- 100
+# inFiles_chunks <- split(inFiles, ceiling(seq_along(inFiles) / chunk_size))
+# x = 1
+# cData = NULL  
+# cDatah = NULL
+# 
+# #process data by chunk (to avoid crashing R with too much data at once)
+# #RERUN the for loop below for every chunk of 100 days
+# #will automatically increase chunk number that you are on at end of loop, just need to restart it
+# 
+# if (length(inFiles_chunks[[x]]) > 0) { 
+#   for (f in 1: length(inFiles_chunks[[x]]) ){ # 1245:1246 length(inFiles)
+#     
+#     cat("Processing", f, "of", length(inFiles_chunks[[x]]), basename(inFiles_chunks[[x]][f]), "\n")
+#     
+#     ncFile = inFiles_chunks[[x]][f]
+#     hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
+#     #tolData = createOctaveLevel(hmdData, type='tol')
+#     names( hmdData )
+#     # add software column
+#     if ( grepl("MinRes.nc", basename(inFiles_chunks[[x]][f]) ) ) {
+#       hmdData$software = "manta"
+#     } else {  
+#       hmdData$software = "pypam" }
+#     
+#     # combine data- check to make sure columns match
+#     hmdData = hmdData[, setdiff(names(hmdData), "platform"), drop = FALSE]
+#     #remove_cols = setdiff(names(tolData), names(cData))
+#     if(f > 1) {
+#       hmdData = hmdData[ , names(hmdData) %in% names(cData) ] 
+#     }
+#     
+#     cData   = rbind(cData, hmdData)
+#     
+#   } 
+#   
+#   #bin to hourly median values
+#   cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
+#   
+#   #had to use below line for CI01 because it wasnt keeping Lat/Long by default for some reason
+#   #cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median"), extraCols = c("Latitude", "Longitude"))
+#   
+#   #cData_chunks[[x]] <- cData
+#   cDatah_chunks[[x]] <- cDatah
+#   x = x+1
+#   cData = NULL  
+#   cDatah = NULL
+# }
+# 
+# #2.5 hours for 8 chunks
+# #setdiff(names(cData_chunks[[3]]), names(cDatah_chunks[[3]]))  
+# 
+# #rerun loop after every chunk of 100 completes
+# 
+# #put chunks back together after you run for loop for total number of chunks
+# cDatah <- dplyr::bind_rows(cDatah_chunks)
+# 
+# 
+# #ADD a few basic columns about the data
+# cDatah$yr  = year(cDatah$UTC)
+# cDatah$mth = month(cDatah$UTC)
+# cDatah$site = site
+# 
 
-#where we will store results
-cData_chunks <- list()  
-cDatah_chunks <- list()
-
-#get number of chunks
-# Split that list of days into ~100-day chunks
-chunk_size <- 100
-inFiles_chunks <- split(inFiles, ceiling(seq_along(inFiles) / chunk_size))
-x = 1
-cData = NULL  
-cDatah = NULL
-
-#process data by chunk (to avoid crashing R with too much data at once)
-#RERUN the for loop below for every chunk of 100 days
-#will automatically increase chunk number that you are on at end of loop, just need to restart it
-
-if (length(inFiles_chunks[[x]]) > 0) { 
-  for (f in 1: length(inFiles_chunks[[x]]) ){ # 1245:1246 length(inFiles)
-    
-    cat("Processing", f, "of", length(inFiles_chunks[[x]]), basename(inFiles_chunks[[x]][f]), "\n")
-    
-    ncFile = inFiles_chunks[[x]][f]
-    hmdData = loadSoundscapeData(ncFile) #only keeps quality 1 as default
-    #tolData = createOctaveLevel(hmdData, type='tol')
-    names( hmdData )
-    # add software column
-    if ( grepl("MinRes.nc", basename(inFiles_chunks[[x]][f]) ) ) {
-      hmdData$software = "manta"
-    } else {  
-      hmdData$software = "pypam" }
-    
-    # combine data- check to make sure columns match
-    hmdData = hmdData[, setdiff(names(hmdData), "platform"), drop = FALSE]
-    #remove_cols = setdiff(names(tolData), names(cData))
-    if(f > 1) {
-      hmdData = hmdData[ , names(hmdData) %in% names(cData) ] 
-    }
-    
-    cData   = rbind(cData, hmdData)
-    
-  } 
-  
-  #bin to hourly median values
-  cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median") )
-  
-  #had to use below line for CI01 because it wasnt keeping Lat/Long by default for some reason
-  #cDatah = binSoundscapeData(cData, bin = "1hour", method = c("median"), extraCols = c("Latitude", "Longitude"))
-  
-  #cData_chunks[[x]] <- cData
-  cDatah_chunks[[x]] <- cDatah
-  x = x+1
-  cData = NULL  
-  cDatah = NULL
-}
-
-#2.5 hours for 8 chunks
-#setdiff(names(cData_chunks[[3]]), names(cDatah_chunks[[3]]))  
-
-#rerun loop after every chunk of 100 completes
-
-#put chunks back together after you run for loop for total number of chunks
-cDatah <- dplyr::bind_rows(cDatah_chunks)
-
-
-#ADD a few basic columns about the data
-cDatah$yr  = year(cDatah$UTC)
-cDatah$mth = month(cDatah$UTC)
-cDatah$site = site
-
-
+ncFile = inFiles[1200]
+test = loadSoundscapeData(ncFile)
 
 #SKIP if completed w/ chunks
 
@@ -258,6 +263,12 @@ if (length(inFiles) > 0) {
     
     #bin to hourly median values
     cDatah_day = binSoundscapeData(hmdData, bin = "1hour", method = c("median") )
+    
+    #FOR ONMS gr01 data! onms has columns HMD_0-HMD_19 (all NA) but SS data starts at HMD_20
+    #For SB03, remove HMD_0-HMD_19 from SS and ONMS data. There are values in those columns for SS dataset, but not accurate because those values shouldnt be measurable at those frequencies
+    if (f >= 1292){
+      cDatah_day = cDatah_day[, -c(2:21)]
+    }
     
     if (is.null(cDatah)) {
       cDatah = cDatah_day
@@ -318,22 +329,24 @@ sapply(data_chunks, nrow)
 
 gps_chunks <- list()  # store wind-matched results
 
-#loop but usually overwhelms R
-#for (i in seq_along(data_chunks)) {
-#cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
-#gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
-#}
+
+#loop through chunks!
+for (i in seq_along(data_chunks)) {
+cat("Processing matchGFS for chunk", i, "of", length(data_chunks), "\n")
+gps_chunks[[i]] <- matchGFS(data_chunks[[i]])
+}
+
 
 #add/remove lines for the number of chunks data was broken into
 #run one line at a time, it will take a while
 #can try for loop above but may crash if too many chunks
-gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
-gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
-gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
-gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
-gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
-gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
-gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
+# gps_chunks[[1]] <- matchGFS(data_chunks[[1]])
+# gps_chunks[[2]] <- matchGFS(data_chunks[[2]])
+# gps_chunks[[3]] <- matchGFS(data_chunks[[3]])
+# gps_chunks[[4]] <- matchGFS(data_chunks[[4]])
+# gps_chunks[[5]] <- matchGFS(data_chunks[[5]])
+# gps_chunks[[6]] <- matchGFS(data_chunks[[6]])
+# gps_chunks[[7]] <- matchGFS(data_chunks[[7]])
 #gps_chunks[[8]] <- matchGFS(data_chunks[[8]])
 
 #put chunks back together
@@ -344,13 +357,13 @@ gps <- dplyr::bind_rows(gps_chunks)
 #SKIP IF YOU ALREADY GOT WIND USING CHUNKS
 # GET WIND ####
 #when there arent too many days 
-if ( length(cDatah) > 0 ) {
-  
-  cat("ONMS data only ...") 
-  cat("This takes a bit ... maybe grab a coffee or go for walk") 
-  gps = matchGFS(cDatah)
-  
-}
+# if ( length(cDatah) > 0 ) {
+#   
+#   cat("ONMS data only ...") 
+#   cat("This takes a bit ... maybe grab a coffee or go for walk") 
+#   gps = matchGFS(cDatah)
+#   
+# }
 
 
 #Fix for HI01

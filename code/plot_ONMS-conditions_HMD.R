@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk05")
+ONMSsites = c("sb03")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -210,7 +210,11 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   ed = as.Date( max(gps$UTC) )
   udays = length( unique(as.Date(gps$UTC)) )
   #cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
-  Fq = as.numeric( as.character( gsub("TOL_", "",  colnames(gps)[grep("TOL", colnames(gps))] ) ))
+ 
+  #for SB03! forgot to remove HMD_0-19 during processing
+  #gps = gps[, -c(2:21)]
+  
+   Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
   
   # ##REMOVE sanctsound data ####
   # if (removess == 1){
@@ -365,7 +369,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     geom_hline(yintercept = 23,    
                linetype = "dashed",
                color = "red",
-               size = .5)
+               linewidth = .5)
   
   p1
   ##save figure ####
