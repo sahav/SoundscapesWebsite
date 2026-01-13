@@ -61,6 +61,8 @@ display(HTML(standardTextDict["FKNMS"]))
 ### Summary of monitoring sites
 ```{python}
 #| echo: false
+display(HTML(gf.makeImage("FKNMSSiteMap.jpg", "FK Site Map")))
+
 display(HTML(htmlTable))
 ```
 :::
