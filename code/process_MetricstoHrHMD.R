@@ -16,6 +16,7 @@ library(dplyr)
 library(ggplot2)
 library(reshape)
 library(rJava)
+install.packages("xlsx")
 library(xlsx)
 library(openxlsx)
 library(devtools)
@@ -27,7 +28,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "sb01" 
+site  = "hi01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -38,7 +39,8 @@ dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP wo
 
 #SANCTSOUND DATA DIRECTORY
 #for what sanctsound data is in different location than ONMS data: grnms and sbnms
-dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB01") # for GCP workstation
+#dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB01") # for GCP workstation
+dirGCPSS = paste0( "X:/Emma_Beretta/HI01SanctSound") # for GCP workstation - HI01
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
@@ -73,7 +75,7 @@ cat("CHECK: Read in data for: ",
 inFilesPY = list.files(dirGCPSS, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 4),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
       "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
@@ -227,7 +229,7 @@ if (length(tmp) != 0){
 # cDatah$site = site
 # 
 
-ncFile = inFiles[1200]
+ncFile = inFiles[336]
 test = loadSoundscapeData(ncFile)
 
 #SKIP if completed w/ chunks
@@ -265,9 +267,11 @@ if (length(inFiles) > 0) {
     cDatah_day = binSoundscapeData(hmdData, bin = "1hour", method = c("median") )
     
     #FOR ONMS gr01 data! onms has columns HMD_0-HMD_19 (all NA) but SS data starts at HMD_20
-    #For SB03, remove HMD_0-HMD_19 from SS and ONMS data. There are values in those columns for SS dataset, but not accurate because those values shouldnt be measurable at those frequencies
-    if (f >= 1292){
-      cDatah_day = cDatah_day[, -c(2:21)]
+    #For SB03, remove HMD_0-HMD_19 from SS and ONMS data. There are values in those columns for SS dataset...
+    if (f >= 337){
+      cDatah_day = cDatah_day[, -c(2:22)]
+    } else{
+      cDatah_day = cDatah_day[, -2]
     }
     
     if (is.null(cDatah)) {

@@ -27,14 +27,14 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("fk06")
+ONMSsites = c("hi01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "F:/CODE/GitHub/SoundscapesWebsite/" # your local git repo 
 #outDir   =  "/Users/quca3108/SoundscapesWebsite/" # your local git repo
-#outDir = "X:/Emma_Beretta/SoundscapesWebsite/" #for GCP workstation remote desktop
-outDir = "C:/Users/embe5980/SoundscapesWebsite/" #for GCP workstation remote desktop
+outDir = "X:/Emma_Beretta/SoundscapesWebsite/" #for GCP workstation remote desktop
+#outDir = "C:/Users/embe5980/SoundscapesWebsite/"
 
 outDirG  =  paste0(outDir,"content/resources/") #where save graphics
 outDirGe =  paste0(outDir,"content/resources/extra") #where extra save graphics
@@ -322,7 +322,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
     summary$year[summary$month == 12] =  summary$year[summary$month == 12] + seasonShift
  
     #order months to start with Dec for effort graph
-    summary$month <- factor(summary$month, levels = c("12", "01", "02", "03", "04", "05", "06", "07"))
+    summary$month <- factor(summary$month, levels = c("11", "12", "01", "02", "03", "04", "05", "06", "07"))
     month_nums <- as.numeric(as.character( sort(unique(summary$month)) ))
     peakDays <- sum(summary$dy)
   }
@@ -713,7 +713,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
       geom_hline(yintercept = 23,    
                  linetype = "dashed",
                  color = "red",
-                 size = .5)
+                 linewidth = .5)
     
     p1
     ## re-save effort figure ####
