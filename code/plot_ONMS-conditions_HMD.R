@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi01")
+ONMSsites = c("gr01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -213,6 +213,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   udays = length( unique(as.Date(gps$UTC)) )
   #cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
  
+  #for GR01! Removing HMD_20 until we can fix data quality matrix to have 20 Hz ONMS data
+  gps = gps[, -2]
+  
   #for SB03! forgot to remove HMD_0-19 during processing
   #gps = gps[, -c(2:21)]
   
