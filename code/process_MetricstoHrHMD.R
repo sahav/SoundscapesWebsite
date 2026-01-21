@@ -28,7 +28,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "sb01" 
+site  = "ci01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -38,8 +38,8 @@ site = tolower(site)
 dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP workstation
 
 #SANCTSOUND DATA DIRECTORY
-#for what sanctsound data is in different location than ONMS data: grnms and sbnms
-dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB03") # for GCP workstation
+#for what sanctsound data is in different location than ONMS data: grnms, sbnms, hihwnms
+#dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB03") # for GCP workstation
 #dirGCPSS = paste0( "X:/Emma_Beretta/HI01SanctSound") # for GCP workstation - HI01
 
 # LOCAL CODE REPO DIRECTORIES ####
@@ -72,7 +72,7 @@ cat("CHECK: Read in data for: ",
 # GET list of files to process ####
 ## PyPAM soundscape FILES- NEFSC-GCP ####
 # e.g. NEFSC_SBNMS_201811_SB03_20181112.nc
-inFilesPY = list.files(dirGCPSS, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
+inFilesPY = list.files(dirGCP, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
   dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
@@ -251,8 +251,8 @@ if ( length(pFile) > 0 ) {
 # 
 
 #testing for when a site has both SS data and ONMS (SB01,03, GR01, and HI01)
-ncFile = inFiles[336]
-test = loadSoundscapeData(ncFile)
+# ncFile = inFiles[336]
+# test = loadSoundscapeData(ncFile)
 
 #SKIP if completed w/ chunks
 
