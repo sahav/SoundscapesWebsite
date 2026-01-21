@@ -28,7 +28,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "pm01" 
+site  = "sb01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -39,7 +39,7 @@ dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP wo
 
 #SANCTSOUND DATA DIRECTORY
 #for what sanctsound data is in different location than ONMS data: grnms and sbnms
-###dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB03") # for GCP workstation
+dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB03") # for GCP workstation
 #dirGCPSS = paste0( "X:/Emma_Beretta/HI01SanctSound") # for GCP workstation - HI01
 
 # LOCAL CODE REPO DIRECTORIES ####
@@ -75,7 +75,7 @@ cat("CHECK: Read in data for: ",
 inFilesPY = list.files(dirGCPSS, pattern = "_[0-9]{8}\\.nc$", recursive = T, full.names = T)
 tmp = sapply( strsplit(basename(inFilesPY), "[.]"), "[[", 1)
 if (length(tmp) != 0){
-  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 4),format = "%Y%m%d")
+  dysPy = as.Date(sapply( strsplit(tmp, "_"), "[", 5),format = "%Y%m%d")
   cat("Found ", length(inFilesPY), "PyPAM files for ", site, "(", as.character( min(dysPy , na.rm = T) ), " to ", as.character(max(dysPy , na.rm = T)),
       "with", sum( duplicated(dysPy)), "duplicated days\n (if NA for date range fix line 59)\n")
 }
@@ -86,6 +86,27 @@ inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names 
 dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
 cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),") with",
     sum( duplicated(dysON)), "duplicated days\n")
+
+
+#For SB03 since new data has different naming convention
+# inFilesON = list.files(dirGCP, pattern = "MinRes.nc", recursive = T, full.names = T)
+# 
+# dirNew = paste0( "E:/onms/products/sound_level_metrics/", site,"/onms_sb03_20240524-20240930_hmd/data")
+# inFilesNew = list.files(dirNew, pattern = ".nc", recursive = T, full.names = T)
+# 
+# dirNew2 = paste0( "E:/onms/products/sound_level_metrics/", site,"/onms_sb03_20240930-20250329_hmd/data")
+# inFilesNew2 = list.files(dirNew2, pattern = ".nc", recursive = T, full.names = T)
+# 
+# inFilesON2 = c(inFilesNew, inFilesNew2)
+# 
+# dysON = as.Date(sapply( strsplit(basename(inFilesON), "_"), "[[", 5), format = "%Y%m%d")
+# dysON2 = as.Date(sapply( strsplit(basename(inFilesON2), "_"), "[[", 4), format = "%Y%m%d")
+# 
+# dysON = c(dysON, dysON2)
+# inFilesON = c(inFilesON, inFilesON2)
+# 
+# cat("Found ", length(inFilesON), "NCEI files for ", site, "(", as.character(min( dysON , na.rm = T)), " to ", as.character(max( dysON , na.rm = T)),") with",
+#     sum( duplicated(dysON)), "duplicated days\n")
 
 
 
@@ -130,7 +151,7 @@ if ( length(pFile) > 0 ) {
     load( inFileP[which.max(file_info$ctime)] )
     #outData = gps    #for some reason hi03,8, and 4 AND pm01 earlier outdata was saved as gps in products folder
     if( exists("outData") ) {
-      processedData = outData
+      processedData1 = outData
       rm(outData)
       #rm(gps) #fix for hi03,8, and 4 AND pm01
     }
@@ -385,66 +406,52 @@ gps <- dplyr::bind_rows(gps_chunks)
 
 
 # APPEND & SAVE NEW DATA FILES ####
-#SINCE HMD, we dont want to combine data with old TOL data  
 
-dysA = length( unique( as.Date( gps$UTC) ) )
-cat( "Output data for ", site, " has ", dysA, "unique days: ", 
-     as.character( as.Date( min( gps$UTC))) , " to ", 
-     as.character( as.Date( max( gps$UTC)) ))
-# writes new file with data
-outData = gps
-save(outData, file = paste0(outDirP, "HMDdata_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
-# write out processed files
-processedFiles  = basename(inFiles)
-save(processedFiles, file = paste0(outDirP, "HMDfilesProcesed_", tolower(site), "_HourlySPL.Rda") )
+if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data
 
+  #remove any no matching headings
+  data_mismatched = setdiff(colnames(processedData2), colnames(processedData1))
+  gps_clean = gps[, !colnames(gps) %in% data_mismatched] #new data with matching headings
+  
+  #re-order columns
+  # setdiff(colnames(gps_clean), colnames(processedData))
+  print(names(processedData))
+  col_order = colnames(processedData)
+  gps_clean1 = gps_clean[, col_order]
+  names( processedData)
+  names( gps_clean)
 
-# 
-# if ( length(pFile) > 0 ){   #append old (processedData) and save out all processed data
-#   
-#   #remove any no matching headings
-#   data_mismatched = setdiff(colnames(gps), colnames(processedData))
-#   gps_clean = gps[, !colnames(gps) %in% data_mismatched] #new data with matching headings
-#   
-#   #re-order columns
-#   # setdiff(colnames(gps_clean), colnames(processedData))
-#   print(names(processedData))
-#   col_order = colnames(processedData)
-#   gps_clean1 = gps_clean[, col_order]
-#   names( processedData)
-#   names( gps_clean)
-#   
-#   # combine data
-#   outData = rbind(processedData, gps_clean)
-#   
-#   #track days added
-#   dys = length( unique( as.Date( outData$UTC) ) )
-#   dysA = dys - length( unique( as.Date( gps_clean$UTC) ) )
-#   
-#   # summary of data processed
-#   cat( "Output data for ", site, " has ", dys, "unique days: ", 
-#        as.character( as.Date( min( outData$UTC))) , " to ", 
-#        as.character( as.Date( max( outData$UTC)) ), "with ", dysA, " new days added")
-#   
-#   # writes new file with appended data
-#   save(outData, file = paste0(outDirP, "HMDdata_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
-#   
-#   # write out processed files
-#   processedFiles = c(processedFiles, basename(inFiles) )
-#   # writes over previous file
-#   save(processedFiles, file = paste0(outDirP, "HMDfilesProcesed_", tolower(site), "_HourlySPL.Rda") )
-#   
-# } else {  # save out all the newly processed data
-#   # summary of data processed
-#   dysA = length( unique( as.Date( gps$UTC) ) )
-#   cat( "Output data for ", site, " has ", dysA, "unique days: ", 
-#        as.character( as.Date( min( gps$UTC))) , " to ", 
-#        as.character( as.Date( max( gps$UTC)) ))
-#   # writes new file with data
-#   outData = gps
-#   save(outData, file = paste0(outDirP, "HMDdata_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
-#   # write out processed files
-#   processedFiles  = basename(inFiles)
-#   save(processedFiles, file = paste0(outDirP, "HMDfilesProcesed_", tolower(site), "_HourlySPL.Rda") )
-# }
+  # combine data
+  outData = rbind(processedData, gps_clean)
 
+  #track days added
+  dys = length( unique( as.Date( outData$UTC) ) )
+  dysA = dys - length( unique( as.Date( gps_clean$UTC) ) )
+
+  # summary of data processed
+  cat( "Output data for ", site, " has ", dys, "unique days: ",
+       as.character( as.Date( min( outData$UTC))) , " to ",
+       as.character( as.Date( max( outData$UTC)) ), "with ", dysA, " new days added")
+
+  # writes new file with appended data
+  save(outData, file = paste0(outDirP, "HMDdata_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
+
+  # write out processed files
+  processedFiles = c(processedFiles, basename(inFiles) )
+  
+  # writes over previous file
+  save(processedFiles, file = paste0(outDirP, "HMDfilesProcesed_", tolower(site), "_HourlySPL.Rda") )
+
+} else {  # save out all the newly processed data
+  # summary of data processed
+  dysA = length( unique( as.Date( gps$UTC) ) )
+  cat( "Output data for ", site, " has ", dysA, "unique days: ",
+       as.character( as.Date( min( gps$UTC))) , " to ",
+       as.character( as.Date( max( gps$UTC)) ))
+  # writes new file with data
+  outData = gps
+  save(outData, file = paste0(outDirP, "HMDdata_", tolower(site), "_HourlySPL-gfs_", DC, ".Rda") )
+  # write out processed files
+  processedFiles  = basename(inFiles)
+  save(processedFiles, file = paste0(outDirP, "HMDfilesProcesed_", tolower(site), "_HourlySPL.Rda") )
+}

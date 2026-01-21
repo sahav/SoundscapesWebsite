@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("pm02")
+ONMSsites = c("sb03")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -218,6 +218,10 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   #for SB03! forgot to remove HMD_0-19 during processing
   #gps = gps[, -c(2:22)]
+  
+  #also SB03: remove 2018
+  # gps = gps %>%
+  #   filter(yr != 2018)
   
   Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
   
@@ -599,27 +603,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
   
   mallDataS = mallData
-  
-  # ribbonData <- mallDataS %>%
-  #   filter(Quantile %in% c("25%", "75%")) %>%
-  #   pivot_wider(
-  #     id_cols = c(Season, Frequency),
-  #     names_from = Quantile,
-  #     values_from = SoundLevel
-  #   )
-  
+
+#plot  
   p = ggplot() +
-    # Add shaded area for 25%-75% range
-    # geom_ribbon(
-    #   data = ribbonData,
-    #   aes(
-    #     x = Frequency,
-    #     ymin = `25%`,
-    #     ymax = `75%`,
-    #     fill = Season
-    #   ),
-    #   alpha = 0.2
-    # )+
     geom_ribbon(data = mallDataS %>%
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Season),
@@ -810,20 +796,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #if NRS, scale y min lower so that FOI labels are visible 
   NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
   
-  # ribbonDataA <- mallData %>%
-  #   filter(Quantile %in% c("25%", "75%")) %>%
-  #   pivot_wider(
-  #     id_cols = c(Year, Frequency),
-  #     names_from = Quantile,
-  #     values_from = SoundLevel
-  #   )
   
-  
+#plot
   p = ggplot() +
-    #ribbon for year lines
-    # geom_ribbon(data = ribbonDataA,
-    #   aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year),
-    #   alpha = 0.1) +  # Use alpha for transparency
     geom_ribbon(data = mallData %>% pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year), alpha = 0.1) + # Use alpha for transparency
     #median TOL values- each year
@@ -870,7 +845,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1)) #make height of last graph larger when legend gets cut off  b/c of too many data years. default is 1
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_HMDYearSPLV2.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_HMDYearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
  
   
