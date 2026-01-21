@@ -28,7 +28,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "hi01" 
+site  = "pm01" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
@@ -39,8 +39,8 @@ dirGCP = paste0( "E:/onms/products/sound_level_metrics/", site,"/") # for GCP wo
 
 #SANCTSOUND DATA DIRECTORY
 #for what sanctsound data is in different location than ONMS data: grnms and sbnms
-#dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB01") # for GCP workstation
-dirGCPSS = paste0( "X:/Emma_Beretta/HI01SanctSound") # for GCP workstation - HI01
+###dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB03") # for GCP workstation
+#dirGCPSS = paste0( "X:/Emma_Beretta/HI01SanctSound") # for GCP workstation - HI01
 
 # LOCAL CODE REPO DIRECTORIES ####
 #outDir =  "/Users/quca3108/SoundscapesWebsite/"
@@ -110,47 +110,47 @@ if (length(tmp) != 0){
 }
 
 
-# 
-# ## CHECK FOR PROCESSED FILES #### 
-# #updates list of files to process
-# pFile = list.files(path = (outDirP), pattern = paste0("filesProcesed_", site), full.names = T, recursive = T)
-# if ( length(pFile) > 0 ) {
-#   load(pFile)
-#   
-#   # are there any new files to process?
-#   inFilesN = inFiles[!basename(inFiles) %in% processedFiles]
-#   
-#   if ( length(inFilesN ) > 0 ) {
-#     
-#     # read in processed data to append results
-#     inFileP = list.files((outDir), 
-#                          pattern = paste0("data_", site, "_HourlySPL-gfs_\\d{4}-\\d{2}-\\d{2}\\.Rda$"), 
-#                          full.names = T, recursive = T)
-#     file_info = file.info(inFileP)
-#     load( inFileP[which.max(file_info$ctime)] )
-#     #outData = gps    #for some reason hi03,8, and 4 AND pm01 earlier outdata was saved as gps in products folder
-#     if( exists("outData") ) {
-#       processedData = outData
-#       rm(outData)
-#       #rm(gps) #fix for hi03,8, and 4 AND pm01
-#     }
-#     
-#     cat( "Processed data for ", site, ": ", 
-#          as.character( as.Date( min( processedData$UTC))) , " to ", 
-#          as.character( as.Date( max( processedData$UTC)) ), 
-#          " Found ", length(inFilesN), "new files to process\n")
-#     
-#     # these are the files that will be processed!
-#     inFiles = inFilesN 
-#     
-#   } else {
-#     stop("No new files to process... come back when you have more data")
-#   }
-#   
-# } else {
-#   cat("No processed files for", site, ", processing all new files")
-#   processedData = NULL
-# }
+
+## CHECK FOR PROCESSED FILES ####
+#updates list of files to process
+pFile = list.files(path = (outDirP), pattern = paste0("HMDfilesProcesed_", site), full.names = T, recursive = T)
+if ( length(pFile) > 0 ) {
+  load(pFile)
+
+  # are there any new files to process?
+  inFilesN = inFiles[!basename(inFiles) %in% processedFiles]
+
+  if ( length(inFilesN ) > 0 ) {
+
+    # read in processed data to append results
+    inFileP = list.files((outDir),
+                         pattern = paste0("HMDdata_", site, "_HourlySPL-gfs_\\d{4}-\\d{2}-\\d{2}\\.Rda$"),
+                         full.names = T, recursive = T)
+    file_info = file.info(inFileP)
+    load( inFileP[which.max(file_info$ctime)] )
+    #outData = gps    #for some reason hi03,8, and 4 AND pm01 earlier outdata was saved as gps in products folder
+    if( exists("outData") ) {
+      processedData = outData
+      rm(outData)
+      #rm(gps) #fix for hi03,8, and 4 AND pm01
+    }
+
+    cat( "Processed data for ", site, ": ",
+         as.character( as.Date( min( processedData$UTC))) , " to ",
+         as.character( as.Date( max( processedData$UTC)) ),
+         " Found ", length(inFilesN), "new files to process\n")
+
+    # these are the files that will be processed!
+    inFiles = inFilesN
+
+  } else {
+    stop("No new files to process... come back when you have more data")
+  }
+
+} else {
+  cat("No processed files for", site, ", processing all new files")
+  processedData = NULL
+}
 
 
 # PROCESS ONMS Sound FILES ####
@@ -229,6 +229,7 @@ if (length(tmp) != 0){
 # cDatah$site = site
 # 
 
+#testing for when a site has both SS data and ONMS (SB01,03, GR01, and HI01)
 ncFile = inFiles[336]
 test = loadSoundscapeData(ncFile)
 
@@ -268,11 +269,11 @@ if (length(inFiles) > 0) {
     
     #FOR ONMS gr01 data! onms has columns HMD_0-HMD_19 (all NA) but SS data starts at HMD_20
     #For SB03, remove HMD_0-HMD_19 from SS and ONMS data. There are values in those columns for SS dataset...
-    if (f >= 337){
-      cDatah_day = cDatah_day[, -c(2:22)]
-    } else{
-      cDatah_day = cDatah_day[, -2]
-    }
+    #if (f >= 337){
+    #   cDatah_day = cDatah_day[, -c(2:22)]
+    # } else{
+    #   cDatah_day = cDatah_day[, -2]
+    # }
     
     if (is.null(cDatah)) {
       cDatah = cDatah_day

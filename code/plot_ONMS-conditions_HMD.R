@@ -27,7 +27,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("gr01")
+ONMSsites = c("pm02")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -214,12 +214,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #cat("Input Data - ", site, " has ", udays, " unique days (", as.character(st), " to ",as.character(ed), ")\n")
  
   #for GR01! Removing HMD_20 until we can fix data quality matrix to have 20 Hz ONMS data
-  gps = gps[, -2]
+  #gps = gps[, -2]
   
   #for SB03! forgot to remove HMD_0-19 during processing
-  #gps = gps[, -c(2:21)]
+  #gps = gps[, -c(2:22)]
   
-   Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
+  Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
   
   # ##REMOVE sanctsound data ####
   # if (removess == 1){
@@ -520,6 +520,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   hmd_columns = grep("HMD", colnames(gps))
   all_quantiles = apply(gps[, hmd_columns, drop = FALSE], 2, quantile, 
                         probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)
+  
   # this re-formats the quantiles for plotting
   All = as.data.frame( all_quantiles )
   All$Quantile = rownames(All)
@@ -528,12 +529,14 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   mALL = melt(All, id.vars = c("Quantile","Year"), measure.vars = hmd_columns)
   mALL$variable = as.numeric( as.character( gsub("HMD_", "", mALL$variable )))
   colnames(mALL) = c("Quantile", "Year", "Frequency" , "SoundLevel" )
-  # by season
+ 
+   # by season
   hmd_columns = grep("HMD", colnames(gps))
   season_split = split(gps, gps$Season)
   season_quantiles = lapply(season_split, function(season_data) {
     apply(season_data[, hmd_columns, drop = FALSE], 2, quantile, 
           probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
+  
   # by year -- recalculated below if only plotting peak
   yr_split = split(gps, gps$yr) # Calculate quantiles for each year
   year_quantiles = lapply(yr_split, function(season_data) {
@@ -597,13 +600,30 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   
   mallDataS = mallData
   
+  # ribbonData <- mallDataS %>%
+  #   filter(Quantile %in% c("25%", "75%")) %>%
+  #   pivot_wider(
+  #     id_cols = c(Season, Frequency),
+  #     names_from = Quantile,
+  #     values_from = SoundLevel
+  #   )
+  
   p = ggplot() +
     # Add shaded area for 25%-75% range
-    geom_ribbon(data = mallDataS %>% 
+    # geom_ribbon(
+    #   data = ribbonData,
+    #   aes(
+    #     x = Frequency,
+    #     ymin = `25%`,
+    #     ymax = `75%`,
+    #     fill = Season
+    #   ),
+    #   alpha = 0.2
+    # )+
+    geom_ribbon(data = mallDataS %>%
                   pivot_wider(names_from = Quantile, values_from = SoundLevel),
                 aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Season),
                 alpha = 0.2) +  # Use alpha for transparency
-    
     # Median (50%) HMD values
     geom_line(data = mallDataS[mallDataS$Quantile == "50%",], 
               aes(x = Frequency, y = SoundLevel, color = Season), linewidth = 2) +
@@ -768,7 +788,7 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   yr_split = split(gps, gps$yr) # Calculate quantiles for each year
   year_quantiles = lapply(yr_split, function(season_data) {
     apply(season_data[, hmd_columns, drop = FALSE], 2, quantile,  
-          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)   })
+          probs = c(0.99, 0.90, 0.75, 0.50, 0.25, 0.10, .01), na.rm = TRUE)})
   
   hmd_columns = grep("HMD", colnames(gps))
   yearAll = NULL
@@ -790,13 +810,22 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #if NRS, scale y min lower so that FOI labels are visible 
   NRSLabelShift <- if (substr(site, 1, 3) == "NRS") 39 else NA
   
+  # ribbonDataA <- mallData %>%
+  #   filter(Quantile %in% c("25%", "75%")) %>%
+  #   pivot_wider(
+  #     id_cols = c(Year, Frequency),
+  #     names_from = Quantile,
+  #     values_from = SoundLevel
+  #   )
+  
   
   p = ggplot() +
     #ribbon for year lines
-    geom_ribbon(data = mallData %>% 
-                  pivot_wider(names_from = Quantile, values_from = SoundLevel),
-                aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year),
-                alpha = 0.1) +  # Use alpha for transparency
+    # geom_ribbon(data = ribbonDataA,
+    #   aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year),
+    #   alpha = 0.1) +  # Use alpha for transparency
+    geom_ribbon(data = mallData %>% pivot_wider(names_from = Quantile, values_from = SoundLevel),
+                aes(x = Frequency, ymin = `25%`, ymax = `75%`, fill = Year), alpha = 0.1) + # Use alpha for transparency
     #median TOL values- each year
     geom_line(data = mallData[mallData$Quantile == "50%",], aes(x = Frequency, y = SoundLevel, color = Year), linewidth = 2) +
     #median TOL values- all data
@@ -841,9 +870,21 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   pYear = grid.arrange(p, separator, p1, heights =c(4, 0.1, 1)) #make height of last graph larger when legend gets cut off  b/c of too many data years. default is 1
   
   ### save figure ####
-  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_HMDYearSPL.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
+  ggsave(filename = paste0(outDirG, "/plot_", toupper(site), "_HMDYearSPLV2.jpg"), plot = pYear, width = 10, height = 12, dpi = 300)
   
  
+  
+  #check to see why PM sites have strange shading - just occasional really loud sounds 
+  # test = mallData %>% filter(Quantile %in% c("50%", "75%"))  %>%
+  #   pivot_wider(
+  #     id_cols = c(Year, Frequency),   # grouping by Year and Frequency
+  #     names_from = Quantile,
+  #     values_from = SoundLevel
+  #   ) + 
+  #   mutate (diff = mallData$"75%" - mallData$'50%')
+  
+  
+  
   
   
   #INTERACTIVE PLOT
