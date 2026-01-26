@@ -28,7 +28,7 @@ devtools::install_github('TaikiSan21/PAMscapes')
 # SET UP PARAMS ####
 rm(list=ls()) 
 DC = Sys.Date()
-site  = "ci01" 
+site  = "hi04" 
 site = tolower(site) 
 
 # LOCAL DATA DIRECTORIES ####
