@@ -209,11 +209,11 @@ if (length(inFiles) > 0) {
     
     #FOR ONMS gr01 data! onms has columns HMD_0-HMD_19 (all NA) but SS data starts at HMD_20
     #For SB03, remove HMD_0-HMD_19 from SS and ONMS data. There are values in those columns for SS dataset...
-    if (f >= 1292){
-      cDatah_day = cDatah_day[, -c(2:22)]
-    } else{
-      cDatah_day = cDatah_day[, -2]
-    }
+    # if (f >= 1292){
+    #   cDatah_day = cDatah_day[, -c(2:22)]
+    # } else{
+    #   cDatah_day = cDatah_day[, -2]
+    # }
     
       data_list[[f]] = cDatah_day
     
