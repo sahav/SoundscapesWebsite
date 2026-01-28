@@ -28,7 +28,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("sb01")
+ONMSsites = c("gr01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -221,8 +221,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #gps = gps[, -c(2:22)]
   
   #SB01 and SB03: remove 2018
-  gps = gps %>%
-    filter(yr != 2018)
+  # gps = gps %>%
+  #   filter(yr != 2018)
+  
+  #GR01: remove 2018
+  # gps = gps %>%
+  #   filter(yr != 2022)
   
   Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
   
