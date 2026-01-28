@@ -1,8 +1,5 @@
 # COMPILE SOUNDSCAPE METRICS
 
-# assumes data are already downloaded from cloud, stored locally
-# assumes NCEI and NEFSC (e.g.NEFSC_SBNMS_201811_SB03_20181112.nc) data inputs
-
 # runs one site at a time 
 # adds wind estimate from PAMscapes for any new data (takes time!)
 
@@ -49,11 +46,9 @@ dirGCPSS = paste0( "M:/FATESD/PASSIVE_ACOUSTIC_DATA_ANALYSIS/SANCTSOUND_SBNMS/SB
 #outDir =  "C:/Users/embe5980/SoundscapesWebsite/" #for CIRES computer
 outDir =  "X:/Emma_Beretta/SoundscapesWebsite/" #for GCP workstation
 
-
 outDirC = paste0( outDir,"content/resources/") #context
 outDirP = paste0( outDir,"products/", substr(tolower(site),start = 1, stop =2),"/" )#products
 outDirG = paste0( outDir,"report/" ) #graphics
-
 
 
 # ONMS Metadata ####
@@ -185,10 +180,7 @@ test = loadSoundscapeData(ncFile)
 ncFile = inFiles[1292]
 test2 = loadSoundscapeData(ncFile)
 
-
-# PROCESS ONMS Sound FILES ####
 # faster method to save each day in list and rbind after, prevents R from crashing
-
 cDatah = NULL
 data_list <- list()
 
