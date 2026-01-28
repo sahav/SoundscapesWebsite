@@ -8,6 +8,7 @@
 #devtools::install_github('TaikiSan21/PAMscapes')
 
 library(patchwork)
+library(reshape2)
 library(PAMscapes)
 library(scales)
 library(gridExtra)
@@ -27,7 +28,7 @@ rm(list=ls())
 
 #SITES ####
 # ONMSsites = c("sb01", "sb03", "hi01", "hi03", "hi04", "hi08", "pm01", "as01", "mb01", "mb02", "oc02", "cb11" )
-ONMSsites = c("hi04")
+ONMSsites = c("sb01")
 
 ## directories ####
 #outDir   =  "C:/Users/embe5980/SoundscapesWebsite/" # your local git repo 
@@ -219,9 +220,9 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   #for SB03! forgot to remove HMD_0-19 during processing
   #gps = gps[, -c(2:22)]
   
-  #also SB03: remove 2018
-  # gps = gps %>%
-  #   filter(yr != 2018)
+  #SB01 and SB03: remove 2018
+  gps = gps %>%
+    filter(yr != 2018)
   
   Fq = as.numeric( as.character( gsub("HMD_", "",  colnames(gps)[grep("HMD", colnames(gps))] ) ))
   
@@ -474,10 +475,12 @@ for (uu in 1:length(ONMSsites)) { # uu = 1
   colnums = suppressWarnings(as.numeric(colnames(windInfo)))
  # widx = which(!is.na(colnums) & colnums == max(Fq))
  # windInfo = windInfo[,1:widx] #wind noise by frequency (columns) and speed (rows)
+  
   #re-structure for ggplot
-  mwindInfo = melt(windInfo, id.vars = c("windSpeed"), measure.vars = colnames(windInfo)[4:ncol(windInfo)])
+  mwindInfo = reshape2::melt(windInfo, id.vars = c("windSpeed"), measure.vars = colnames(windInfo)[4:ncol(windInfo)])
   mwindInfo$variable = as.numeric( as.character(mwindInfo$variable ))
-  ## wind bar
+ 
+   ## wind bar
   gps$wind_category <- factor(gps$wind_category, levels = c("low", "med", "high"))
  
    # Create the horizontal stacked bar plot with the counts of wind speed categories
